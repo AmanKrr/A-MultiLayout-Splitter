@@ -1,3 +1,4 @@
+import SplitUtils from "../utils/SplitUtils";
 import LayoutHelper from "./LayoutHelper";
 class ManageHandleBar {
     /**
@@ -63,28 +64,34 @@ class ManageHandleBar {
             const currentTarget = sections[currentSectionIndex == null ? -1 : currentSectionIndex];
             const prevTarget = sections[previousSectionIndex == null ? -1 : previousSectionIndex];
             const nextTarget = sections[nextSectionIndex == null ? -1 : nextSectionIndex];
-            // remove left icon
-            if (currentTarget && !prevTarget) {
-                const currentHandleBar = currentTarget.nextElementSibling;
-                (_b = currentHandleBar === null || currentHandleBar === void 0 ? void 0 : currentHandleBar.firstChild) === null || _b === void 0 ? void 0 : _b.classList.add("disable");
-                currentHandleBar === null || currentHandleBar === void 0 ? void 0 : currentHandleBar.children[1].classList.add(splitMode === "horizontal" ? "left-margin-fix" : "top-margin-fix");
-            }
-            else if (currentTarget && !nextTarget) {
-                // remove right icon
-                const currentHandleBar = currentTarget.previousElementSibling;
-                (_c = currentHandleBar === null || currentHandleBar === void 0 ? void 0 : currentHandleBar.lastChild) === null || _c === void 0 ? void 0 : _c.classList.add("disable");
-                currentHandleBar === null || currentHandleBar === void 0 ? void 0 : currentHandleBar.children[1].classList.add(splitMode === "horizontal" ? "right-margin-fix" : "bottom-margin-fix");
-            }
-            else {
-                // remove current left icon and right icon of previous
-                // previous then current
-                const previousHandleBar = currentTarget === null || currentTarget === void 0 ? void 0 : currentTarget.nextElementSibling;
-                (_d = previousHandleBar === null || previousHandleBar === void 0 ? void 0 : previousHandleBar.firstChild) === null || _d === void 0 ? void 0 : _d.classList.add("disable");
-                previousHandleBar === null || previousHandleBar === void 0 ? void 0 : previousHandleBar.children[1].classList.add(splitMode === "horizontal" ? "left-margin-fix" : "top-margin-fix");
-                // current
-                const currentHandleBar = currentTarget === null || currentTarget === void 0 ? void 0 : currentTarget.previousElementSibling;
-                (_e = currentHandleBar === null || currentHandleBar === void 0 ? void 0 : currentHandleBar.lastChild) === null || _e === void 0 ? void 0 : _e.classList.add("disable");
-                currentHandleBar === null || currentHandleBar === void 0 ? void 0 : currentHandleBar.children[1].classList.add(splitMode === "horizontal" ? "right-margin-fix" : "bottom-margin-fix");
+            if (!SplitUtils.isSectionOpen(sectionNumber, splitMode)) {
+                // remove left icon
+                if (currentTarget && !prevTarget) {
+                    const currentHandleBar = currentTarget.nextElementSibling;
+                    (_b = currentHandleBar === null || currentHandleBar === void 0 ? void 0 : currentHandleBar.firstChild) === null || _b === void 0 ? void 0 : _b.classList.add("disable");
+                    currentHandleBar === null || currentHandleBar === void 0 ? void 0 : currentHandleBar.children[1].classList.add(splitMode === "horizontal" ? "left-margin-fix" : "top-margin-fix");
+                }
+                else if (currentTarget && !nextTarget) {
+                    // remove right icon
+                    const currentHandleBar = currentTarget.previousElementSibling;
+                    (_c = currentHandleBar === null || currentHandleBar === void 0 ? void 0 : currentHandleBar.lastChild) === null || _c === void 0 ? void 0 : _c.classList.add("disable");
+                    currentHandleBar === null || currentHandleBar === void 0 ? void 0 : currentHandleBar.children[1].classList.add(splitMode === "horizontal"
+                        ? "right-margin-fix"
+                        : "bottom-margin-fix");
+                }
+                else {
+                    // remove current left icon and right icon of previous
+                    // previous then current
+                    const previousHandleBar = currentTarget === null || currentTarget === void 0 ? void 0 : currentTarget.nextElementSibling;
+                    (_d = previousHandleBar === null || previousHandleBar === void 0 ? void 0 : previousHandleBar.firstChild) === null || _d === void 0 ? void 0 : _d.classList.add("disable");
+                    previousHandleBar === null || previousHandleBar === void 0 ? void 0 : previousHandleBar.children[1].classList.add(splitMode === "horizontal" ? "left-margin-fix" : "top-margin-fix");
+                    // current
+                    const currentHandleBar = currentTarget === null || currentTarget === void 0 ? void 0 : currentTarget.previousElementSibling;
+                    (_e = currentHandleBar === null || currentHandleBar === void 0 ? void 0 : currentHandleBar.lastChild) === null || _e === void 0 ? void 0 : _e.classList.add("disable");
+                    currentHandleBar === null || currentHandleBar === void 0 ? void 0 : currentHandleBar.children[1].classList.add(splitMode === "horizontal"
+                        ? "right-margin-fix"
+                        : "bottom-margin-fix");
+                }
             }
         }
     }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import LayoutHelper from "../helper/LayoutHelper";
 import ManageHandleBar from "../helper/ManageHandleBar";
 import SplitSessionStorage from "./SplitSessionStorage";
@@ -36,9 +35,10 @@ class SplitUtils {
         }
         const sections = (_a = this.modeWrapper[splitMode]) === null || _a === void 0 ? void 0 : _a.children;
         if (sections && sectionNumber > 0 && sections.length >= sectionNumber) {
-            let sectionIndex = parseInt(this.cachedMappedSplitPanePosition[splitMode][sectionNumber]);
-            if (sectionIndex === null || sectionIndex === undefined) {
+            let sectionIndex = LayoutHelper.getSection(this.cachedMappedSplitPanePosition, splitMode, sectionNumber);
+            if (sectionIndex == null || sectionIndex === undefined) {
                 console.error(`Section number ${sectionIndex}. Provide correct section number.`);
+                // @ts-ignore
                 return;
             }
             if (sectionIndex !== null && sectionIndex !== undefined) {
@@ -114,7 +114,7 @@ class SplitUtils {
                     // on closing section this function checks which arrow side(left/right) is need to be removed from drag handle bar.
                     ManageHandleBar.removeHandleIconOnClose(sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "horizontal");
                     // on close storing user layout
-                    this.saveSizesToLocalStorage(this.HORIZONTAL);
+                    this.saveSizesToLocalStorage("horizontal");
                 }
                 else if (mode === this.VERTICAL && currentTarget) {
                     /*
@@ -140,10 +140,20 @@ class SplitUtils {
                     else if (direction === this.TOP) {
                         nextTarget.style.flexGrow = "1";
                     }
+                    else {
+                        if (nextTarget) {
+                            nextTarget.style.flexGrow = "1";
+                        }
+                        else {
+                            if (prevTarget) {
+                                prevTarget.style.flexGrow = "1";
+                            }
+                        }
+                    }
                     // // on closing section this function checks which arrow side(left/right) is need to be removed from drag handle bar.
                     ManageHandleBar.removeHandleIconOnClose(sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "vertical");
                     // on close storing user layout
-                    this.saveSizesToLocalStorage(this.VERTICAL);
+                    this.saveSizesToLocalStorage("vertical");
                 }
             }
         }
@@ -190,7 +200,7 @@ class SplitUtils {
                 if (mode === this.HORIZONTAL && currentTarget) {
                     // For opening the current section
                     // Remove flex grow because its closed, means flex-grow is 0
-                    // also remove class w-split-hidden that having flex-basis 0!important
+                    // also remove class a-split-hidden that having flex-basis 0!important
                     currentTarget.style.removeProperty("flex-grow");
                     currentTarget.classList.remove(this.SECTION_CLASS_HIDE);
                     /*
@@ -244,7 +254,7 @@ class SplitUtils {
                     // on opening a section show the arrow side(left/right)
                     ManageHandleBar.showHandleIconOnOpen(sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "horizontal");
                     // after opening saving the layout
-                    this.saveSizesToLocalStorage(mode);
+                    this.saveSizesToLocalStorage("horizontal");
                 }
                 else if (mode === this.VERTICAL && currentTarget) {
                     currentTarget.style.removeProperty("flex-grow");
@@ -268,10 +278,30 @@ class SplitUtils {
                             prevTarget.style.flexGrow = "1";
                         }
                     }
+                    else {
+                        if (nextTarget) {
+                            if (openSectionCounter !== 1) {
+                                nextTarget.style.removeProperty("flex-grow");
+                            }
+                            else {
+                                nextTarget.style.flexGrow = "1";
+                            }
+                        }
+                        else {
+                            if (prevTarget) {
+                                if (openSectionCounter !== 1) {
+                                    prevTarget.style.removeProperty("flex-grow");
+                                }
+                                else {
+                                    prevTarget.style.flexGrow = "1";
+                                }
+                            }
+                        }
+                    }
                     // on opening a section show the arrow side(left/right)
                     ManageHandleBar.showHandleIconOnOpen(sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "vertical");
                     // after opening saving the layout
-                    this.saveSizesToLocalStorage(mode);
+                    this.saveSizesToLocalStorage("vertical");
                 }
             }
         }
@@ -312,7 +342,7 @@ SplitUtils.LEFT = "left";
 SplitUtils.RIGHT = "right";
 SplitUtils.HORIZONTAL = "horizontal";
 SplitUtils.VERTICAL = "vertical";
-SplitUtils.SECTION_CLASS_HIDE = "w-split-hidden";
+SplitUtils.SECTION_CLASS_HIDE = "a-split-hidden";
 // Reference to the HTML wrapper element for split panes
 SplitUtils.wrapper = null;
 // Default split mode ("horizontal")
