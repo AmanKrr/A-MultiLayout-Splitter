@@ -206,7 +206,7 @@ class SplitUtils {
             "horizontal"
           );
           // on close storing user layout
-          this.saveSizesToLocalStorage(this.HORIZONTAL);
+          this.saveSizesToLocalStorage("horizontal");
         } else if (mode === this.VERTICAL && currentTarget) {
           /*
             - For vertical no closing direction is currently implemented.
@@ -248,7 +248,7 @@ class SplitUtils {
             "vertical"
           );
           // on close storing user layout
-          this.saveSizesToLocalStorage(this.VERTICAL);
+          this.saveSizesToLocalStorage("vertical");
         }
       }
     }
@@ -366,7 +366,7 @@ class SplitUtils {
             "horizontal"
           );
           // after opening saving the layout
-          this.saveSizesToLocalStorage(mode);
+          this.saveSizesToLocalStorage("horizontal");
         } else if (mode === this.VERTICAL && currentTarget) {
           currentTarget.style.removeProperty("flex-grow");
           currentTarget.classList.remove(this.SECTION_CLASS_HIDE);
@@ -411,7 +411,7 @@ class SplitUtils {
             "vertical"
           );
           // after opening saving the layout
-          this.saveSizesToLocalStorage(mode);
+          this.saveSizesToLocalStorage("vertical");
         }
       }
     }
