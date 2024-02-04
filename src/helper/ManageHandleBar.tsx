@@ -1,3 +1,4 @@
+import SplitUtils from "../utils/SplitUtils";
 import LayoutHelper from "./LayoutHelper";
 
 class ManageHandleBar {
@@ -10,7 +11,7 @@ class ManageHandleBar {
    */
   public static showHandleIconOnOpen(
     sectionNumber: number,
-    wrapper: Record<string, HTMLDivElement | HTMLElement>,
+    wrapper: Record<string, HTMLDivElement | HTMLElement | null>,
     cachedMappedSplitPanePosition: Record<
       string,
       Record<string, string | null> | null
@@ -93,7 +94,7 @@ class ManageHandleBar {
    */
   public static removeHandleIconOnClose(
     sectionNumber: number,
-    wrapper: Record<string, HTMLDivElement | HTMLElement>,
+    wrapper: Record<string, HTMLDivElement | HTMLElement | null>,
     cachedMappedSplitPanePosition: Record<
       string,
       Record<string, string | null> | null
@@ -132,37 +133,48 @@ class ManageHandleBar {
       const nextTarget = sections[
         nextSectionIndex == null ? -1 : nextSectionIndex
       ] as HTMLDivElement | null | undefined;
-
-      // remove left icon
-      if (currentTarget && !prevTarget) {
-        const currentHandleBar = currentTarget.nextElementSibling;
-        (currentHandleBar?.firstChild as HTMLElement)?.classList.add("disable");
-        currentHandleBar?.children[1].classList.add(
-          splitMode === "horizontal" ? "left-margin-fix" : "top-margin-fix"
-        );
-      } else if (currentTarget && !nextTarget) {
-        // remove right icon
-        const currentHandleBar = currentTarget.previousElementSibling;
-        (currentHandleBar?.lastChild as HTMLElement)?.classList.add("disable");
-        currentHandleBar?.children[1].classList.add(
-          splitMode === "horizontal" ? "right-margin-fix" : "bottom-margin-fix"
-        );
-      } else {
-        // remove current left icon and right icon of previous
-        // previous then current
-        const previousHandleBar = currentTarget?.nextElementSibling;
-        (previousHandleBar?.firstChild as HTMLElement)?.classList.add(
-          "disable"
-        );
-        previousHandleBar?.children[1].classList.add(
-          splitMode === "horizontal" ? "left-margin-fix" : "top-margin-fix"
-        );
-        // current
-        const currentHandleBar = currentTarget?.previousElementSibling;
-        (currentHandleBar?.lastChild as HTMLElement)?.classList.add("disable");
-        currentHandleBar?.children[1].classList.add(
-          splitMode === "horizontal" ? "right-margin-fix" : "bottom-margin-fix"
-        );
+      if (!SplitUtils.isSectionOpen(sectionNumber, splitMode)) {
+        // remove left icon
+        if (currentTarget && !prevTarget) {
+          const currentHandleBar = currentTarget.nextElementSibling;
+          (currentHandleBar?.firstChild as HTMLElement)?.classList.add(
+            "disable"
+          );
+          currentHandleBar?.children[1].classList.add(
+            splitMode === "horizontal" ? "left-margin-fix" : "top-margin-fix"
+          );
+        } else if (currentTarget && !nextTarget) {
+          // remove right icon
+          const currentHandleBar = currentTarget.previousElementSibling;
+          (currentHandleBar?.lastChild as HTMLElement)?.classList.add(
+            "disable"
+          );
+          currentHandleBar?.children[1].classList.add(
+            splitMode === "horizontal"
+              ? "right-margin-fix"
+              : "bottom-margin-fix"
+          );
+        } else {
+          // remove current left icon and right icon of previous
+          // previous then current
+          const previousHandleBar = currentTarget?.nextElementSibling;
+          (previousHandleBar?.firstChild as HTMLElement)?.classList.add(
+            "disable"
+          );
+          previousHandleBar?.children[1].classList.add(
+            splitMode === "horizontal" ? "left-margin-fix" : "top-margin-fix"
+          );
+          // current
+          const currentHandleBar = currentTarget?.previousElementSibling;
+          (currentHandleBar?.lastChild as HTMLElement)?.classList.add(
+            "disable"
+          );
+          currentHandleBar?.children[1].classList.add(
+            splitMode === "horizontal"
+              ? "right-margin-fix"
+              : "bottom-margin-fix"
+          );
+        }
       }
     }
   }

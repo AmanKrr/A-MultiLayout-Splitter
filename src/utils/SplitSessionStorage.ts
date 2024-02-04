@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Define the interface for SplitSessionStorage
 export interface ISplitSessionStorage {
   // Method to set session data

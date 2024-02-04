@@ -1,5 +1,4 @@
-// @ts-nocheck
-import React from "react";
+import React, { TouchEvent } from "react";
 import "./style/index.css";
 import SplitUtils from "./utils/SplitUtils";
 import SplitSessionStorage, {
@@ -8,6 +7,8 @@ import SplitSessionStorage, {
 
 import throttle from "lodash/throttle";
 import debounce from "lodash/debounce";
+import ManageHandleBar from "./helper/ManageHandleBar";
+import DragHandle from "./DragHandle/DragHandle";
 
 export interface SplitProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, "onDragEnd"> {
@@ -47,14 +48,25 @@ export interface SplitProps
    */
   initialSizes?: number[];
   /**
-   * minimum sizes for each pane
+   * minimum sizes for each pane, range 0 to 100
    */
   minSizes?: number[];
+  /**
+   * maximum sizes for each pane, range 0 to 100
+   */
+  maxSizes?: number[];
   /**
    * session storage for storing splitter size
    */
   enableSessionStorage?: boolean;
+  /**
+   * collasped sections, "true" or "false"
+   */
   collapsed?: boolean[];
+  // /**
+  //  * make section collapsible, "true" or "false"
+  //  */
+  // collapsible?: boolean[];
 }
 
 /**
@@ -68,12 +80,20 @@ export interface SplitState {
  * Split component for creating resizable split panes.
  */
 export default class Split extends React.Component<SplitProps, SplitState> {
+  private TOP = "top";
+  private BOTTOM = "bottom";
+  private LEFT = "left";
+  private RIGHT = "right";
+  private HORIZONTAL = "horizontal";
+  private VERTICAL = "vertical";
+
   public static defaultProps: SplitProps = {
-    prefixCls: "w-split",
+    prefixCls: "a-split",
     visiable: true,
     mode: "horizontal",
     initialSizes: [], // Default to an empty array
     minSizes: [], // Default to an empty array
+    maxSizes: [],
     enableSessionStorage: false,
     collapsed: [false, false, false],
   };
@@ -115,6 +135,55 @@ export default class Split extends React.Component<SplitProps, SplitState> {
       );
       if (totalInitialSize !== 100) {
         throw new Error("Initial Size sum is not euqal to 100.");
+      }
+
+      if (
+        this.props.minSizes &&
+        this.props.minSizes.length > 0 &&
+        this.props.minSizes.length === this.props.initialSizes.length
+      ) {
+        for (let size = 0; size < this.props.minSizes.length; size++) {
+          if (this.props.minSizes[size] > this.props.initialSizes[size]) {
+            throw new Error("Initial Size should not be less than minSizes");
+          }
+        }
+      }
+
+      if (
+        this.props.maxSizes &&
+        this.props.maxSizes.length > 0 &&
+        this.props.maxSizes.length === this.props.initialSizes.length
+      ) {
+        for (let size = 0; size < this.props.maxSizes.length; size++) {
+          if (this.props.maxSizes[size] < this.props.initialSizes[size]) {
+            throw new Error("Initial Size should not be greater than maxSizes");
+          }
+        }
+      }
+
+      if (
+        this.props.maxSizes &&
+        this.props.maxSizes.length > 0 &&
+        this.props.minSizes &&
+        this.props.minSizes.length > 0 &&
+        this.props.initialSizes &&
+        this.props.initialSizes.length > 0 &&
+        this.props.maxSizes.length === this.props.minSizes.length &&
+        this.props.maxSizes.length === this.props.initialSizes.length &&
+        this.props.minSizes.length === this.props.initialSizes.length
+      ) {
+        for (let size = 0; size < this.props.maxSizes.length; size++) {
+          if (this.props.maxSizes[size] < this.props.minSizes[size]) {
+            throw new Error("maxSizes should not be less than minSizes");
+          }
+
+          if (
+            this.props.initialSizes[size] <= 0 &&
+            this.props.initialSizes[size] >= 100
+          ) {
+            throw new Error("Initial sizes should be in range of 0 to 100.");
+          }
+        }
       }
     }
 
@@ -202,18 +271,19 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     const { mode, initialSizes } = this.props;
     const sections = this.warpper?.children;
 
-    if (sections && initialSizes.length > 0) {
-      const userLayoutDefault = this.userSession.GetSession(mode);
+    if (sections && initialSizes && initialSizes.length > 0) {
+      const userLayoutDefault = this.userSession.GetSession(mode!);
       let collapsedcounter = 0;
+      let sectionCounter = 1;
 
       for (let i = 0; i < initialSizes.length; i++) {
         const size = initialSizes[i];
-        const sectionIndex = mode === "horizontal" ? i * 2 : i * 2; // Each section has a content and separator element
+        const sectionIndex = i * 2; // Each section has a content and separator element
 
         if (sections.length > sectionIndex) {
           const contentTarget = sections[sectionIndex] as HTMLDivElement;
 
-          if (mode === "horizontal" && contentTarget) {
+          if (mode === this.HORIZONTAL && contentTarget) {
             if (
               userLayoutDefault &&
               userLayoutDefault.length > 0 &&
@@ -224,7 +294,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
                   userLayoutDefault[i]["flexBasis"];
               } else {
                 if (userLayoutDefault[i]["flexGrow"] === "0") {
-                  contentTarget.classList.add("w-split-hidden");
+                  contentTarget.classList.add("a-split-hidden");
                 }
                 contentTarget.style.flexBasis =
                   userLayoutDefault[i]["flexBasis"];
@@ -236,16 +306,28 @@ export default class Split extends React.Component<SplitProps, SplitState> {
                 contentTarget.style.flexGrow = "1";
                 collapsedcounter = 0;
               }
-              if (this.props.collapsed[i] && collapsedcounter === 0) {
+              if (this.props.collapsed![i] && collapsedcounter === 0) {
                 contentTarget.style.flexGrow = "0";
-                contentTarget.classList.add("w-split-hidden");
+                contentTarget.classList.add("a-split-hidden");
                 collapsedcounter++;
               }
             }
-            contentTarget.setAttribute("min-size", `${this.props.minSizes[i]}`);
+            contentTarget.setAttribute(
+              "min-size",
+              `${this.props.minSizes![i]}`
+            );
+            contentTarget.setAttribute(
+              "max-size",
+              `${this.props.maxSizes![i]}`
+            );
+            ManageHandleBar.removeHandleIconOnClose(
+              sectionCounter++,
+              SplitUtils.modeWrapper,
+              SplitUtils.cachedMappedSplitPanePosition,
+              "horizontal"
+            );
             // contentTarget.style.overflow = `hidden`;
-            // this.props.visible && SplitUtils.removeHandleIconOnClose(sectionCounter++, mode, true);
-          } else if (mode === "vertical" && contentTarget) {
+          } else if (mode === this.VERTICAL && contentTarget) {
             if (
               userLayoutDefault &&
               userLayoutDefault.length > 0 &&
@@ -256,7 +338,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
                   userLayoutDefault[i]["flexBasis"];
               } else {
                 if (userLayoutDefault[i]["flexGrow"] === "0") {
-                  contentTarget.classList.add("w-split-hidden");
+                  contentTarget.classList.add("a-split-hidden");
                 }
                 contentTarget.style.flexBasis =
                   userLayoutDefault[i]["flexBasis"];
@@ -268,14 +350,26 @@ export default class Split extends React.Component<SplitProps, SplitState> {
                 contentTarget.style.flexGrow = "1";
                 collapsedcounter = 0;
               }
-              if (this.props.collapsed[i] && collapsedcounter === 0) {
+              if (this.props.collapsed![i] && collapsedcounter === 0) {
                 contentTarget.style.flexGrow = "0";
-                contentTarget.classList.add("w-split-hidden");
+                contentTarget.classList.add("a-split-hidden");
                 collapsedcounter++;
               }
             }
-            contentTarget.setAttribute("min-size", `${this.props.minSizes[i]}`);
-            // this.props.visible && SplitUtils.removeHandleIconOnClose(sectionCounter++, mode, true);
+            contentTarget.setAttribute(
+              "min-size",
+              `${this.props.minSizes![i]}`
+            );
+            contentTarget.setAttribute(
+              "max-size",
+              `${this.props.maxSizes![i]}`
+            );
+            ManageHandleBar.removeHandleIconOnClose(
+              sectionCounter++,
+              SplitUtils.modeWrapper,
+              SplitUtils.cachedMappedSplitPanePosition,
+              "vertical"
+            );
           }
         }
       }
@@ -283,14 +377,13 @@ export default class Split extends React.Component<SplitProps, SplitState> {
       let openSectionCounter = 0;
       if (sections && sections.length > 0) {
         for (let pane = 0; pane < initialSizes.length; pane++) {
-          // console.log(pane + 1)
-          if (SplitUtils.isSectionOpen(pane + 1, mode)) {
+          if (SplitUtils.isSectionOpen(pane + 1, mode!)) {
             openSectionCounter++;
           }
         }
       }
 
-      if (openSectionCounter === 1 && !this.props.collapsed[0]) {
+      if (openSectionCounter === 1 && !this.props.collapsed![0]) {
         if (sections[0]) {
           (sections[0] as HTMLDivElement).style.flexGrow = "1";
         }
@@ -335,11 +428,6 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     this.startX = clientX;
     this.startY = clientY;
     this.move = true;
-    console.log(
-      (env.target as HTMLDivElement).classList.contains(
-        "a-splitter-handlebar-icon"
-      )
-    );
     if (
       (env.target as HTMLDivElement).classList.contains(
         "a-splitter-handlebar-icon"
@@ -376,7 +464,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
    * Handle mouse dragging to resize panes.
    * @param env - MouseEvent.
    */
-  onDragging(env: Event) {
+  onDragging(env: Event | TouchEvent) {
     // preventing default functionality on dragging
     if (env.cancelable && !this.checkTouchDevice()) {
       // preventDefault can not be called for touch event because passive is by default true.
@@ -396,8 +484,8 @@ export default class Split extends React.Component<SplitProps, SplitState> {
 
     if (nextTarget && prevTarget) {
       if (
-        nextTarget.classList.contains("w-split-hidden") ||
-        prevTarget.classList.contains("w-split-hidden")
+        nextTarget.classList.contains("a-split-hidden") ||
+        prevTarget.classList.contains("a-split-hidden")
       )
         return;
     }
@@ -411,8 +499,8 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     this.preSize = 0;
     this.nextSize = 0;
 
-    function updateSizes() {
-      if (mode === "horizontal") {
+    const updateSizes = () => {
+      if (mode === this.HORIZONTAL) {
         this.preSize = this.preWidth + x > -1 ? this.preWidth + x : 0;
         this.nextSize = this.nextWidth - x > -1 ? this.nextWidth - x : 0;
 
@@ -436,17 +524,25 @@ export default class Split extends React.Component<SplitProps, SplitState> {
           if (minNextSize && this.nextSize <= parseInt(minNextSize)) return;
         }
         if (prevTarget && nextTarget) {
+          const maxPrevSize = prevTarget.getAttribute("max-size");
+          const maxNextSize = nextTarget.getAttribute("max-size");
+          if (maxPrevSize && this.preSize >= parseInt(maxPrevSize)) return;
+          if (maxNextSize && this.nextSize >= parseInt(maxNextSize)) return;
+        }
+        if (prevTarget && nextTarget) {
           prevTarget.style.flexBasis = `${this.preSize + delta}%`;
           nextTarget.style.flexBasis = `${this.nextSize + delta}%`;
         }
       }
       if (
-        mode === "vertical" &&
+        mode === this.VERTICAL &&
         this.preHeight + y > -1 &&
         this.nextHeight - y > -1
       ) {
         this.preSize = this.preHeight + y > -1 ? this.preHeight + y : 0;
         this.nextSize = this.nextHeight - y > -1 ? this.nextHeight - y : 0;
+        if (Math.abs(this.preSize - this.preWidth) <= 1) return;
+        if (Math.abs(this.nextSize - this.nextWidth) <= 1) return;
         this.preSize =
           (this.preSize / this.boxHeight >= 1
             ? 1
@@ -461,8 +557,14 @@ export default class Split extends React.Component<SplitProps, SplitState> {
         if (prevTarget && nextTarget) {
           const minPrevSize = prevTarget.getAttribute("min-size");
           const minNextSize = nextTarget.getAttribute("min-size");
-          if (this.preSize <= parseInt(minPrevSize)) return;
-          if (this.nextSize <= parseInt(minNextSize)) return;
+          if (minPrevSize && this.preSize <= parseInt(minPrevSize)) return;
+          if (minNextSize && this.nextSize <= parseInt(minNextSize)) return;
+        }
+        if (prevTarget && nextTarget) {
+          const maxPrevSize = prevTarget.getAttribute("max-size");
+          const maxNextSize = nextTarget.getAttribute("max-size");
+          if (maxPrevSize && this.preSize >= parseInt(maxPrevSize)) return;
+          if (maxNextSize && this.nextSize >= parseInt(maxNextSize)) return;
         }
         if (prevTarget && nextTarget) {
           // prevTarget.style.height = `${this.preSize}%`;
@@ -474,9 +576,9 @@ export default class Split extends React.Component<SplitProps, SplitState> {
 
       this.initDragging = true;
       onDragging && onDragging(this.preSize, this.nextSize, this.paneNumber);
-    }
+    };
 
-    const animateUpdateSize = updateSizes.bind(this);
+    const animateUpdateSize = updateSizes;
     function animate() {
       animateUpdateSize();
       // calling recursively is good for maintaing repaintaing sync
@@ -497,15 +599,8 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     this.removeTouchEvent();
     this.removeEvent();
     this.setState({ dragging: false });
-    // if (
-    //   this.props.mode == "horizontal" &&
-    //   SplitUtils.isSectionOpen(this.paneNumber)
-    // ) {
-    //   console.log("here called?")
-    //   SplitUtils.showAllHandleIcon("horizontal");
-    // }
     if (
-      this.props.mode == "horizontal" &&
+      this.props.mode === "horizontal" &&
       this.props.enableSessionStorage &&
       this.initDragging
     ) {
@@ -542,7 +637,14 @@ export default class Split extends React.Component<SplitProps, SplitState> {
       .trim();
     const child = React.Children.toArray(children);
     // Extract needed props from the remaining props
-    const { initialSizes, minSizes, collapsed, ...neededProps } = other;
+    const {
+      initialSizes,
+      minSizes,
+      maxSizes,
+      enableSessionStorage,
+      collapsed,
+      ...neededProps
+    } = other;
     return (
       <div
         className={cls}
@@ -594,12 +696,22 @@ export default class Split extends React.Component<SplitProps, SplitState> {
               idx
             );
           } else if (idx !== 0 && visibleBar) {
-            BarCom = React.createElement(
-              "div",
-              { ...barProps },
-              <div
+            // BarCom = React.createElement(
+            //   "div",
+            //   { ...barProps },
+            //   <div
+            //     onMouseDown={this.onMouseDown.bind(this, idx + 1)}
+            //     onTouchStart={this.onMouseDown.bind(this, idx + 1)}
+            //   />
+            // );
+            BarCom = (
+              <DragHandle
+                key={idx}
+                props={barProps}
+                mode={this.props.mode!}
                 onMouseDown={this.onMouseDown.bind(this, idx + 1)}
                 onTouchStart={this.onMouseDown.bind(this, idx + 1)}
+                position={idx}
               />
             );
           }

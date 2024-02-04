@@ -1,4 +1,3 @@
-// @ts-nocheck
 import LayoutHelper from "../helper/LayoutHelper";
 import ManageHandleBar from "../helper/ManageHandleBar";
 import SplitSessionStorage, {
@@ -14,7 +13,7 @@ class SplitUtils {
   private static RIGHT = "right";
   private static HORIZONTAL = "horizontal";
   private static VERTICAL = "vertical";
-  private static SECTION_CLASS_HIDE = "w-split-hidden";
+  private static SECTION_CLASS_HIDE = "a-split-hidden";
 
   // Reference to the HTML wrapper element for split panes
   static wrapper: HTMLDivElement | null = null;
@@ -29,7 +28,7 @@ class SplitUtils {
   };
 
   // Interface for user session storage
-  static userSession: ISplitSessionStorage | null;
+  static userSession: ISplitSessionStorage;
 
   // Flags to enable or disable session storage for both modes
   static enableSessionStorage = {
@@ -55,7 +54,7 @@ class SplitUtils {
    * @param enableSessionStorage - Flag to enable session storage for storing split sizes.
    */
   static setWrapper(
-    wrapper: HTMLDivElement,
+    wrapper: HTMLDivElement | null,
     mode: "horizontal" | "vertical" = "horizontal",
     minSizes: number[] = [],
     enableSessionStorage = false
@@ -100,13 +99,17 @@ class SplitUtils {
     const sections = this.modeWrapper[splitMode]?.children;
 
     if (sections && sectionNumber > 0 && sections.length >= sectionNumber) {
-      let sectionIndex = parseInt(
-        this.cachedMappedSplitPanePosition[splitMode][sectionNumber]
+      let sectionIndex = LayoutHelper.getSection(
+        this.cachedMappedSplitPanePosition,
+        splitMode,
+        sectionNumber
       );
-      if (sectionIndex === null || sectionIndex === undefined) {
+
+      if (sectionIndex == null || sectionIndex === undefined) {
         console.error(
           `Section number ${sectionIndex}. Provide correct section number.`
         );
+        // @ts-ignore
         return;
       }
 
@@ -163,9 +166,7 @@ class SplitUtils {
         const currentTarget = sections[sectionIndex] as HTMLDivElement; // current section
         const prevTarget = sections[sectionIndex - 2] as HTMLDivElement; // previous section
         // next section
-        const nextTarget = sections[sectionIndex + 2] as
-          | HTMLDivElement
-          | undefined;
+        const nextTarget = sections[sectionIndex + 2] as HTMLDivElement;
 
         if (mode === this.HORIZONTAL && currentTarget) {
           // closing the current section
@@ -229,6 +230,14 @@ class SplitUtils {
             prevTarget.style.flexGrow = "1";
           } else if (direction === this.TOP) {
             nextTarget.style.flexGrow = "1";
+          } else {
+            if (nextTarget) {
+              nextTarget.style.flexGrow = "1";
+            } else {
+              if (prevTarget) {
+                prevTarget.style.flexGrow = "1";
+              }
+            }
           }
 
           // // on closing section this function checks which arrow side(left/right) is need to be removed from drag handle bar.
@@ -290,9 +299,7 @@ class SplitUtils {
         const currentTarget = sections[sectionIndex] as HTMLDivElement; // current section
         const prevTarget = sections[sectionIndex - 2] as HTMLDivElement; // previous section
         // next section
-        const nextTarget = sections[sectionIndex + 2] as
-          | HTMLDivElement
-          | undefined;
+        const nextTarget = sections[sectionIndex + 2] as HTMLDivElement;
 
         // check corner case if all splitter is close
         const totalPaneSize = (sections.length + 1) / 2; // give total section present excluding handle bar
@@ -306,7 +313,7 @@ class SplitUtils {
         if (mode === this.HORIZONTAL && currentTarget) {
           // For opening the current section
           // Remove flex grow because its closed, means flex-grow is 0
-          // also remove class w-split-hidden that having flex-basis 0!important
+          // also remove class a-split-hidden that having flex-basis 0!important
           currentTarget.style.removeProperty("flex-grow");
           currentTarget.classList.remove(this.SECTION_CLASS_HIDE);
           /* 
@@ -377,6 +384,22 @@ class SplitUtils {
               prevTarget.style.removeProperty("flex-grow");
             } else {
               prevTarget.style.flexGrow = "1";
+            }
+          } else {
+            if (nextTarget) {
+              if (openSectionCounter !== 1) {
+                nextTarget.style.removeProperty("flex-grow");
+              } else {
+                nextTarget.style.flexGrow = "1";
+              }
+            } else {
+              if (prevTarget) {
+                if (openSectionCounter !== 1) {
+                  prevTarget.style.removeProperty("flex-grow");
+                } else {
+                  prevTarget.style.flexGrow = "1";
+                }
+              }
             }
           }
 

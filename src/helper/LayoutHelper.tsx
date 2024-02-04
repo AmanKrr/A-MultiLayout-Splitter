@@ -1,8 +1,8 @@
 class LayoutHelper {
-  private static PANE_CLASS = "w-split-pane";
+  private static PANE_CLASS = "a-split-pane";
 
   public static mapElementPosition(
-    wrapper: Record<string, HTMLDivElement | HTMLElement>,
+    wrapper: Record<string, HTMLDivElement | HTMLElement | null>,
     splitMode: "horizontal" | "vertical",
     cachedMappedSplitPanePosition: Record<
       string,
