@@ -58,5 +58,5 @@ class LayoutHelper {
         return position == null ? null : parseInt(position);
     }
 }
-LayoutHelper.PANE_CLASS = "w-split-pane";
+LayoutHelper.PANE_CLASS = "a-split-pane";
 export default LayoutHelper;

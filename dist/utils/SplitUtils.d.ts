@@ -10,7 +10,7 @@ declare class SplitUtils {
     static wrapper: HTMLDivElement | null;
     static mode: string;
     static modeWrapper: Record<string, HTMLDivElement | HTMLElement | null>;
-    static userSession: ISplitSessionStorage | null;
+    static userSession: ISplitSessionStorage;
     static enableSessionStorage: {
         horizontal: boolean;
         vertical: boolean;
@@ -23,7 +23,7 @@ declare class SplitUtils {
      * @param mode - Split mode, either "horizontal" or "vertical".
      * @param enableSessionStorage - Flag to enable session storage for storing split sizes.
      */
-    static setWrapper(wrapper: HTMLDivElement, mode?: "horizontal" | "vertical", minSizes?: number[], enableSessionStorage?: boolean): void;
+    static setWrapper(wrapper: HTMLDivElement | null, mode?: "horizontal" | "vertical", minSizes?: number[], enableSessionStorage?: boolean): void;
     /**
      * Checks if a specific split section is open.
      * @param sectionNumber - The section number to be checked.

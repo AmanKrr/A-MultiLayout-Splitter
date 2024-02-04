@@ -1,4 +1,4 @@
-import React from "react";
+import React, { TouchEvent } from "react";
 import "./style/index.css";
 export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onDragEnd"> {
     style?: React.CSSProperties;
@@ -34,13 +34,20 @@ export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
      */
     initialSizes?: number[];
     /**
-     * minimum sizes for each pane
+     * minimum sizes for each pane, range 0 to 100
      */
     minSizes?: number[];
+    /**
+     * maximum sizes for each pane, range 0 to 100
+     */
+    maxSizes?: number[];
     /**
      * session storage for storing splitter size
      */
     enableSessionStorage?: boolean;
+    /**
+     * collasped sections, "true" or "false"
+     */
     collapsed?: boolean[];
 }
 /**
@@ -53,6 +60,12 @@ export interface SplitState {
  * Split component for creating resizable split panes.
  */
 export default class Split extends React.Component<SplitProps, SplitState> {
+    private TOP;
+    private BOTTOM;
+    private LEFT;
+    private RIGHT;
+    private HORIZONTAL;
+    private VERTICAL;
     static defaultProps: SplitProps;
     state: SplitState;
     warpper: HTMLDivElement | null;
@@ -110,7 +123,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
      * Handle mouse dragging to resize panes.
      * @param env - MouseEvent.
      */
-    onDragging(env: Event): void;
+    onDragging(env: Event | TouchEvent): void;
     /**
      * Handle mouse up event to end dragging.
      */
