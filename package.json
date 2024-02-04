@@ -4,7 +4,7 @@
   "types": "dist/index.d.ts",
   "author": "Aman Kumar",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "clean": "rimraf dist/",
     "copy-files": "copyfiles -u 1 src/**/*.css src/assets/**/* dist/",
