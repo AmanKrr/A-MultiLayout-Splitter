@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports":true,
+    "target": "es2015",
+    "module": "esnext",
+    "declaration": true,
+    "outDir": "./dist",
+    "strict": false,
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "jsx": "react-jsx",
+    "moduleResolution": "node",
+    "removeComments": false,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*.ts", "src/**/*tsx","src/**/*.css"],
+  "exclude": ["node_modules"]
+}
