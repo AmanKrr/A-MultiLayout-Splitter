@@ -1,8 +1,6 @@
 import LayoutHelper from "../helper/LayoutHelper";
 import ManageHandleBar from "../helper/ManageHandleBar";
-import SplitSessionStorage, {
-  ISplitSessionStorage,
-} from "./SplitSessionStorage";
+import SplitSessionStorage, { ISplitSessionStorage } from "./SplitSessionStorage";
 
 // Define the SplitUtils class
 class SplitUtils {
@@ -37,10 +35,7 @@ class SplitUtils {
   };
 
   // Cached split pane positions for both modes
-  static cachedMappedSplitPanePosition: Record<
-    string,
-    Record<string, string | null> | null
-  > = {
+  static cachedMappedSplitPanePosition: Record<string, Record<string, string | null> | null> = {
     horizontal: null,
     vertical: null,
   };
@@ -70,11 +65,33 @@ class SplitUtils {
     this.userSession = new SplitSessionStorage();
     this.enableSessionStorage[mode] = enableSessionStorage;
     this.cachedMappedSplitPanePosition[mode] = null;
-    LayoutHelper.mapElementPosition(
-      this.modeWrapper,
-      mode,
-      this.cachedMappedSplitPanePosition
-    );
+    LayoutHelper.mapElementPosition(this.modeWrapper, mode, this.cachedMappedSplitPanePosition);
+  }
+
+  static percentageToPixel(percentage: number, referenceWidth: string) {
+    // Convert percentage to pixel value
+    if (referenceWidth && referenceWidth.includes("vw")) {
+      return (percentage / 100) * window.innerWidth * (parseFloat(referenceWidth.replace("vw", "")) / 100);
+    } else if (referenceWidth && referenceWidth.includes("vh")) {
+      return (percentage / 100) * window.innerHeight * (parseFloat(referenceWidth.replace("vh", "")) / 100);
+    } else if (referenceWidth && referenceWidth.includes("%")) {
+      return (percentage / 100) * parseFloat(referenceWidth.replace("%", ""));
+    } else {
+      return (percentage / 100) * parseFloat(referenceWidth.replace("px", ""));
+    }
+  }
+
+  static pixelToPercentage(pixelValue: number, referenceWidth: string) {
+    // Convert pixel value to percentage
+    if (referenceWidth.includes("vw")) {
+      return (pixelValue / window.innerWidth) * 100;
+    } else if (referenceWidth.includes("vh")) {
+      return (pixelValue / window.innerHeight) * 100;
+    } else if (referenceWidth.includes("px")) {
+      return (pixelValue / parseFloat(referenceWidth.replace("px", ""))) * 100;
+    } else {
+      return (pixelValue / parseFloat(referenceWidth.replace("%", ""))) * 100;
+    }
   }
 
   /**
@@ -83,32 +100,21 @@ class SplitUtils {
    * @param splitMode - Split mode, either "horizontal" or "vertical".
    * @returns True if the section is open, false otherwise.
    */
-  static isSectionOpen(
-    sectionNumber: number,
-    splitMode: "horizontal" | "vertical"
-  ): boolean {
+  static isSectionOpen(sectionNumber: number, splitMode: "horizontal" | "vertical"): boolean {
     // Implementation for checking if a specific split section is open
 
     if (!this.modeWrapper[splitMode]) {
-      console.error(
-        "Wrapper not set. Call setWrapper before using isSectionOpen."
-      );
+      console.error("Wrapper not set. Call setWrapper before using isSectionOpen.");
       return false;
     }
 
     const sections = this.modeWrapper[splitMode]?.children;
 
     if (sections && sectionNumber > 0 && sections.length >= sectionNumber) {
-      let sectionIndex = LayoutHelper.getSection(
-        this.cachedMappedSplitPanePosition,
-        splitMode,
-        sectionNumber
-      );
+      let sectionIndex = LayoutHelper.getSection(this.cachedMappedSplitPanePosition, splitMode, sectionNumber);
 
       if (sectionIndex == null || sectionIndex === undefined) {
-        console.error(
-          `Section number ${sectionIndex}. Provide correct section number.`
-        );
+        console.error(`Section number ${sectionIndex}. Provide correct section number.`);
         // @ts-ignore
         return;
       }
@@ -138,9 +144,7 @@ class SplitUtils {
 
     // if wrapper is not set throw error
     if (!this.modeWrapper[splitMode]) {
-      console.error(
-        "Wrapper not set. Call setWrapper before using closeSplitter."
-      );
+      console.error("Wrapper not set. Call setWrapper before using closeSplitter.");
       return;
     }
 
@@ -149,16 +153,10 @@ class SplitUtils {
       // Retrieve the correct section position using the cached mapped split-pane position,
       // considering the specified split mode and section number. The 'LayoutHelper' object
       // contains the 'getSection' method responsible for this operation.
-      const sectionIndex = LayoutHelper.getSection(
-        this.cachedMappedSplitPanePosition,
-        splitMode,
-        sectionNumber
-      );
+      const sectionIndex = LayoutHelper.getSection(this.cachedMappedSplitPanePosition, splitMode, sectionNumber);
       // throw error if sectionIndex is null or undefined
       if (sectionIndex == null || sectionIndex === undefined) {
-        console.error(
-          `Section number ${sectionIndex}. Provide correct section number.`
-        );
+        console.error(`Section number ${sectionIndex}. Provide correct section number.`);
         return;
       }
       // check valid sectionIndex
@@ -199,14 +197,9 @@ class SplitUtils {
           }
 
           // on closing section this function checks which arrow side(left/right) is need to be removed from drag handle bar.
-          ManageHandleBar.removeHandleIconOnClose(
-            sectionNumber,
-            this.modeWrapper,
-            this.cachedMappedSplitPanePosition,
-            "horizontal"
-          );
+          ManageHandleBar.removeHandleIconOnClose(sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "horizontal");
           // on close storing user layout
-          this.saveSizesToLocalStorage("horizontal");
+          this.saveSizesToLocalStorage(this.HORIZONTAL);
         } else if (mode === this.VERTICAL && currentTarget) {
           /*
             - For vertical no closing direction is currently implemented.
@@ -241,14 +234,9 @@ class SplitUtils {
           }
 
           // // on closing section this function checks which arrow side(left/right) is need to be removed from drag handle bar.
-          ManageHandleBar.removeHandleIconOnClose(
-            sectionNumber,
-            this.modeWrapper,
-            this.cachedMappedSplitPanePosition,
-            "vertical"
-          );
+          ManageHandleBar.removeHandleIconOnClose(sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "vertical");
           // on close storing user layout
-          this.saveSizesToLocalStorage("vertical");
+          this.saveSizesToLocalStorage(this.VERTICAL);
         }
       }
     }
@@ -270,9 +258,7 @@ class SplitUtils {
 
     // if wrapper is not set throw error
     if (!this.modeWrapper[splitMode]) {
-      console.error(
-        "Wrapper not set. Call setWrapper before using openSplitter."
-      );
+      console.error("Wrapper not set. Call setWrapper before using openSplitter.");
       return;
     }
 
@@ -282,16 +268,10 @@ class SplitUtils {
       // Retrieve the correct section position using the cached mapped split-pane position,
       // considering the specified split mode and section number. The 'LayoutHelper' object
       // contains the 'getSection' method responsible for this operation.
-      let sectionIndex = LayoutHelper.getSection(
-        this.cachedMappedSplitPanePosition,
-        splitMode,
-        sectionNumber
-      );
+      let sectionIndex = LayoutHelper.getSection(this.cachedMappedSplitPanePosition, splitMode, sectionNumber);
       // throw error if sectionIndex is null or undefined
       if (sectionIndex === null || sectionIndex === undefined) {
-        console.error(
-          `Section number ${sectionIndex}. Provide correct section number.`
-        );
+        console.error(`Section number ${sectionIndex}. Provide correct section number.`);
         return;
       }
 
@@ -331,12 +311,18 @@ class SplitUtils {
           if (direction === this.RIGHT) {
             if (openSectionCounter !== 1) {
               nextTarget.style.removeProperty("flex-grow");
+              if (prevTarget) {
+                prevTarget.style.removeProperty("flex-grow");
+              }
             } else {
               nextTarget.style.flexGrow = "1";
             }
           } else if (direction === this.LEFT) {
             if (openSectionCounter !== 1) {
               prevTarget.style.removeProperty("flex-grow");
+              if (nextTarget) {
+                nextTarget.style.removeProperty("flex-grow");
+              }
             } else {
               prevTarget.style.flexGrow = "1";
             }
@@ -344,6 +330,9 @@ class SplitUtils {
             if (nextTarget) {
               if (openSectionCounter !== 1) {
                 nextTarget.style.removeProperty("flex-grow");
+                if (prevTarget) {
+                  prevTarget.style.removeProperty("flex-grow");
+                }
               } else {
                 nextTarget.style.flexGrow = "1";
               }
@@ -351,6 +340,9 @@ class SplitUtils {
               if (prevTarget) {
                 if (openSectionCounter !== 1) {
                   prevTarget.style.removeProperty("flex-grow");
+                  if (nextTarget) {
+                    (nextTarget as HTMLDivElement).style.removeProperty("flex-grow");
+                  }
                 } else {
                   prevTarget.style.flexGrow = "1";
                 }
@@ -359,14 +351,9 @@ class SplitUtils {
           }
 
           // on opening a section show the arrow side(left/right)
-          ManageHandleBar.showHandleIconOnOpen(
-            sectionNumber,
-            this.modeWrapper,
-            this.cachedMappedSplitPanePosition,
-            "horizontal"
-          );
+          ManageHandleBar.showHandleIconOnOpen(sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "horizontal");
           // after opening saving the layout
-          this.saveSizesToLocalStorage("horizontal");
+          this.saveSizesToLocalStorage(mode);
         } else if (mode === this.VERTICAL && currentTarget) {
           currentTarget.style.removeProperty("flex-grow");
           currentTarget.classList.remove(this.SECTION_CLASS_HIDE);
@@ -374,6 +361,8 @@ class SplitUtils {
             - Similar logic as left and right just direction changes.
           */
           if (direction === this.BOTTOM) {
+            console.log("bottom", nextTarget);
+            console.log("bottom prev", prevTarget);
             if (openSectionCounter !== 1) {
               nextTarget.style.removeProperty("flex-grow");
             } else {
@@ -404,14 +393,9 @@ class SplitUtils {
           }
 
           // on opening a section show the arrow side(left/right)
-          ManageHandleBar.showHandleIconOnOpen(
-            sectionNumber,
-            this.modeWrapper,
-            this.cachedMappedSplitPanePosition,
-            "vertical"
-          );
+          ManageHandleBar.showHandleIconOnOpen(sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "vertical");
           // after opening saving the layout
-          this.saveSizesToLocalStorage("vertical");
+          this.saveSizesToLocalStorage(mode);
         }
       }
     }
@@ -420,16 +404,11 @@ class SplitUtils {
   /**
    * Save sizes to local storage.
    */
-  static saveSizesToLocalStorage(
-    splitMode: "horizontal" | "vertical" = "horizontal",
-    closeSection = false
-  ) {
+  static saveSizesToLocalStorage(splitMode: "horizontal" | "vertical" = "horizontal", closeSection = false) {
     const mode = splitMode || this.mode;
 
     if (!this.modeWrapper[splitMode]) {
-      console.error(
-        "Wrapper not set. Call setWrapper before using saveSizesToLocalStorage."
-      );
+      console.error("Wrapper not set. Call setWrapper before using saveSizesToLocalStorage.");
       return false;
     }
 
@@ -439,10 +418,7 @@ class SplitUtils {
       for (let i = 0; i < sections.length; i += 2) {
         let userLayoutData = {};
         const contentTarget = sections[i] as HTMLDivElement;
-        if (
-          contentTarget.style.flexGrow === "0" ||
-          contentTarget.style.flexGrow === "1"
-        ) {
+        if (contentTarget.style.flexGrow === "0" || contentTarget.style.flexGrow === "1") {
           userLayoutData = {
             ...userLayoutData,
             flexGrow: contentTarget.style.flexGrow,
@@ -458,11 +434,7 @@ class SplitUtils {
 
         sizes.push(userLayoutData);
       }
-      this.userSession.SetSession(
-        sizes,
-        mode === "horizontal" ? "horizontal" : "vertical",
-        closeSection
-      );
+      this.userSession.SetSession(sizes, mode === "horizontal" ? "horizontal" : "vertical", closeSection);
     }
   }
 }
