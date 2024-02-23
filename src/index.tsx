@@ -130,67 +130,6 @@ export default class Split extends React.Component<SplitProps, SplitState> {
   constructor(props: SplitProps) {
     super(props);
 
-    // if (this.props.initialSizes && this.props.initialSizes.length > 0) {
-    //   const totalInitialSize = this.props.initialSizes.reduce(
-    //     (accumulator, currentValue) => {
-    //       return accumulator + currentValue;
-    //     },
-    //     0
-    //   );
-    //   if (totalInitialSize !== 100) {
-    //     throw new Error("Initial Size sum is not euqal to 100.");
-    //   }
-
-    //   if (
-    //     this.props.minSizes &&
-    //     this.props.minSizes.length > 0 &&
-    //     this.props.minSizes.length === this.props.initialSizes.length
-    //   ) {
-    //     for (let size = 0; size < this.props.minSizes.length; size++) {
-    //       if (this.props.minSizes[size] > this.props.initialSizes[size]) {
-    //         throw new Error("Initial Size should not be less than minSizes");
-    //       }
-    //     }
-    //   }
-
-    //   if (
-    //     this.props.maxSizes &&
-    //     this.props.maxSizes.length > 0 &&
-    //     this.props.maxSizes.length === this.props.initialSizes.length
-    //   ) {
-    //     for (let size = 0; size < this.props.maxSizes.length; size++) {
-    //       if (this.props.maxSizes[size] < this.props.initialSizes[size]) {
-    //         throw new Error("Initial Size should not be greater than maxSizes");
-    //       }
-    //     }
-    //   }
-
-    //   if (
-    //     this.props.maxSizes &&
-    //     this.props.maxSizes.length > 0 &&
-    //     this.props.minSizes &&
-    //     this.props.minSizes.length > 0 &&
-    //     this.props.initialSizes &&
-    //     this.props.initialSizes.length > 0 &&
-    //     this.props.maxSizes.length === this.props.minSizes.length &&
-    //     this.props.maxSizes.length === this.props.initialSizes.length &&
-    //     this.props.minSizes.length === this.props.initialSizes.length
-    //   ) {
-    //     for (let size = 0; size < this.props.maxSizes.length; size++) {
-    //       if (this.props.maxSizes[size] < this.props.minSizes[size]) {
-    //         throw new Error("maxSizes should not be less than minSizes");
-    //       }
-
-    //       if (
-    //         this.props.initialSizes[size] <= 0 &&
-    //         this.props.initialSizes[size] >= 100
-    //       ) {
-    //         throw new Error("Initial sizes should be in range of 0 to 100.");
-    //       }
-    //     }
-    //   }
-    // }
-
     // Throttle the dragging and drag end functions to control the frequency of execution
     this.onDraggingThrottled = throttle(this.onDragging.bind(this), 16);
     this.onDragEndThrottled = throttle(this.onDragEnd.bind(this), 16);
@@ -262,7 +201,6 @@ export default class Split extends React.Component<SplitProps, SplitState> {
   setInitialSizes() {
     const { mode, initialSizes } = this.props;
     const sections = this.warpper?.children;
-    console.log("###", sections);
     let totalHandleBarSize =
       mode &&
       sections &&
@@ -273,7 +211,6 @@ export default class Split extends React.Component<SplitProps, SplitState> {
             : accumulator,
         0
       );
-    console.log(mode, totalHandleBarSize);
 
     if (sections && initialSizes && initialSizes.length > 0) {
       const userLayoutDefault = this.userSession.GetSession(mode!);
@@ -365,73 +302,6 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     }
   }
 
-  // /**
-  //  *
-  //  * @param nextTarget - Accepts next target HTMLElement
-  //  * @param prevTarget - Accepts previous target HTMLElemen
-  //  * @param mode - layout
-  //  */
-  // private setResizingLayout(nextTarget: HTMLElement, prevTarget: HTMLElement, mode: "horizontal" | "vertical") {
-  //   const referenceWidth = mode === "horizontal" ? this.props.width! : this.props.height!;
-  //   if (this.prevToPrev && this.prevToPrev.classList.contains("a-split-hidden")) {
-  //     let prevTargetVal = -1,
-  //       pixel = false;
-  //     if (this.prevToPrev.style.flexBasis.includes("px") && prevTarget.style.flexBasis.includes("%")) {
-  //       prevTargetVal = this.preSize - SplitUtils.pixelToPercentage(parseFloat(this.prevToPrev.style.flexBasis), referenceWidth);
-  //     } else if (this.nextToNext.style.flexBasis.includes("%") && prevTarget.style.flexBasis.includes("px")) {
-  //       pixel = true;
-  //       prevTargetVal =
-  //         SplitUtils.percentageToPixel(this.preSize, referenceWidth) -
-  //         SplitUtils.percentageToPixel(parseFloat(this.prevToPrev.style.flexBasis), referenceWidth);
-  //     } else {
-  //       prevTargetVal = this.preSize - parseFloat(this.prevToPrev.style.flexBasis);
-  //     }
-  //     if (prevTargetVal >= 0) {
-  //       prevTarget.style.flexBasis = `${prevTargetVal}${pixel ? "px" : "%"}`;
-  //       if (nextTarget.style.flexBasis.includes("px")) {
-  //         nextTarget.style.flexBasis = `${SplitUtils.percentageToPixel(this.nextSize, referenceWidth)}px`;
-  //       } else {
-  //         nextTarget.style.flexBasis = `${this.nextSize}%`;
-  //       }
-  //     }
-  //   } else if (this.nextToNext && this.nextToNext.classList.contains("a-split-hidden")) {
-  //     let nextTargetVal = -1,
-  //       pixel = false;
-  //     if (this.nextToNext.style.flexBasis.includes("px") && nextTarget.style.flexBasis.includes("%")) {
-  //       nextTargetVal = this.nextSize - SplitUtils.pixelToPercentage(parseFloat(this.nextToNext.style.flexBasis), referenceWidth);
-  //     } else if (this.nextToNext.style.flexBasis.includes("%") && nextTarget.style.flexBasis.includes("px")) {
-  //       pixel = true;
-  //       nextTargetVal =
-  //         SplitUtils.percentageToPixel(this.nextSize, referenceWidth) -
-  //         SplitUtils.percentageToPixel(parseFloat(this.nextToNext.style.flexBasis), referenceWidth);
-  //     } else {
-  //       nextTargetVal = this.nextSize - parseFloat(this.nextToNext.style.flexBasis);
-  //     }
-
-  //     if (nextTargetVal >= 0) {
-  //       if (prevTarget.style.flexBasis.includes("px")) {
-  //         prevTarget.style.flexBasis = `${SplitUtils.percentageToPixel(this.preSize, referenceWidth)}px`;
-  //       } else {
-  //         prevTarget.style.flexBasis = `${this.preSize}%`;
-  //       }
-  //       nextTarget.style.flexBasis = `${nextTargetVal}${pixel ? "px" : "%"}`;
-  //     }
-  //   } else {
-  //     // if no sections are found collapsed normal resizing
-  //     if (prevTarget.style.flexBasis.includes("px")) {
-  //       prevTarget.style.flexBasis = `${SplitUtils.percentageToPixel(this.preSize, referenceWidth)}px`;
-  //     } else {
-  //       prevTarget.style.flexBasis = `${this.preSize}%`;
-  //     }
-
-  //     if (nextTarget.style.flexBasis.includes("px")) {
-  //       nextTarget.style.flexBasis = `${SplitUtils.percentageToPixel(this.nextSize, referenceWidth)}px`;
-  //     } else {
-  //       nextTarget.style.flexBasis = `${this.nextSize}%`;
-  //     }
-  //   }
-  // }
-
   /**
    * This function adjusts the layout of two adjacent elements while resizing,
    * ensuring that the flex basis of the elements is updated correctly based on the resizing mode.
@@ -450,20 +320,85 @@ export default class Split extends React.Component<SplitProps, SplitState> {
 
       // Check if the previous target is in pixels and the next target is in percentage
       if (this.prevToPrev.style.flexBasis.includes("px") && prevTarget.style.flexBasis.includes("%")) {
-        // Calculate the new value for the previous target in pixels
-        prevTargetVal = this.preSize - SplitUtils.pixelToPercentage(parseFloat(this.prevToPrev.style.flexBasis), referenceWidth);
+        // distributing size
+        if (prevTarget.style.flexGrow === "") {
+          const limit = SplitUtils.percentageToPixel(this.nextSize, referenceWidth) - parseFloat(this.prevToPrev.style.flexBasis) < 0;
+          if (limit) return;
+          if (nextTarget.style.flexBasis.includes("px")) {
+            nextTarget.style.flexBasis = `${
+              SplitUtils.percentageToPixel(this.nextSize, referenceWidth) - parseFloat(this.prevToPrev.style.flexBasis)
+            }px`;
+          } else {
+            nextTarget.style.flexBasis = `${
+              this.nextSize - SplitUtils.pixelToPercentage(parseFloat(this.prevToPrev.style.flexBasis), referenceWidth)
+            }%`;
+          }
+          prevTarget.style.flexBasis = `${this.preSize}%`;
+        } else {
+          // Calculate the new value for the previous target in pixels
+          prevTargetVal = this.preSize - SplitUtils.pixelToPercentage(parseFloat(this.prevToPrev.style.flexBasis), referenceWidth);
+        }
       } else if (this.prevToPrev.style.flexBasis.includes("%") && prevTarget.style.flexBasis.includes("px")) {
         pixel = true; // Set the flag to true since the value will be in pixels
-        // Calculate the new value for the previous target in pixels
-        prevTargetVal =
-          SplitUtils.percentageToPixel(this.preSize, referenceWidth) -
-          SplitUtils.percentageToPixel(parseFloat(this.prevToPrev.style.flexBasis), referenceWidth);
+        // distributing size
+        if (prevTarget.style.flexGrow === "") {
+          const limit =
+            SplitUtils.percentageToPixel(this.nextSize, referenceWidth) -
+              SplitUtils.percentageToPixel(parseFloat(this.prevToPrev.style.flexBasis), referenceWidth) <
+            0;
+          if (limit) return;
+          if (nextTarget.style.flexBasis.includes("px")) {
+            nextTarget.style.flexBasis = `${
+              SplitUtils.percentageToPixel(this.nextSize, referenceWidth) -
+              SplitUtils.percentageToPixel(parseFloat(this.prevToPrev.style.flexBasis), referenceWidth)
+            }px`;
+          } else {
+            nextTarget.style.flexBasis = `${this.nextSize - parseFloat(this.prevToPrev.style.flexBasis)}%`;
+          }
+          prevTarget.style.flexBasis = `${SplitUtils.percentageToPixel(this.preSize, referenceWidth)}px`;
+        } else {
+          // Calculate the new value for the previous target in pixels
+          prevTargetVal =
+            SplitUtils.percentageToPixel(this.preSize, referenceWidth) -
+            SplitUtils.percentageToPixel(parseFloat(this.prevToPrev.style.flexBasis), referenceWidth);
+        }
       } else if (this.prevToPrev.style.flexBasis.includes("px") && prevTarget.style.flexBasis.includes("px")) {
         pixel = true;
-        prevTargetVal = SplitUtils.percentageToPixel(this.preSize, referenceWidth) - parseFloat(this.prevToPrev.style.flexBasis);
+        // distributing size
+        if (prevTarget.style.flexGrow === "") {
+          const limit = SplitUtils.percentageToPixel(this.nextSize, referenceWidth) - parseFloat(this.prevToPrev.style.flexBasis) < 0;
+          if (limit) return;
+          if (nextTarget.style.flexBasis.includes("px")) {
+            nextTarget.style.flexBasis = `${
+              SplitUtils.percentageToPixel(this.nextSize, referenceWidth) - parseFloat(this.prevToPrev.style.flexBasis)
+            }px`;
+          } else {
+            nextTarget.style.flexBasis = `${
+              this.nextSize - SplitUtils.percentageToPixel(parseFloat(this.prevToPrev.style.flexBasis), referenceWidth)
+            }%`;
+          }
+          prevTarget.style.flexBasis = `${SplitUtils.percentageToPixel(this.preSize, referenceWidth)}px`;
+        } else {
+          prevTargetVal = SplitUtils.percentageToPixel(this.preSize, referenceWidth) - parseFloat(this.prevToPrev.style.flexBasis);
+        }
       } else {
-        // Calculate the new value for the previous target directly
-        prevTargetVal = this.preSize - parseFloat(this.prevToPrev.style.flexBasis);
+        // distributing size
+        if (prevTarget.style.flexGrow === "") {
+          const limit = this.nextSize - parseFloat(this.prevToPrev.style.flexBasis) < 0;
+          if (limit) return;
+          if (nextTarget.style.flexBasis.includes("px")) {
+            nextTarget.style.flexBasis = `${
+              SplitUtils.percentageToPixel(this.nextSize, referenceWidth) -
+              SplitUtils.percentageToPixel(parseFloat(this.prevToPrev.style.flexBasis), referenceWidth)
+            }px`;
+          } else {
+            nextTarget.style.flexBasis = `${this.nextSize - parseFloat(this.prevToPrev.style.flexBasis)}%`;
+          }
+          prevTarget.style.flexBasis = `${this.preSize}%`;
+        } else {
+          // Calculate the new value for the previous target directly
+          prevTargetVal = this.preSize - parseFloat(this.prevToPrev.style.flexBasis);
+        }
       }
 
       // Check if the new value for the previous target is valid
@@ -485,6 +420,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
 
       // Check if the next target is in pixels and the previous target is in percentage
       if (this.nextToNext.style.flexBasis.includes("px") && nextTarget.style.flexBasis.includes("%")) {
+        // distributing size
         if (nextTarget.style.flexGrow === "") {
           const limit = SplitUtils.percentageToPixel(this.preSize, referenceWidth) - parseFloat(this.nextToNext.style.flexBasis) < 0;
           if (limit) return;
@@ -504,6 +440,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
         }
       } else if (this.nextToNext.style.flexBasis.includes("%") && nextTarget.style.flexBasis.includes("px")) {
         pixel = true; // Set the flag to true since the value will be in pixels
+        // distributing size
         if (nextTarget.style.flexGrow === "") {
           const limit =
             SplitUtils.percentageToPixel(this.preSize, referenceWidth) -
@@ -527,6 +464,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
         }
       } else if (this.nextToNext.style.flexBasis.includes("px") && nextTarget.style.flexBasis.includes("px")) {
         pixel = true;
+        // distributing size
         if (nextTarget.style.flexGrow === "") {
           const limit = SplitUtils.percentageToPixel(this.preSize, referenceWidth) - parseFloat(this.nextToNext.style.flexBasis) < 0;
           if (limit) return;
@@ -544,6 +482,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
           nextTargetVal = SplitUtils.percentageToPixel(this.nextSize, referenceWidth) - parseFloat(this.nextToNext.style.flexBasis);
         }
       } else {
+        // distributing size
         if (nextTarget.style.flexGrow === "") {
           const limit = this.preSize - parseFloat(this.nextToNext.style.flexBasis) < 0;
           if (limit) return;
@@ -692,22 +631,26 @@ export default class Split extends React.Component<SplitProps, SplitState> {
         if (this.preSize === 0 || this.nextSize === 0) {
           return;
         }
-        if (Math.abs(this.preSize - this.preWidth) <= 1) return;
-        if (Math.abs(this.nextSize - this.nextWidth) <= 1) return;
+        if (Math.abs(this.preSize - this.preWidth) <= 1) return; // check to ensure there is no unecessary displacement
+        if (Math.abs(this.nextSize - this.nextWidth) <= 1) return; // check to ensure there is no unecessary displacement
+        // calculating prevSize and nextSize
         this.preSize = (this.preSize / this.boxWidth >= 1 ? 1 : this.preSize / this.boxWidth) * 100;
         this.nextSize = (this.nextSize / this.boxWidth >= 1 ? 1 : this.nextSize / this.boxWidth) * 100;
-        // if (prevTarget && nextTarget) {
-        //   const minPrevSize = prevTarget.getAttribute("min-size");
-        //   const minNextSize = nextTarget.getAttribute("min-size");
-        //   if (minPrevSize && this.preSize <= parseInt(minPrevSize)) return;
-        //   if (minNextSize && this.nextSize <= parseInt(minNextSize)) return;
-        // }
-        // if (prevTarget && nextTarget) {
-        //   const maxPrevSize = prevTarget.getAttribute("max-size");
-        //   const maxNextSize = nextTarget.getAttribute("max-size");
-        //   if (maxPrevSize && this.preSize >= parseInt(maxPrevSize)) return;
-        //   if (maxNextSize && this.nextSize >= parseInt(maxNextSize)) return;
-        // }
+        // checks for controlling dragging for max check
+        if (prevTarget && nextTarget) {
+          const minPrevSize = prevTarget.getAttribute("min-size");
+          const minNextSize = nextTarget.getAttribute("min-size");
+          if (minPrevSize && this.preSize <= parseInt(minPrevSize)) return;
+          if (minNextSize && this.nextSize <= parseInt(minNextSize)) return;
+        }
+        // checks for controlling dragging for min check
+        if (prevTarget && nextTarget) {
+          const maxPrevSize = prevTarget.getAttribute("max-size");
+          const maxNextSize = nextTarget.getAttribute("max-size");
+          if (maxPrevSize && this.preSize >= parseInt(maxPrevSize)) return;
+          if (maxNextSize && this.nextSize >= parseInt(maxNextSize)) return;
+        }
+        // set layout size
         if (prevTarget && nextTarget) {
           this.setResizingLayout(nextTarget, prevTarget, this.HORIZONTAL);
         }
@@ -715,29 +658,33 @@ export default class Split extends React.Component<SplitProps, SplitState> {
       if (mode === this.VERTICAL && this.preHeight + y > -1 && this.nextHeight - y > -1) {
         this.preSize = this.preHeight + y > -1 ? this.preHeight + y : 0;
         this.nextSize = this.nextHeight - y > -1 ? this.nextHeight - y : 0;
-        if (Math.abs(this.preSize - this.preWidth) <= 1) return;
-        if (Math.abs(this.nextSize - this.nextWidth) <= 1) return;
+        // calculating prevSize and nextSize
         this.preSize = (this.preSize / this.boxHeight >= 1 ? 1 : this.preSize / this.boxHeight) * 100;
         this.nextSize = (this.nextSize / this.boxHeight >= 1 ? 1 : this.nextSize / this.boxHeight) * 100;
+
         if (this.preSize === 0 || this.nextSize === 0) {
           return;
         }
+
+        if (Math.abs(this.preSize - this.preHeight) <= 1) return; // check to ensure there is no unecessary displacement
+        if (Math.abs(this.nextSize - this.nextHeight) <= 1) return; // check to ensure there is no unecessary displacement
+        // checks for controlling dragging for max check
         if (prevTarget && nextTarget) {
           const minPrevSize = prevTarget.getAttribute("min-size");
           const minNextSize = nextTarget.getAttribute("min-size");
           if (minPrevSize && this.preSize <= parseInt(minPrevSize)) return;
           if (minNextSize && this.nextSize <= parseInt(minNextSize)) return;
         }
+        // checks for controlling dragging for min check
         if (prevTarget && nextTarget) {
           const maxPrevSize = prevTarget.getAttribute("max-size");
           const maxNextSize = nextTarget.getAttribute("max-size");
           if (maxPrevSize && this.preSize >= parseInt(maxPrevSize)) return;
           if (maxNextSize && this.nextSize >= parseInt(maxNextSize)) return;
         }
+        // set layout size
         if (prevTarget && nextTarget) {
           this.setResizingLayout(nextTarget, prevTarget, this.VERTICAL);
-          // prevTarget.style.flexBasis = `${this.preSize}%`;
-          // nextTarget.style.flexBasis = `${this.nextSize}%`;
         }
       }
 
