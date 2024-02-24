@@ -620,7 +620,6 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     const nextTarget = this.target.nextElementSibling;
     this.boxWidth = this.warpper.offsetWidth;
     this.boxHeight = this.warpper.offsetHeight;
-    console.log(this.boxWidth, this.boxHeight);
     if (prevTarget) {
       this.preWidth = (prevTarget as HTMLElement).offsetWidth;
       this.preHeight = (prevTarget as HTMLElement).offsetHeight;
