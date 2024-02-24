@@ -539,7 +539,6 @@ class SplitUtils {
    */
   private static saveSizesToLocalStorage(splitMode: Orientation = "horizontal", closeSection = false): boolean {
     const mode = splitMode || this.mode; // Set the mode to the specified split mode or the default mode
-    console.log(splitMode);
 
     // Check if the wrapper is not set
     if (!this.modeWrapper[splitMode]) {
