@@ -4,61 +4,26 @@ export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
     style?: React.CSSProperties;
     className?: string;
     prefixCls?: string;
-    /**
-     * Drag width/height change callback function,
-     * the width or height is determined according to the mode parameter
-     */
+    childPrefixCls?: string;
     onDragging?: (preSize: number, nextSize: number, paneNumber: number) => void;
-    /** Callback function for dragging end */
     onDragEnd?: (preSize: number, nextSize: number, paneNumber: number) => void;
-    /** Support custom drag and drop toolbar */
     renderBar?: (props: React.HTMLAttributes<HTMLDivElement>, position: number) => JSX.Element;
-    /** Set the drag and drop toolbar as a line style. */
-    lineBar?: boolean;
-    /** Set the dragged toolbar, whether it is visible or not */
+    lineBar?: boolean | number[];
     visible?: boolean | number[];
-    /**
-     * @deprecated Use `visible` instead
-     */
     visiable?: boolean | number[];
-    /**
-     * Set the drag and drop toolbar, disable
-     */
     disable?: boolean | number[];
-    /**
-     * type, optional `horizontal` or `vertical`
-     */
     mode?: "horizontal" | "vertical";
-    /**
-     * initial sizes for each pane
-     */
-    initialSizes?: number[];
-    /**
-     * minimum sizes for each pane, range 0 to 100
-     */
+    initialSizes?: string[];
     minSizes?: number[];
-    /**
-     * maximum sizes for each pane, range 0 to 100
-     */
     maxSizes?: number[];
-    /**
-     * session storage for storing splitter size
-     */
     enableSessionStorage?: boolean;
-    /**
-     * collasped sections, "true" or "false"
-     */
     collapsed?: boolean[];
+    height?: string;
+    width?: string;
 }
-/**
- * State for the Split component.
- */
 export interface SplitState {
     dragging: boolean;
 }
-/**
- * Split component for creating resizable split panes.
- */
 export default class Split extends React.Component<SplitProps, SplitState> {
     private TOP;
     private BOTTOM;
@@ -84,49 +49,25 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     nextSize: number;
     private userSession;
     private initDragging;
+    private nextToNext;
+    private prevToPrev;
+    private breaker;
+    private handleBarLayoutInfo;
     private onDraggingThrottled;
     private onDragEndThrottled;
-    private saveSizesToLocalStorageDebounced;
+    private saveHorizontalSizesToLocalStorageDebounced;
+    private saveVerticalSizesToLocalStorageDebounced;
     constructor(props: SplitProps);
-    /**
-     * Cleanup: Remove event listeners to prevent memory leaks.
-     */
     componentWillUnmount(): void;
-    /**
-     * Initialization: Set up initial sizes and wrapper based on the provided mode.
-     */
     componentDidMount(): void;
     private checkTouchDevice;
-    /**
-     * add touch event listeners.
-     */
     private addTouchEvent;
-    /**
-     * Remove mouse move and mouse up event listeners.
-     */
     private removeTouchEvent;
-    /**
-     * Remove mouse move and mouse up event listeners.
-     */
     private removeEvent;
-    /**
-     * Set initial sizes for the panes.
-     */
     setInitialSizes(): void;
-    /**
-     * Handle mouse down event to start dragging.
-     * @param paneNumber - The number of the pane being dragged.
-     * @param env - MouseEvent.
-     */
+    private setResizingLayout;
     onMouseDown(paneNumber: number, env: React.MouseEvent<HTMLDivElement, MouseEvent> | React.TouchEvent<HTMLDivElement>): void;
-    /**
-     * Handle mouse dragging to resize panes.
-     * @param env - MouseEvent.
-     */
     onDragging(env: Event | TouchEvent): void;
-    /**
-     * Handle mouse up event to end dragging.
-     */
     onDragEnd(): void;
     render(): JSX.Element;
 }

@@ -1,4 +1,5 @@
 import { ISplitSessionStorage } from "./SplitSessionStorage";
+type Orientation = "horizontal" | "vertical";
 declare class SplitUtils {
     private static TOP;
     private static BOTTOM;
@@ -17,37 +18,18 @@ declare class SplitUtils {
     };
     static cachedMappedSplitPanePosition: Record<string, Record<string, string | null> | null>;
     static minThreshold: number[];
-    /**
-     * Sets the wrapper, mode, and other configurations for the SplitUtils.
-     * @param wrapper - HTMLDivElement that wraps the split panes.
-     * @param mode - Split mode, either "horizontal" or "vertical".
-     * @param enableSessionStorage - Flag to enable session storage for storing split sizes.
-     */
-    static setWrapper(wrapper: HTMLDivElement | null, mode?: "horizontal" | "vertical", minSizes?: number[], enableSessionStorage?: boolean): void;
-    /**
-     * Checks if a specific split section is open.
-     * @param sectionNumber - The section number to be checked.
-     * @param splitMode - Split mode, either "horizontal" or "vertical".
-     * @returns True if the section is open, false otherwise.
-     */
-    static isSectionOpen(sectionNumber: number, splitMode: "horizontal" | "vertical"): boolean;
-    /**
-     * Closes a specific split section.
-     * @param sectionNumber - The section number to be closed.
-     * @param splitMode - Split mode, either "horizontal" or "vertical".
-     * @param direction - The direction of the close operation, either "left", "right", "top", "bottom" or "null". Direction null is used only when not using arrow icon of handlebar to close the splitter.
-     */
-    static closeSplitter(sectionNumber: number, splitMode: "horizontal" | "vertical", direction?: "left" | "right" | "top" | "bottom" | null): void;
-    /**
-     * Opens a specific split section with a new size.
-     * @param sectionNumber - The section number to be opened.
-     * @param splitMode - Split mode, either "horizontal" or "vertical".
-     * @param direction - The direction of the open operation, either "left" or "right".
-     */
-    static openSplitter(sectionNumber: number, splitMode: "horizontal" | "vertical", direction?: "left" | "right" | "top" | "bottom" | null): void;
-    /**
-     * Save sizes to local storage.
-     */
-    static saveSizesToLocalStorage(splitMode?: "horizontal" | "vertical", closeSection?: boolean): boolean;
+    static setWrapper(wrapper: HTMLDivElement | null, mode?: Orientation, minSizes?: number[], enableSessionStorage?: boolean): void;
+    static getHandlebarPosition(handlePosition: number): number;
+    static percentageToPixel(percentage: number, referenceWidth: string): number;
+    static pixelToPercentage(pixelValue: number, referenceWidth: string): number;
+    static isSectionOpen(sectionNumber: number, splitMode: Orientation): boolean;
+    static reCheckPaneOpening(splitMode: Orientation): number;
+    static closeSplitter(sectionNumber: number, splitMode: Orientation, direction?: "left" | "right" | "top" | "bottom" | null): void;
+    static openSplitter(sectionNumber: number, splitMode: Orientation, direction?: "left" | "right" | "top" | "bottom" | null): void;
+    static totalPaneCount(splitMode: Orientation): number;
+    static totalHandleCount(splitMode: Orientation): number;
+    private static saveSizesToLocalStorage;
+    static saveHorizontalSizesToLocalStorage(): void;
+    static saveVerticalSizesToLocalStorage(): void;
 }
 export default SplitUtils;
