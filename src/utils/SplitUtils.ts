@@ -199,7 +199,7 @@ class SplitUtils {
           // on closing section this function checks which arrow side(left/right) is need to be removed from drag handle bar.
           ManageHandleBar.removeHandleIconOnClose(sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "horizontal");
           // on close storing user layout
-          this.saveSizesToLocalStorage(this.HORIZONTAL);
+          this.saveSizesToLocalStorage(this.HORIZONTAL as "horizontal");
         } else if (mode === this.VERTICAL && currentTarget) {
           /*
             - For vertical no closing direction is currently implemented.
@@ -236,7 +236,7 @@ class SplitUtils {
           // // on closing section this function checks which arrow side(left/right) is need to be removed from drag handle bar.
           ManageHandleBar.removeHandleIconOnClose(sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "vertical");
           // on close storing user layout
-          this.saveSizesToLocalStorage(this.VERTICAL);
+          this.saveSizesToLocalStorage(this.VERTICAL as "vertical");
         }
       }
     }
@@ -353,7 +353,7 @@ class SplitUtils {
           // on opening a section show the arrow side(left/right)
           ManageHandleBar.showHandleIconOnOpen(sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "horizontal");
           // after opening saving the layout
-          this.saveSizesToLocalStorage(mode);
+          this.saveSizesToLocalStorage(this.HORIZONTAL as "horizontal");
         } else if (mode === this.VERTICAL && currentTarget) {
           currentTarget.style.removeProperty("flex-grow");
           currentTarget.classList.remove(this.SECTION_CLASS_HIDE);
@@ -361,8 +361,6 @@ class SplitUtils {
             - Similar logic as left and right just direction changes.
           */
           if (direction === this.BOTTOM) {
-            console.log("bottom", nextTarget);
-            console.log("bottom prev", prevTarget);
             if (openSectionCounter !== 1) {
               nextTarget.style.removeProperty("flex-grow");
             } else {
@@ -395,16 +393,54 @@ class SplitUtils {
           // on opening a section show the arrow side(left/right)
           ManageHandleBar.showHandleIconOnOpen(sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "vertical");
           // after opening saving the layout
-          this.saveSizesToLocalStorage(mode);
+          this.saveSizesToLocalStorage(this.VERTICAL as "vertical");
         }
       }
     }
   }
 
   /**
+   * Given total pane count
+   */
+  static totalPaneCount(splitMode: "horizontal" | "vertical") {
+    // if wrapper is not set throw error
+    if (!this.modeWrapper[splitMode]) {
+      console.error("Wrapper not set. Call setWrapper before using totalPaneCount.");
+      return -1;
+    }
+
+    const sections = this.modeWrapper[splitMode]?.children; // on the basis of mode getting sections element
+    if (sections) {
+      const totalPaneSize = (sections.length + 1) / 2; // give total section present excluding handle bar
+      return totalPaneSize;
+    }
+
+    return -1;
+  }
+
+  /**
+   * Given total handle count
+   */
+  static totalHandleCount(splitMode: "horizontal" | "vertical") {
+    // if wrapper is not set throw error
+    if (!this.modeWrapper[splitMode]) {
+      console.error("Wrapper not set. Call setWrapper before using totalHandleCount.");
+      return -1;
+    }
+
+    const sections = this.modeWrapper[splitMode]?.children; // on the basis of mode getting sections element
+    if (sections) {
+      const totalPaneSize = Math.abs((sections.length + 1) / 2 - sections.length); // give total handle bar count
+      return totalPaneSize;
+    }
+
+    return -1;
+  }
+
+  /**
    * Save sizes to local storage.
    */
-  static saveSizesToLocalStorage(splitMode: "horizontal" | "vertical" = "horizontal", closeSection = false) {
+  static saveSizesToLocalStorage(splitMode: "horizontal" | "vertical", closeSection = false) {
     const mode = splitMode || this.mode;
 
     if (!this.modeWrapper[splitMode]) {

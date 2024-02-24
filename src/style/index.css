@@ -39,12 +39,12 @@
 
 .a-split.a-split-horizontal .a-split-control-pane.a-split-pane {
   flex-grow: 0;
-  /* flex-shrink: 0; */
+  flex-shrink: 0;
 }
 
 .a-split.a-split-vertical .a-split-control-pane.a-split-pane {
   flex-grow: 0;
-  /* flex-shrink: 0; */
+  flex-shrink: 0;
 }
 
 .a-split-hidden {

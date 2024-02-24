@@ -123,6 +123,14 @@ export default class Split extends React.Component<SplitProps, SplitState> {
   private prevToPrev!: HTMLElement;
   private breaker: number = 0;
 
+  // fixed computed layout of handlebar
+  private handleBarLayoutInfo = {
+    width: 1,
+    afterElementWidth: 16,
+    marginLeft: 5,
+    marginRight: 5,
+  };
+
   private onDraggingThrottled: (env: Event) => void;
   private onDragEndThrottled: () => void;
   private saveSizesToLocalStorageDebounced: () => void;
@@ -201,16 +209,6 @@ export default class Split extends React.Component<SplitProps, SplitState> {
   setInitialSizes() {
     const { mode, initialSizes } = this.props;
     const sections = this.warpper?.children;
-    let totalHandleBarSize =
-      mode &&
-      sections &&
-      Array.from(sections).reduce(
-        (accumulator, currentValue) =>
-          currentValue.classList.contains(mode === "horizontal" ? "splitterHandleBarContainer-horizontal" : "splitterHandleBarContainer-vertical")
-            ? (currentValue as HTMLElement).offsetWidth + accumulator
-            : accumulator,
-        0
-      );
 
     if (sections && initialSizes && initialSizes.length > 0) {
       const userLayoutDefault = this.userSession.GetSession(mode!);
@@ -236,7 +234,25 @@ export default class Split extends React.Component<SplitProps, SplitState> {
                 contentTarget.style.flexGrow = userLayoutDefault[i]["flexGrow"];
               }
             } else {
-              contentTarget.style.flexBasis = `${size}`;
+              // for maintaing perfect size, exclude the handle bar sizes which can not be calculated dynamically.
+              // Because pseudo element can not be accessed by javascript.
+              // Noteable issue: If user tries to modify the css of handlebar this size will cause issue and splitter can show unexpected behaviour.
+              const totalHandleBarLayoutValue =
+                (this.handleBarLayoutInfo.afterElementWidth +
+                  this.handleBarLayoutInfo.marginLeft +
+                  this.handleBarLayoutInfo.marginRight +
+                  this.handleBarLayoutInfo.width) *
+                SplitUtils.totalHandleCount(this.HORIZONTAL);
+              const sizeToReduce = totalHandleBarLayoutValue / SplitUtils.totalPaneCount(this.HORIZONTAL);
+              if (sizeToReduce > -1) {
+                if (size && size.includes("%")) {
+                  contentTarget.style.flexBasis = `${parseFloat(size) - SplitUtils.pixelToPercentage(sizeToReduce, this.props.width!)}%`;
+                } else {
+                  contentTarget.style.flexBasis = `${parseFloat(size) - sizeToReduce}px`;
+                }
+              } else {
+                contentTarget.style.flexBasis = `${size}`;
+              }
               if (collapsedcounter > 0) {
                 contentTarget.style.flexGrow = "1";
                 collapsedcounter = 0;
@@ -250,7 +266,6 @@ export default class Split extends React.Component<SplitProps, SplitState> {
             contentTarget.setAttribute("min-size", `${this.props.minSizes![i]}`);
             contentTarget.setAttribute("max-size", `${this.props.maxSizes![i]}`);
             ManageHandleBar.removeHandleIconOnClose(sectionCounter++, SplitUtils.modeWrapper, SplitUtils.cachedMappedSplitPanePosition, "horizontal");
-            // contentTarget.style.overflow = `hidden`;
           } else if (mode === this.VERTICAL && contentTarget) {
             if (userLayoutDefault && userLayoutDefault.length > 0 && this.props.enableSessionStorage) {
               if (userLayoutDefault[i]["flexGrow"] === "-1") {
