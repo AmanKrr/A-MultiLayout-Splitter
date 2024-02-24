@@ -1,3 +1,15 @@
+# [3.0.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v2.0.0...v3.0.0) (2024-02-24)
+
+
+### Build System
+
+* chore(release): Add compiled/built code ([96fc106](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/96fc106a672d29831e70e7b1133204a391f4d713))
+
+
+### BREAKING CHANGES
+
+* CSS improvements include class changes, affecting existing stylesheets. Developers integrating this code should update their stylesheets accordingly.
+
 # [2.0.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v1.0.0...v2.0.0) (2024-02-24)
 
 
