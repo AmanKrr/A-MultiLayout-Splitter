@@ -23,7 +23,7 @@ export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
   /** Support custom drag and drop toolbar */
   renderBar?: (props: React.HTMLAttributes<HTMLDivElement>, position: number) => JSX.Element;
   /** Set the drag and drop toolbar as a line style. */
-  lineBar?: boolean;
+  lineBar?: boolean | number[];
   /** Set the dragged toolbar, whether it is visible or not */
   visible?: boolean | number[];
   /**
@@ -58,11 +58,13 @@ export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
    * collasped sections, "true" or "false"
    */
   collapsed?: boolean[];
-  // /**
-  //  * make section collapsible, "true" or "false"
-  //  */
-  // collapsible?: boolean[];
+  /**
+   * Height for splitter parent
+   */
   height?: string;
+  /**
+   * Width for splitter parent
+   */
   width?: string;
 }
 
@@ -93,7 +95,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     minSizes: [], // Default to an empty array
     maxSizes: [],
     enableSessionStorage: false,
-    collapsed: [false, false, false],
+    collapsed: [],
     height: "600px",
     width: "600px",
   };
@@ -133,7 +135,8 @@ export default class Split extends React.Component<SplitProps, SplitState> {
 
   private onDraggingThrottled: (env: Event) => void;
   private onDragEndThrottled: () => void;
-  private saveSizesToLocalStorageDebounced: () => void;
+  private saveHorizontalSizesToLocalStorageDebounced: () => void;
+  private saveVerticalSizesToLocalStorageDebounced: () => void;
 
   constructor(props: SplitProps) {
     super(props);
@@ -143,11 +146,15 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     this.onDragEndThrottled = throttle(this.onDragEnd.bind(this), 16);
 
     // Explicitly bind and debounce the session storage update
-    this.saveSizesToLocalStorageDebounced = debounce(SplitUtils.saveSizesToLocalStorage.bind(SplitUtils), 300);
+    this.saveHorizontalSizesToLocalStorageDebounced = debounce(SplitUtils.saveHorizontalSizesToLocalStorage.bind(SplitUtils), 300);
+    this.saveVerticalSizesToLocalStorageDebounced = debounce(SplitUtils.saveVerticalSizesToLocalStorage.bind(SplitUtils), 300);
 
     // Initialize session storage utility and dragging flag
     this.userSession = new SplitSessionStorage();
     this.initDragging = false;
+
+    window.addEventListener("beforeunload", this.saveHorizontalSizesToLocalStorageDebounced);
+    window.addEventListener("beforeunload", this.saveVerticalSizesToLocalStorageDebounced);
   }
   /**
    * Cleanup: Remove event listeners to prevent memory leaks.
@@ -200,7 +207,8 @@ export default class Split extends React.Component<SplitProps, SplitState> {
   private removeEvent() {
     window.removeEventListener("mousemove", this.onDraggingThrottled, false);
     window.removeEventListener("mouseup", this.onDragEndThrottled, false);
-    window.removeEventListener("beforeunload", this.saveSizesToLocalStorageDebounced, false);
+    window.removeEventListener("beforeunload", this.saveHorizontalSizesToLocalStorageDebounced, false);
+    window.removeEventListener("beforeunload", this.saveVerticalSizesToLocalStorageDebounced, false);
   }
 
   /**
@@ -253,18 +261,22 @@ export default class Split extends React.Component<SplitProps, SplitState> {
               } else {
                 contentTarget.style.flexBasis = `${size}`;
               }
+              // checks for collaped props
               if (collapsedcounter > 0) {
                 contentTarget.style.flexGrow = "1";
                 collapsedcounter = 0;
               }
-              if (this.props.collapsed![i] && collapsedcounter === 0) {
+              // by default not collapsing any horizontal
+              if ((this.props.collapsed![i] || false) && collapsedcounter === 0) {
                 contentTarget.style.flexGrow = "0";
                 contentTarget.classList.add("a-split-hidden");
                 collapsedcounter++;
               }
             }
-            contentTarget.setAttribute("min-size", `${this.props.minSizes![i]}`);
-            contentTarget.setAttribute("max-size", `${this.props.maxSizes![i]}`);
+            // setting min and max limit by default 0 and 100
+            contentTarget.setAttribute("min-size", `${this.props.minSizes![i] || 0}`);
+            contentTarget.setAttribute("max-size", `${this.props.maxSizes![i] || 100}`);
+            // remove horizontal handlebar icons if some sections are closed
             ManageHandleBar.removeHandleIconOnClose(sectionCounter++, SplitUtils.modeWrapper, SplitUtils.cachedMappedSplitPanePosition, "horizontal");
           } else if (mode === this.VERTICAL && contentTarget) {
             if (userLayoutDefault && userLayoutDefault.length > 0 && this.props.enableSessionStorage) {
@@ -278,24 +290,47 @@ export default class Split extends React.Component<SplitProps, SplitState> {
                 contentTarget.style.flexGrow = userLayoutDefault[i]["flexGrow"];
               }
             } else {
-              contentTarget.style.flexBasis = `${size}`;
+              // for maintaing perfect size, exclude the handle bar sizes which can not be calculated dynamically.
+              // Because pseudo element can not be accessed by javascript.
+              // Noteable issue: If user tries to modify the css of handlebar this size will cause issue and splitter can show unexpected behaviour.
+              const totalHandleBarLayoutValue =
+                (this.handleBarLayoutInfo.afterElementWidth +
+                  this.handleBarLayoutInfo.marginLeft +
+                  this.handleBarLayoutInfo.marginRight +
+                  this.handleBarLayoutInfo.width) *
+                SplitUtils.totalHandleCount(this.VERTICAL);
+              const sizeToReduce = totalHandleBarLayoutValue / SplitUtils.totalPaneCount(this.VERTICAL);
+              if (sizeToReduce > -1) {
+                if (size && size.includes("%")) {
+                  contentTarget.style.flexBasis = `${parseFloat(size) - SplitUtils.pixelToPercentage(sizeToReduce, this.props.height!)}%`;
+                } else {
+                  contentTarget.style.flexBasis = `${parseFloat(size) - sizeToReduce}px`;
+                }
+              } else {
+                contentTarget.style.flexBasis = `${size}`;
+              }
+              // checks for collaped props
               if (collapsedcounter > 0) {
                 contentTarget.style.flexGrow = "1";
                 collapsedcounter = 0;
               }
-              if (this.props.collapsed![i] && collapsedcounter === 0) {
+              // by default not collapsing any vertical section
+              if ((this.props.collapsed![i] || false) && collapsedcounter === 0) {
                 contentTarget.style.flexGrow = "0";
                 contentTarget.classList.add("a-split-hidden");
                 collapsedcounter++;
               }
             }
-            contentTarget.setAttribute("min-size", `${this.props.minSizes![i]}`);
-            contentTarget.setAttribute("max-size", `${this.props.maxSizes![i]}`);
+            // setting min and max limit by default 0 and 100
+            contentTarget.setAttribute("min-size", `${this.props.minSizes![i] || 0}`);
+            contentTarget.setAttribute("max-size", `${this.props.maxSizes![i] || 100}`);
+            // remove vertical handlebar icons if some sections are closed
             ManageHandleBar.removeHandleIconOnClose(sectionCounter++, SplitUtils.modeWrapper, SplitUtils.cachedMappedSplitPanePosition, "vertical");
           }
         }
       }
 
+      // check for opened section
       let openSectionCounter = 0;
       if (sections && sections.length > 0) {
         for (let pane = 0; pane < initialSizes.length; pane++) {
@@ -305,6 +340,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
         }
       }
 
+      // corner case: if only one section is opened then grow first section
       if (openSectionCounter === 1 && !this.props.collapsed![0]) {
         if (sections[0]) {
           (sections[0] as HTMLDivElement).style.flexGrow = "1";
@@ -312,7 +348,11 @@ export default class Split extends React.Component<SplitProps, SplitState> {
       }
 
       if (userLayoutDefault && userLayoutDefault.length === 0) {
-        SplitUtils.saveSizesToLocalStorage(mode);
+        if (mode === this.HORIZONTAL) {
+          SplitUtils.saveHorizontalSizesToLocalStorage();
+        } else {
+          SplitUtils.saveVerticalSizesToLocalStorage();
+        }
       }
     }
   }
@@ -580,6 +620,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     const nextTarget = this.target.nextElementSibling;
     this.boxWidth = this.warpper.offsetWidth;
     this.boxHeight = this.warpper.offsetHeight;
+    console.log(this.boxWidth, this.boxHeight);
     if (prevTarget) {
       this.preWidth = (prevTarget as HTMLElement).offsetWidth;
       this.preHeight = (prevTarget as HTMLElement).offsetHeight;
@@ -728,8 +769,12 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     this.removeTouchEvent();
     this.removeEvent();
     this.setState({ dragging: false });
-    if (this.props.mode === "horizontal" && this.props.enableSessionStorage && this.initDragging) {
-      this.saveSizesToLocalStorageDebounced();
+    if (this.props.enableSessionStorage && this.initDragging) {
+      if (this.props.mode === this.HORIZONTAL) {
+        this.saveHorizontalSizesToLocalStorageDebounced();
+      } else {
+        this.saveVerticalSizesToLocalStorageDebounced();
+      }
       this.initDragging = false;
     }
   }
@@ -765,13 +810,14 @@ export default class Split extends React.Component<SplitProps, SplitState> {
           });
           const visibleBar = visible === true || (visible && visible.includes((idx + 1) as never)) || false;
           const barProps = {
-            className: [`${prefixCls}-bar`, lineBar ? `${prefixCls}-line-bar` : null, !lineBar ? `${prefixCls}-large-bar` : null]
-              .filter(Boolean)
-              .join(" ")
-              .trim(),
+            className: [`${prefixCls}-bar`].filter(Boolean).join(" ").trim(),
           };
-          if (disable === true || (disable && disable.includes((idx + 1) as never))) {
-            barProps.className = [barProps.className, disable ? "disable" : null].filter(Boolean).join(" ").trim();
+          // lineBar ? `${prefixCls}-line-bar` : null, !lineBar ? `${prefixCls}-large-bar` : null
+          if (idx !== 0 && (lineBar === true || (lineBar && lineBar.includes(idx)))) {
+            barProps.className = [barProps.className, lineBar ? `${prefixCls}-line-bar` : null].filter(Boolean).join(" ").trim();
+          }
+          if (idx !== 0 && (disable === true || (disable && disable.includes(idx)))) {
+            barProps.className = [barProps.className, disable ? "a-split-handle-disable" : null].filter(Boolean).join(" ").trim();
           }
           let BarCom = null;
           if (idx !== 0 && visibleBar && renderBar) {
