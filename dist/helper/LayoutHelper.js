@@ -1,23 +1,29 @@
 class LayoutHelper {
     static mapElementPosition(wrapper, splitMode, cachedMappedSplitPanePosition) {
         var _a;
+        // Check if the wrapper is set
         if (!wrapper[splitMode]) {
             console.error("Wrapper not set. Call setWrapper before using closeSplitter.");
             return;
         }
         let splitIndex = 1;
         const elements = (_a = wrapper[splitMode]) === null || _a === void 0 ? void 0 : _a.children;
+        // Check if elements exist and the split index is not already cached
         if (elements && !cachedMappedSplitPanePosition[splitMode]) {
+            // Iterate through elements to find split panes
             for (let i = 0; i < elements.length; i++) {
                 const element = elements[i];
+                // Check if the element is a split pane (not a handle bar)
                 if (splitMode === "horizontal") {
                     if (element.classList.contains(this.PANE_CLASS)) {
+                        // Cache the position of the split pane
                         cachedMappedSplitPanePosition[splitMode] = Object.assign(Object.assign({}, cachedMappedSplitPanePosition[splitMode]), { [`${splitIndex}`]: `${i}` });
                         ++splitIndex;
                     }
                 }
                 else {
                     if (element.classList.contains(this.PANE_CLASS)) {
+                        // Cache the position of the split pane
                         cachedMappedSplitPanePosition[splitMode] = Object.assign(Object.assign({}, cachedMappedSplitPanePosition[splitMode]), { [`${splitIndex}`]: `${i}` });
                         ++splitIndex;
                     }

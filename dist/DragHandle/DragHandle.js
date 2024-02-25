@@ -44,7 +44,17 @@ function DragHandle({ mode, onMouseDown, onTouchStart, props, position, }) {
         (_a = e.target.parentElement.firstChild) === null || _a === void 0 ? void 0 : _a.classList.add("a-icon-hide");
         (_b = e.target.parentElement.lastChild) === null || _b === void 0 ? void 0 : _b.classList.add("a-icon-hide");
     }
-    return (_jsx("div", Object.assign({}, props, { onMouseDown: props.className.includes("a-split-handle-disable") ? () => { } : onMouseDown, onTouchStart: props.className.includes("a-split-handle-disable") ? () => { } : onTouchStart, onMouseOver: props.className.includes("a-split-handle-disable") ? () => { } : handleMouseOverParent, onMouseOut: props.className.includes("a-split-handle-disable") ? () => { } : handleMouseOutParent }, { children: props.className.includes("a-split-handle-disable") || props.className.includes("a-split-line-bar") ? (_jsx(_Fragment, {})) : (_jsxs(_Fragment, { children: [_jsx("button", { className: `a-splitter-collapse-icon splitter-${mode}-${mode === "horizontal" ? "left" : "top"}-icon a-icon-hide`, onClick: () => {
+    // console.log("inside handle", props);
+    return (_jsx("div", Object.assign({}, props, { 
+        // className={
+        //   `splitterHandleBarContainer-` +
+        //   mode +
+        //   ` splitterHandleBarContainer-` +
+        //   mode +
+        //   "-" +
+        //   position
+        // }
+        onMouseDown: props.className.includes("a-split-handle-disable") ? () => { } : onMouseDown, onTouchStart: props.className.includes("a-split-handle-disable") ? () => { } : onTouchStart, onMouseOver: props.className.includes("a-split-handle-disable") ? () => { } : handleMouseOverParent, onMouseOut: props.className.includes("a-split-handle-disable") ? () => { } : handleMouseOutParent }, { children: props.className.includes("a-split-handle-disable") || props.className.includes("a-split-line-bar") ? (_jsx(_Fragment, {})) : (_jsxs(_Fragment, { children: [_jsx("button", { className: `a-splitter-collapse-icon splitter-${mode}-${mode === "horizontal" ? "left" : "top"}-icon a-icon-hide`, onClick: () => {
                         if (mode === "horizontal") {
                             handleTopAndLeftArrowClick("horizontal", position, "left");
                         }
@@ -52,6 +62,7 @@ function DragHandle({ mode, onMouseDown, onTouchStart, props, position, }) {
                             handleTopAndLeftArrowClick("vertical", position, "top");
                         }
                     }, onMouseOver: handleMouseOverChild, onMouseOut: handleMouseOutChild }), _jsx("div", { className: "a-splitter-handlebar-icon", onMouseOver: handleMouseOverChild, onMouseOut: handleMouseOutChild }), _jsx("button", { className: `a-splitter-collapse-icon splitter-${mode}-${mode === "horizontal" ? "right" : "bottom"}-icon a-icon-hide`, onClick: () => {
+                        // here position + 1 is the section which we want to close or open using right arrow
                         if (mode === "horizontal") {
                             handleBottomAndRightArrowClick("horizontal", position, "right");
                         }

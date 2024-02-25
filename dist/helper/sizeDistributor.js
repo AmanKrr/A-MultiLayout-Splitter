@@ -1,6 +1,6 @@
 function distributionHelper(newArray, change) {
     let i = 0;
-    let hp = newArray.map((val) => [...val]);
+    let hp = newArray.map((val) => [...val]); // Deep copy to avoid modifying the original
     let skip = 0;
     let nonSkip = newArray.length;
     while (change !== 0) {
