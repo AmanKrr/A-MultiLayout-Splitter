@@ -96,8 +96,8 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     maxSizes: [],
     enableSessionStorage: false,
     collapsed: [],
-    height: "600px",
-    width: "600px",
+    height: "400px",
+    width: "400px",
   };
   public state: SplitState = {
     dragging: false,
@@ -352,6 +352,46 @@ export default class Split extends React.Component<SplitProps, SplitState> {
           SplitUtils.saveHorizontalSizesToLocalStorage();
         } else {
           SplitUtils.saveVerticalSizesToLocalStorage();
+        }
+      }
+    }
+
+    if (sections && sections.length > 0 && initialSizes && initialSizes.length === 0) {
+      let counter = 0;
+      for (let pane = 0; pane < sections.length; pane += 2) {
+        const contentTarget = sections[pane] as HTMLDivElement;
+        if (mode === this.HORIZONTAL) {
+          // for maintaing perfect size, exclude the handle bar sizes which can not be calculated dynamically.
+          // Because pseudo element can not be accessed by javascript.
+          // Noteable issue: If user tries to modify the css of handlebar this size will cause issue and splitter can show unexpected behaviour.
+          const totalHandleBarLayoutValue =
+            (this.handleBarLayoutInfo.afterElementWidth +
+              this.handleBarLayoutInfo.marginLeft +
+              this.handleBarLayoutInfo.marginRight +
+              this.handleBarLayoutInfo.width) *
+            SplitUtils.totalHandleCount(this.HORIZONTAL);
+          const sizeToReduce = totalHandleBarLayoutValue / SplitUtils.totalPaneCount(this.HORIZONTAL);
+          // setting min and max limit by default 0 and 100
+          contentTarget.setAttribute("min-size", `${this.props.minSizes![counter] || 0}`);
+          contentTarget.setAttribute("max-size", `${this.props.maxSizes![counter] || 100}`);
+          contentTarget.style.flexBasis = `${parseFloat(this.props.width!) / SplitUtils.totalPaneCount(this.HORIZONTAL) - sizeToReduce}px`;
+          ++counter;
+        }
+        if (mode === this.VERTICAL) {
+          // for maintaing perfect size, exclude the handle bar sizes which can not be calculated dynamically.
+          // Because pseudo element can not be accessed by javascript.
+          // Noteable issue: If user tries to modify the css of handlebar this size will cause issue and splitter can show unexpected behaviour.
+          const totalHandleBarLayoutValue =
+            (this.handleBarLayoutInfo.afterElementWidth +
+              this.handleBarLayoutInfo.marginLeft +
+              this.handleBarLayoutInfo.marginRight +
+              this.handleBarLayoutInfo.width) *
+            SplitUtils.totalHandleCount(this.VERTICAL);
+          const sizeToReduce = totalHandleBarLayoutValue / SplitUtils.totalPaneCount(this.VERTICAL); // setting min and max limit by default 0 and 100
+          contentTarget.setAttribute("min-size", `${this.props.minSizes![counter] || 0}`);
+          contentTarget.setAttribute("max-size", `${this.props.maxSizes![counter] || 100}`);
+          contentTarget.style.flexBasis = `${parseFloat(this.props.width!) / SplitUtils.totalPaneCount(this.VERTICAL) - sizeToReduce}px`;
+          ++counter;
         }
       }
     }
