@@ -1,3 +1,10 @@
+## [3.0.1](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v3.0.0...v3.0.1) (2024-02-25)
+
+
+### Bug Fixes
+
+* auto distribution of size if no initialSizes is given ([3559bce](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/3559bce60e58fb9573727745d724d29dedf60f26))
+
 # [3.0.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v2.0.0...v3.0.0) (2024-02-24)
 
 
