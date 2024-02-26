@@ -749,7 +749,7 @@ export default class Split extends React.Component {
                     // );
                     BarCom = (_jsx(DragHandle, { props: barProps, mode: this.props.mode, onMouseDown: this.onMouseDown.bind(this, idx + 1), onTouchStart: this.onMouseDown.bind(this, idx + 1), position: idx }, idx));
                 }
-                return (_jsxs(React.Fragment, { children: [BarCom, React.cloneElement(_jsx("div", { children: element }), Object.assign({}, props))] }, idx));
+                return (_jsxs(React.Fragment, { children: [BarCom, React.cloneElement(element && element.props && (element.props.mode === "horizontal" || element.props.mode === "vertical") ? (element) : (_jsx("div", { children: element })), Object.assign({}, props))] }, idx));
             }) })));
     }
 }
