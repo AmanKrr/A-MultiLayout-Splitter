@@ -891,7 +891,14 @@ export default class Split extends React.Component<SplitProps, SplitState> {
           return (
             <React.Fragment key={idx}>
               {BarCom}
-              {React.cloneElement(<div>{element}</div>, { ...props })}
+              {React.cloneElement(
+                element && element.props && (element.props.mode === "horizontal" || element.props.mode === "vertical") ? (
+                  element
+                ) : (
+                  <div>{element}</div>
+                ),
+                { ...props }
+              )}
             </React.Fragment>
           );
         })}
