@@ -1,3 +1,15 @@
+## [3.0.2](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v3.0.1...v3.0.2) (2024-02-26)
+
+
+### Bug Fixes
+
+* Nested layout render only one mode ([7416fdb](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/7416fdb50b4130e769feeb0d81b5ad4ca9d3b9e8))
+
+
+### Performance Improvements
+
+* Resize performance improvement ([b17151c](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/b17151c1c110dc986c8c0927b808c322415d0f45))
+
 ## [3.0.1](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v3.0.0...v3.0.1) (2024-02-25)
 
 
