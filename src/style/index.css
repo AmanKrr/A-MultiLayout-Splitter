@@ -6,6 +6,23 @@
   --a-split-bar-shadow-disable: #d5d5d5;
 }
 
+.a-split.dragging .a-split-pane {
+  position: relative;
+}
+
+.a-split.dragging .a-split-pane::before {
+  content: '';
+  display: block;
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: 10;
+}
+
+.a-split>.a-split-pane {
+  transform: none;
+}
+
 .a-split.a-split-horizontal,
 .a-split.a-split-vertical {
   border-width: 1px;
