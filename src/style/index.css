@@ -1,6 +1,5 @@
 /* Base Definition */
 .a-split {
-  height: 100%;
   display: flex;
   --a-split-bar-shadow: #d5d5d5;
   --a-split-bar-shadow-disable: #d5d5d5;
@@ -31,6 +30,7 @@
   position: relative;
   touch-action: none;
   width: 100%;
+  height: 100%;
 }
 
 .a-split.a-split-horizontal {
