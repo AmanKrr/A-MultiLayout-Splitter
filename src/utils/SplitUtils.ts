@@ -3,6 +3,7 @@ import ManageHandleBar from "../helper/ManageHandleBar";
 import SplitSessionStorage, { ISplitSessionStorage } from "./SplitSessionStorage";
 
 type Orientation = "horizontal" | "vertical";
+type Instance = Element | null;
 
 // Define the SplitUtils class
 class SplitUtils {
@@ -14,6 +15,8 @@ class SplitUtils {
   private static HORIZONTAL: Orientation = "horizontal";
   private static VERTICAL: Orientation = "vertical";
   private static SECTION_CLASS_HIDE = "a-split-hidden";
+  private static FIX_CLASS = "a-split-pane-fix";
+  private static FIX_HELPER_CLASS = "a-split-pane-helper-fix";
 
   // Reference to the HTML wrapper element for split panes
   static wrapper: HTMLDivElement | null = null;
@@ -42,6 +45,8 @@ class SplitUtils {
     vertical: null,
   };
 
+  static splitPaneInstance: Record<string, Instance> | null = null;
+
   static minThreshold: number[];
 
   /**
@@ -62,7 +67,28 @@ class SplitUtils {
     this.userSession = new SplitSessionStorage();
     this.enableSessionStorage[mode] = enableSessionStorage;
     this.cachedMappedSplitPanePosition[mode] = null;
-    LayoutHelper.mapElementPosition(this.modeWrapper, mode, this.cachedMappedSplitPanePosition);
+    LayoutHelper.mapElementPosition(null, this.modeWrapper, mode, this.cachedMappedSplitPanePosition);
+  }
+
+  static fixClass(): string {
+    return this.FIX_CLASS + " " + this.FIX_HELPER_CLASS;
+  }
+
+  static setSplitPaneInstance(instance: Record<string, Instance>): void {
+    if (this.splitPaneInstance) {
+      this.splitPaneInstance = {
+        ...this.splitPaneInstance,
+        ...instance,
+      };
+    } else {
+      this.splitPaneInstance = {
+        ...instance,
+      };
+    }
+  }
+
+  static getSplitPaneInstance() {
+    return this.splitPaneInstance;
   }
 
   /**
@@ -135,15 +161,15 @@ class SplitUtils {
    * @param splitMode - Split mode, either "horizontal" or "vertical".
    * @returns True if the section is open, false otherwise.
    */
-  static isSectionOpen(sectionNumber: number, splitMode: Orientation): boolean {
+  static isSectionOpen(instance: Instance, sectionNumber: number, splitMode: Orientation): boolean {
     // Implementation for checking if a specific split section is open
-
     if (!this.modeWrapper[splitMode]) {
       console.error("Wrapper not set. Call setWrapper before using isSectionOpen.");
       return false;
     }
 
-    const sections = this.modeWrapper[splitMode]?.children;
+    const sections = instance?.children || this.modeWrapper[splitMode]?.children;
+    LayoutHelper.mapElementPosition(instance, this.modeWrapper, splitMode, this.cachedMappedSplitPanePosition, true);
 
     if (sections && sectionNumber > 0 && sections.length >= sectionNumber) {
       let sectionIndex = LayoutHelper.getSection(this.cachedMappedSplitPanePosition, splitMode, sectionNumber);
@@ -169,7 +195,7 @@ class SplitUtils {
    * @param splitMode The mode of splitting, either "horizontal" or "vertical".
    * @returns -1 if the wrapper is not set, otherwise no return value.
    */
-  static reCheckPaneOpening(splitMode: Orientation) {
+  static reCheckPaneOpening(instance: Instance, splitMode: Orientation) {
     // Check if the wrapper is not set
     if (!this.modeWrapper[splitMode]) {
       console.error("Wrapper not set. Call setWrapper before using totalHandleCount.");
@@ -177,12 +203,13 @@ class SplitUtils {
     }
 
     // Get the sections within the wrapper based on the split mode
-    const sections = this.modeWrapper[splitMode]?.children;
+    const sections = instance?.children || this.modeWrapper[splitMode]?.children;
+    LayoutHelper.mapElementPosition(instance, this.modeWrapper, splitMode, this.cachedMappedSplitPanePosition, true);
 
     // Check if sections exist and the count is greater than 0
     if (sections && sections.length > 0) {
       // Get the total count of panes
-      const totalPaneSize = this.totalPaneCount(splitMode);
+      const totalPaneSize = this.totalPaneCount(instance, splitMode);
 
       // Initialize a counter for opened sections
       let openedSectionCount = 0;
@@ -191,7 +218,7 @@ class SplitUtils {
       for (let i = 1; i <= totalPaneSize; i++) {
         // Increment the opened section count if the section is open
         // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        this.isSectionOpen(i, splitMode) ? ++openedSectionCount : openedSectionCount;
+        this.isSectionOpen(instance, i, splitMode) ? ++openedSectionCount : openedSectionCount;
       }
 
       // Check if all sections are opened
@@ -222,17 +249,23 @@ class SplitUtils {
    * @param splitMode - Split mode, either "horizontal" or "vertical".
    * @param direction - The direction of the close operation, either "left", "right", "top", "bottom" or "null". Direction null is used only when not using arrow icon of handlebar to close the splitter.
    */
-  static closeSplitter(sectionNumber: number, splitMode: Orientation, direction: "left" | "right" | "top" | "bottom" | null = null): void {
+  static closeSplitter(
+    instance: Instance = null,
+    sectionNumber: number,
+    splitMode: Orientation,
+    direction: "left" | "right" | "top" | "bottom" | null = null
+  ): void {
     // Implementation for closing a specific split section
     const mode = splitMode || this.mode;
 
     // if wrapper is not set throw error
-    if (!this.modeWrapper[splitMode]) {
+    if (!this.modeWrapper[splitMode] && !instance) {
       console.error("Wrapper not set. Call setWrapper before using closeSplitter.");
       return;
     }
 
-    const sections = this.modeWrapper[splitMode]?.children; // on the basis of mode getting sections element
+    const sections = instance?.children || this.modeWrapper[splitMode]?.children; // on the basis of mode getting sections element
+    LayoutHelper.mapElementPosition(instance, this.modeWrapper, splitMode, this.cachedMappedSplitPanePosition, true);
     if (sections && sectionNumber > 0 && sections.length >= sectionNumber) {
       // Retrieve the correct section position using the cached mapped split-pane position,
       // considering the specified split mode and section number. The 'LayoutHelper' object
@@ -254,6 +287,9 @@ class SplitUtils {
           // closing the current section
           currentTarget.style.flexGrow = "0";
           currentTarget.classList.add(this.SECTION_CLASS_HIDE);
+          if (currentTarget.classList.contains(this.FIX_CLASS)) {
+            currentTarget.classList.remove(this.FIX_CLASS);
+          }
 
           /* 
             - Direction: Right
@@ -281,7 +317,7 @@ class SplitUtils {
           }
 
           // on closing section this function checks which arrow side(left/right) is need to be removed from drag handle bar.
-          ManageHandleBar.removeHandleIconOnClose(sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "horizontal");
+          ManageHandleBar.removeHandleIconOnClose(instance, sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "horizontal");
           // on close storing user layout
           this.saveSizesToLocalStorage(this.HORIZONTAL);
         } else if (mode === this.VERTICAL && currentTarget) {
@@ -291,6 +327,9 @@ class SplitUtils {
           */
           currentTarget.style.flexGrow = "0";
           currentTarget.classList.add(this.SECTION_CLASS_HIDE);
+          if (currentTarget.classList.contains(this.FIX_CLASS)) {
+            currentTarget.classList.remove(this.FIX_CLASS);
+          }
 
           /* 
             - Direction: Bottom
@@ -318,7 +357,7 @@ class SplitUtils {
           }
 
           // // on closing section this function checks which arrow side(left/right) is need to be removed from drag handle bar.
-          ManageHandleBar.removeHandleIconOnClose(sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "vertical");
+          ManageHandleBar.removeHandleIconOnClose(instance, sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "vertical");
           // on close storing user layout
           this.saveSizesToLocalStorage(this.VERTICAL);
         }
@@ -332,17 +371,23 @@ class SplitUtils {
    * @param splitMode - Split mode, either "horizontal" or "vertical".
    * @param direction - The direction of the open operation, either "left" or "right".
    */
-  static openSplitter(sectionNumber: number, splitMode: Orientation, direction: "left" | "right" | "top" | "bottom" | null = null): void {
+  static openSplitter(
+    instance: Instance = null,
+    sectionNumber: number,
+    splitMode: Orientation,
+    direction: "left" | "right" | "top" | "bottom" | null = null
+  ): void {
     // Implementation for opening a specific split section with a new size
     const mode = splitMode || this.mode;
 
     // if wrapper is not set throw error
-    if (!this.modeWrapper[splitMode]) {
+    if (!this.modeWrapper[splitMode] && !instance) {
       console.error("Wrapper not set. Call setWrapper before using openSplitter.");
       return;
     }
 
-    const sections = this.modeWrapper[splitMode]?.children; // on the basis of mode getting sections element
+    const sections = instance?.children || this.modeWrapper[splitMode]?.children; // on the basis of mode getting sections element
+    LayoutHelper.mapElementPosition(instance, this.modeWrapper, splitMode, this.cachedMappedSplitPanePosition, true);
 
     if (sections && sectionNumber > 0 && sections.length >= sectionNumber) {
       // Retrieve the correct section position using the cached mapped split-pane position,
@@ -365,7 +410,7 @@ class SplitUtils {
         const totalPaneSize = (sections.length + 1) / 2; // give total section present excluding handle bar
         let openSectionCounter = 0;
         for (let pane = 0; pane < totalPaneSize; pane++) {
-          if (this.isSectionOpen(pane + 1, splitMode)) {
+          if (this.isSectionOpen(instance, pane + 1, splitMode)) {
             openSectionCounter++;
           }
         }
@@ -376,6 +421,9 @@ class SplitUtils {
           // also remove class a-split-hidden that having flex-basis 0!important
           currentTarget.style.removeProperty("flex-grow");
           currentTarget.classList.remove(this.SECTION_CLASS_HIDE);
+          if (currentTarget.classList.contains(this.FIX_HELPER_CLASS) && !currentTarget.classList.contains(this.FIX_CLASS)) {
+            currentTarget.classList.add(this.FIX_CLASS);
+          }
           /* 
             - Direction: Right
               - When the direction is specified as right, indicating the use of an arrow to open the section, the following actions need to be taken:
@@ -430,9 +478,9 @@ class SplitUtils {
             }
           }
 
-          this.reCheckPaneOpening(this.HORIZONTAL);
+          this.reCheckPaneOpening(instance, this.HORIZONTAL);
           // on opening a section show the arrow side(left/right)
-          ManageHandleBar.showHandleIconOnOpen(sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "horizontal");
+          ManageHandleBar.showHandleIconOnOpen(instance, sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "horizontal");
           // after opening saving the layout
           this.saveSizesToLocalStorage(mode);
         } else if (mode === this.VERTICAL && currentTarget) {
@@ -471,9 +519,9 @@ class SplitUtils {
             }
           }
 
-          this.reCheckPaneOpening(this.VERTICAL);
+          this.reCheckPaneOpening(instance, this.VERTICAL);
           // on opening a section show the arrow side(left/right)
-          ManageHandleBar.showHandleIconOnOpen(sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "vertical");
+          ManageHandleBar.showHandleIconOnOpen(instance, sectionNumber, this.modeWrapper, this.cachedMappedSplitPanePosition, "vertical");
           // after opening saving the layout
           this.saveSizesToLocalStorage(mode);
         }
@@ -486,7 +534,7 @@ class SplitUtils {
    * @param splitMode The mode of splitting, either "horizontal" or "vertical".
    * @returns The total number of panes, or -1 if the wrapper is not set.
    */
-  static totalPaneCount(splitMode: Orientation) {
+  static totalPaneCount(instance: Instance, splitMode: Orientation) {
     // Check if the wrapper is not set
     if (!this.modeWrapper[splitMode]) {
       console.error("Wrapper not set. Call setWrapper before using totalPaneCount.");
@@ -494,7 +542,7 @@ class SplitUtils {
     }
 
     // Get the sections within the wrapper based on the split mode
-    const sections = this.modeWrapper[splitMode]?.children;
+    const sections = instance?.children || this.modeWrapper[splitMode]?.children;
 
     // Check if sections exist
     if (sections) {
@@ -511,7 +559,7 @@ class SplitUtils {
    * @param splitMode The mode of splitting, either "horizontal" or "vertical".
    * @returns The total number of handle bars, or -1 if the wrapper is not set.
    */
-  static totalHandleCount(splitMode: Orientation) {
+  static totalHandleCount(instance: Instance, splitMode: Orientation) {
     // Check if the wrapper is not set
     if (!this.modeWrapper[splitMode]) {
       console.error("Wrapper not set. Call setWrapper before using totalHandleCount.");
@@ -519,13 +567,13 @@ class SplitUtils {
     }
 
     // Get the sections within the wrapper based on the split mode
-    const sections = this.modeWrapper[splitMode]?.children;
+    const sections = instance?.children || this.modeWrapper[splitMode]?.children;
 
     // Check if sections exist
     if (sections) {
       // Calculate the total handle bar count
-      const totalPaneSize = Math.abs((sections.length + 1) / 2 - sections.length);
-      return totalPaneSize; // Return the total handle bar count
+      const totalHandleCount = Math.abs((sections.length + 1) / 2 - sections.length);
+      return totalHandleCount; // Return the total handle bar count
     }
 
     return -1; // Return -1 if sections do not exist

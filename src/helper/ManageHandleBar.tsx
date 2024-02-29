@@ -10,13 +10,14 @@ class ManageHandleBar {
    * Don't provide the direction if this function is not used inside the SplitUtils class itself.
    */
   public static showHandleIconOnOpen(
+    instance: Element | null,
     sectionNumber: number,
     wrapper: Record<string, HTMLDivElement | HTMLElement | null>,
     cachedMappedSplitPanePosition: Record<string, Record<string, string | null> | null>,
     splitMode: "horizontal" | "vertical"
   ): void {
     // Implementation for handling handle bar icons on open
-    const sections = wrapper[splitMode]?.children;
+    const sections = instance?.children || wrapper[splitMode]?.children;
 
     if (sections && sections.length > 0) {
       const currentSectionIndex = LayoutHelper.getSection(cachedMappedSplitPanePosition, splitMode, sectionNumber);
@@ -56,13 +57,14 @@ class ManageHandleBar {
    * @param splitMode - Split mode, either "horizontal" or "vertical".
    */
   public static removeHandleIconOnClose(
+    instance: Element | null,
     sectionNumber: number,
     wrapper: Record<string, HTMLDivElement | HTMLElement | null>,
     cachedMappedSplitPanePosition: Record<string, Record<string, string | null> | null>,
     splitMode: "horizontal" | "vertical"
   ): void {
     // Implementation for hiding handle bar icons on close
-    const sections = wrapper[splitMode]?.children;
+    const sections = instance?.children || wrapper[splitMode]?.children;
 
     /* 
       - Closing to left (means left arrow button is clicked)
@@ -75,7 +77,7 @@ class ManageHandleBar {
       const currentTarget = sections[currentSectionIndex == null ? -1 : currentSectionIndex] as HTMLDivElement | null | undefined;
       const prevTarget = sections[previousSectionIndex == null ? -1 : previousSectionIndex] as HTMLDivElement | null | undefined;
       const nextTarget = sections[nextSectionIndex == null ? -1 : nextSectionIndex] as HTMLDivElement | null | undefined;
-      if (!SplitUtils.isSectionOpen(sectionNumber, splitMode)) {
+      if (!SplitUtils.isSectionOpen(instance, sectionNumber, splitMode)) {
         // remove left icon
         if (currentTarget && !prevTarget) {
           const currentHandleBar = currentTarget.nextElementSibling;

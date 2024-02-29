@@ -2,26 +2,23 @@ class LayoutHelper {
   private static PANE_CLASS = "a-split-pane";
 
   public static mapElementPosition(
+    instance: Element | null,
     wrapper: Record<string, HTMLDivElement | HTMLElement | null>,
     splitMode: "horizontal" | "vertical",
-    cachedMappedSplitPanePosition: Record<
-      string,
-      Record<string, string | null> | null
-    >
+    cachedMappedSplitPanePosition: Record<string, Record<string, string | null> | null>,
+    force = false
   ): void {
     // Check if the wrapper is set
-    if (!wrapper[splitMode]) {
-      console.error(
-        "Wrapper not set. Call setWrapper before using closeSplitter."
-      );
+    if (!wrapper[splitMode] && !instance) {
+      console.error("Wrapper not set. Call setWrapper before using mapElementPosition.");
       return;
     }
 
     let splitIndex = 1;
-    const elements = wrapper[splitMode]?.children;
+    const elements = instance?.children || wrapper[splitMode]?.children;
 
     // Check if elements exist and the split index is not already cached
-    if (elements && !cachedMappedSplitPanePosition[splitMode]) {
+    if (elements && (!cachedMappedSplitPanePosition[splitMode] || force)) {
       // Iterate through elements to find split panes
       for (let i = 0; i < elements.length; i++) {
         const element = elements[i];
@@ -55,9 +52,7 @@ class LayoutHelper {
     splitMode: "horizontal" | "vertical"
   ) {
     if (!wrapper[splitMode]) {
-      console.error(
-        "Wrapper not set. Call setWrapper before using getRestSectionSize."
-      );
+      console.error("Wrapper not set. Call setWrapper before using getRestSectionSize.");
       return -1;
     }
 
@@ -67,9 +62,7 @@ class LayoutHelper {
       for (let i = 0; i < sections.length; i += 2) {
         if (!skipSections.includes(i)) {
           const contentTarget = sections[i] as HTMLDivElement;
-          totalSize += parseFloat(
-            contentTarget.style.flexBasis.replace("%", "")
-          );
+          totalSize += parseFloat(contentTarget.style.flexBasis.replace("%", ""));
         }
       }
 
@@ -79,15 +72,11 @@ class LayoutHelper {
     }
   }
   public static getSection(
-    cachedMappedSplitPanePosition: Record<
-      string,
-      Record<string, string | null> | null
-    >,
+    cachedMappedSplitPanePosition: Record<string, Record<string, string | null> | null>,
     splitMode: "horizontal" | "vertical",
     sectionNumber: number
   ) {
-    const position =
-      cachedMappedSplitPanePosition?.[splitMode]?.[sectionNumber];
+    const position = cachedMappedSplitPanePosition?.[splitMode]?.[sectionNumber];
     return position == null ? null : parseInt(position);
   }
 }

@@ -11,8 +11,10 @@ import DragHandle from "./DragHandle/DragHandle";
 export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onDragEnd"> {
   style?: React.CSSProperties;
   className?: string;
+  id: string;
   prefixCls?: string;
   childPrefixCls?: string;
+  fixClass?: boolean;
   /**
    * Drag width/height change callback function,
    * the width or height is determined according to the mode parameter
@@ -61,11 +63,25 @@ export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
   /**
    * Height for splitter parent
    */
-  height?: string;
+  height?: null | string;
   /**
    * Width for splitter parent
    */
-  width?: string;
+  width?: null | string;
+}
+
+interface DefaultProps {
+  prefixCls: string;
+  childPrefixCls: string;
+  visiable: boolean;
+  mode: string;
+  initialSizes: string[] | []; // Default to an empty array
+  minSizes: number[] | []; // Default to an empty array
+  maxSizes: number[] | [];
+  enableSessionStorage: boolean;
+  collapsed: boolean[] | [];
+  height: string | null;
+  width: string | null;
 }
 
 /**
@@ -86,7 +102,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
   private HORIZONTAL = "horizontal";
   private VERTICAL = "vertical";
 
-  public static defaultProps: SplitProps = {
+  public static defaultProps: DefaultProps = {
     prefixCls: "a-split",
     childPrefixCls: "a-split-control-pane",
     visiable: true,
@@ -96,8 +112,8 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     maxSizes: [],
     enableSessionStorage: false,
     collapsed: [],
-    height: "400px",
-    width: "400px",
+    height: null,
+    width: null,
   };
   public state: SplitState = {
     dragging: false,
@@ -156,6 +172,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     window.addEventListener("beforeunload", this.saveHorizontalSizesToLocalStorageDebounced);
     window.addEventListener("beforeunload", this.saveVerticalSizesToLocalStorageDebounced);
   }
+
   /**
    * Cleanup: Remove event listeners to prevent memory leaks.
    */
@@ -163,6 +180,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     this.removeTouchEvent();
     this.removeEvent();
   }
+
   /**
    * Initialization: Set up initial sizes and wrapper based on the provided mode.
    */
@@ -217,6 +235,15 @@ export default class Split extends React.Component<SplitProps, SplitState> {
   setInitialSizes() {
     const { mode, initialSizes } = this.props;
     const sections = this.warpper?.children;
+    // console.log("");
+    // console.log("child", mode, this.warpper);
+    // console.log("");
+
+    if (this.props.id) {
+      SplitUtils.setSplitPaneInstance({
+        [this.props.id]: this.warpper,
+      });
+    }
 
     if (sections && initialSizes && initialSizes.length > 0) {
       const userLayoutDefault = this.userSession.GetSession(mode!);
@@ -276,7 +303,13 @@ export default class Split extends React.Component<SplitProps, SplitState> {
             contentTarget.setAttribute("min-size", `${this.props.minSizes![i] || 0}`);
             contentTarget.setAttribute("max-size", `${this.props.maxSizes![i] || 100}`);
             // remove horizontal handlebar icons if some sections are closed
-            ManageHandleBar.removeHandleIconOnClose(sectionCounter++, SplitUtils.modeWrapper, SplitUtils.cachedMappedSplitPanePosition, "horizontal");
+            ManageHandleBar.removeHandleIconOnClose(
+              this.warpper,
+              sectionCounter++,
+              SplitUtils.modeWrapper,
+              SplitUtils.cachedMappedSplitPanePosition,
+              "horizontal"
+            );
           } else if (mode === this.VERTICAL && contentTarget) {
             if (userLayoutDefault && userLayoutDefault.length > 0 && this.props.enableSessionStorage) {
               if (userLayoutDefault[i]["flexGrow"] === "-1") {
@@ -315,7 +348,13 @@ export default class Split extends React.Component<SplitProps, SplitState> {
             contentTarget.setAttribute("min-size", `${this.props.minSizes![i] || 0}`);
             contentTarget.setAttribute("max-size", `${this.props.maxSizes![i] || 100}`);
             // remove vertical handlebar icons if some sections are closed
-            ManageHandleBar.removeHandleIconOnClose(sectionCounter++, SplitUtils.modeWrapper, SplitUtils.cachedMappedSplitPanePosition, "vertical");
+            ManageHandleBar.removeHandleIconOnClose(
+              this.warpper,
+              sectionCounter++,
+              SplitUtils.modeWrapper,
+              SplitUtils.cachedMappedSplitPanePosition,
+              "vertical"
+            );
           }
         }
       }
@@ -324,7 +363,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
       let openSectionCounter = 0;
       if (sections && sections.length > 0) {
         for (let pane = 0; pane < initialSizes.length; pane++) {
-          if (SplitUtils.isSectionOpen(pane + 1, mode!)) {
+          if (SplitUtils.isSectionOpen(this.warpper, pane + 1, mode!)) {
             openSectionCounter++;
           }
         }
@@ -381,7 +420,13 @@ export default class Split extends React.Component<SplitProps, SplitState> {
           }
           ++counter;
           // remove horizontal handlebar icons if some sections are closed
-          ManageHandleBar.removeHandleIconOnClose(sectionCounter++, SplitUtils.modeWrapper, SplitUtils.cachedMappedSplitPanePosition, "horizontal");
+          ManageHandleBar.removeHandleIconOnClose(
+            this.warpper,
+            sectionCounter++,
+            SplitUtils.modeWrapper,
+            SplitUtils.cachedMappedSplitPanePosition,
+            "horizontal"
+          );
         }
         if (mode === this.VERTICAL) {
           const getDimension = contentTarget.parentElement?.getBoundingClientRect();
@@ -403,7 +448,13 @@ export default class Split extends React.Component<SplitProps, SplitState> {
           }
           ++counter;
           // remove vertical handlebar icons if some sections are closed
-          ManageHandleBar.removeHandleIconOnClose(sectionCounter++, SplitUtils.modeWrapper, SplitUtils.cachedMappedSplitPanePosition, "vertical");
+          ManageHandleBar.removeHandleIconOnClose(
+            this.warpper,
+            sectionCounter++,
+            SplitUtils.modeWrapper,
+            SplitUtils.cachedMappedSplitPanePosition,
+            "vertical"
+          );
         }
       }
 
@@ -411,7 +462,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
       let openSectionCounter = 0;
       if (sections && sections.length > 0) {
         for (let pane = 0; pane < initialSizes.length; pane++) {
-          if (SplitUtils.isSectionOpen(pane + 1, mode!)) {
+          if (SplitUtils.isSectionOpen(this.warpper, pane + 1, mode!)) {
             openSectionCounter++;
           }
         }
@@ -443,7 +494,11 @@ export default class Split extends React.Component<SplitProps, SplitState> {
    */
   private setResizingLayout(nextTarget: HTMLElement, prevTarget: HTMLElement, mode: "horizontal" | "vertical") {
     // Determine the reference width based on the layout mode
-    const referenceWidth = mode === "horizontal" ? this.props.width! : this.props.height!;
+    const referenceWidth = String(
+      mode === "horizontal"
+        ? this.props.width || nextTarget?.parentElement?.getBoundingClientRect().width || prevTarget?.parentElement?.getBoundingClientRect().width
+        : this.props.height || nextTarget?.parentElement?.getBoundingClientRect().height || prevTarget?.parentElement?.getBoundingClientRect().height
+    );
 
     // Check if the previous target element is hidden
     if (this.prevToPrev && this.prevToPrev.classList.contains("a-split-hidden")) {
@@ -869,19 +924,44 @@ export default class Split extends React.Component<SplitProps, SplitState> {
       disable,
       onDragEnd,
       onDragging,
+      fixClass,
+      id,
       ...other
     } = this.props;
     const { dragging } = this.state;
     // Generate CSS classes based on component state
-    const cls = [prefixCls, className, `${prefixCls}-${mode}`, dragging ? "dragging" : null].filter(Boolean).join(" ").trim();
+    const cls = [
+      prefixCls,
+      className,
+      `${prefixCls}-${mode}`,
+      dragging ? "dragging" : null,
+      fixClass ? "a-split-pane-fix a-split-pane-helper-fix" : null,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
     const child = React.Children.toArray(children);
     // Extract needed props from the remaining props
     const { initialSizes, minSizes, maxSizes, enableSessionStorage, collapsed, height, width, ...neededProps } = other;
     return (
-      <div className={cls} {...neededProps} ref={(node) => (this.warpper = node)} style={{ height: height, width: width }}>
+      <div
+        className={cls}
+        {...neededProps}
+        ref={(node) => (this.warpper = node)}
+        style={{ height: height || "", width: width || "", ...neededProps.style }}
+        id={id}
+      >
         {React.Children.map(child, (element: any, idx: number) => {
           const props = Object.assign({}, element.props, {
-            className: [childPrefixCls, `${prefixCls}-pane`, "a-split-scrollable", element.props.className].filter(Boolean).join(" ").trim(),
+            className: [
+              childPrefixCls,
+              `${prefixCls}-pane`,
+              element && element.props && element.props.mode !== "horizontal" && element.props.mode !== "vertical" && "a-split-scrollable",
+              element.props.className,
+            ]
+              .filter(Boolean)
+              .join(" ")
+              .trim(),
             style: { ...element.props.style },
           });
           const visibleBar = visible === true || (visible && visible.includes((idx + 1) as never)) || false;
@@ -925,6 +1005,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
               />
             );
           }
+
           return (
             <React.Fragment key={idx}>
               {BarCom}
