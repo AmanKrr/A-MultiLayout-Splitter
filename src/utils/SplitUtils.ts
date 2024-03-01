@@ -47,15 +47,13 @@ class SplitUtils {
 
   static splitPaneInstance: Record<string, Instance> | null = null;
 
-  static minThreshold: number[];
-
   /**
    * Sets the wrapper, mode, and other configurations for the SplitUtils.
    * @param wrapper - HTMLDivElement that wraps the split panes.
    * @param mode - Split mode, either "horizontal" or "vertical".
    * @param enableSessionStorage - Flag to enable session storage for storing split sizes.
    */
-  static setWrapper(wrapper: HTMLDivElement | null, mode: Orientation = "horizontal", minSizes: number[] = [], enableSessionStorage = false): void {
+  static setWrapper(wrapper: HTMLDivElement | null, mode: Orientation = "horizontal", enableSessionStorage = false): void {
     // Set the wrapper, mode, and other configurations
     this.wrapper = wrapper;
     this.mode = mode;
@@ -63,31 +61,44 @@ class SplitUtils {
       ...this.modeWrapper,
       [mode]: wrapper,
     };
-    this.minThreshold = minSizes;
     this.userSession = new SplitSessionStorage();
     this.enableSessionStorage[mode] = enableSessionStorage;
     this.cachedMappedSplitPanePosition[mode] = null;
     LayoutHelper.mapElementPosition(null, this.modeWrapper, mode, this.cachedMappedSplitPanePosition);
   }
 
+  /**
+   * Returns the combined class names for fixing purposes.
+   * @returns {string} Combined class names.
+   */
   static fixClass(): string {
     return this.FIX_CLASS + " " + this.FIX_HELPER_CLASS;
   }
 
+  /**
+   * Sets the split pane instance.
+   * @param {Record<string, Instance>} instance - The instance to set.
+   */
   static setSplitPaneInstance(instance: Record<string, Instance>): void {
+    // If splitPaneInstance already exists, merge the new instance with the existing one
     if (this.splitPaneInstance) {
       this.splitPaneInstance = {
         ...this.splitPaneInstance,
         ...instance,
       };
     } else {
+      // Otherwise, set the splitPaneInstance to the new instance
       this.splitPaneInstance = {
         ...instance,
       };
     }
   }
 
-  static getSplitPaneInstance() {
+  /**
+   * Gets the split pane instance.
+   * @returns {Record<string, Instance>} The split pane instance.
+   */
+  public static getSplitPaneInstance(): Record<string, Element> {
     return this.splitPaneInstance;
   }
 
@@ -264,8 +275,11 @@ class SplitUtils {
       return;
     }
 
-    const sections = instance?.children || this.modeWrapper[splitMode]?.children; // on the basis of mode getting sections element
+    // on the basis of mode getting sections element
+    const sections = instance?.children || this.modeWrapper[splitMode]?.children;
+    // updating cachedMappedSplitPanePosition
     LayoutHelper.mapElementPosition(instance, this.modeWrapper, splitMode, this.cachedMappedSplitPanePosition, true);
+
     if (sections && sectionNumber > 0 && sections.length >= sectionNumber) {
       // Retrieve the correct section position using the cached mapped split-pane position,
       // considering the specified split mode and section number. The 'LayoutHelper' object
@@ -386,7 +400,9 @@ class SplitUtils {
       return;
     }
 
-    const sections = instance?.children || this.modeWrapper[splitMode]?.children; // on the basis of mode getting sections element
+    // on the basis of mode getting sections element
+    const sections = instance?.children || this.modeWrapper[splitMode]?.children;
+    // updating cachedMappedSplitPanePosition
     LayoutHelper.mapElementPosition(instance, this.modeWrapper, splitMode, this.cachedMappedSplitPanePosition, true);
 
     if (sections && sectionNumber > 0 && sections.length >= sectionNumber) {
@@ -536,7 +552,7 @@ class SplitUtils {
    */
   static totalPaneCount(instance: Instance, splitMode: Orientation) {
     // Check if the wrapper is not set
-    if (!this.modeWrapper[splitMode]) {
+    if (!this.modeWrapper[splitMode] && !instance) {
       console.error("Wrapper not set. Call setWrapper before using totalPaneCount.");
       return -1; // Return -1 indicating that the wrapper is not set
     }
@@ -561,7 +577,7 @@ class SplitUtils {
    */
   static totalHandleCount(instance: Instance, splitMode: Orientation) {
     // Check if the wrapper is not set
-    if (!this.modeWrapper[splitMode]) {
+    if (!this.modeWrapper[splitMode] && !instance) {
       console.error("Wrapper not set. Call setWrapper before using totalHandleCount.");
       return -1; // Return -1 indicating that the wrapper is not set
     }

@@ -11,7 +11,13 @@ import DragHandle from "./DragHandle/DragHandle";
 export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onDragEnd"> {
   style?: React.CSSProperties;
   className?: string;
+  /**
+   * Helps in identifying unique Splitter instance
+   */
   id: string;
+  /**
+   * Fix layout issues for deep nested layout
+   */
   prefixCls?: string;
   childPrefixCls?: string;
   fixClass?: boolean;
@@ -184,21 +190,27 @@ export default class Split extends React.Component<SplitProps, SplitState> {
   /**
    * Initialization: Set up initial sizes and wrapper based on the provided mode.
    */
-  componentDidMount() {
+  public componentDidMount() {
     const { mode } = this.props;
-    SplitUtils.setWrapper(this.warpper, mode, this.props.minSizes, this.props.enableSessionStorage);
+    SplitUtils.setWrapper(this.warpper, mode, this.props.enableSessionStorage);
     // Set initial sizes when the component mounts
     this.setInitialSizes();
   }
 
-  private checkTouchDevice() {
+  /**
+   * Checks if the current device supports touch input.
+   * @returns {boolean} Returns true if the device supports touch input, otherwise false.
+   */
+  private checkTouchDevice(): boolean {
+    // Check if the 'ontouchstart' event is supported in the window object
+    // or if the device reports that it has touch points through the navigator object
     return "ontouchstart" in window || navigator.maxTouchPoints > 0;
   }
 
   /**
    * add touch event listeners.
    */
-  private addTouchEvent() {
+  private addTouchEvent(): void {
     if (this.checkTouchDevice()) {
       window.addEventListener("touchmove", this.onDraggingThrottled, {
         passive: false,
@@ -212,7 +224,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
   /**
    * Remove mouse move and mouse up event listeners.
    */
-  private removeTouchEvent() {
+  private removeTouchEvent(): void {
     if (this.checkTouchDevice()) {
       window.removeEventListener("touchmove", this.onDraggingThrottled, false);
       window.removeEventListener("touchcancel", this.onDragEndThrottled, false);
@@ -222,7 +234,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
   /**
    * Remove mouse move and mouse up event listeners.
    */
-  private removeEvent() {
+  private removeEvent(): void {
     window.removeEventListener("mousemove", this.onDraggingThrottled, false);
     window.removeEventListener("mouseup", this.onDragEndThrottled, false);
     window.removeEventListener("beforeunload", this.saveHorizontalSizesToLocalStorageDebounced, false);
@@ -232,20 +244,18 @@ export default class Split extends React.Component<SplitProps, SplitState> {
   /**
    * Set initial sizes for the panes.
    */
-  setInitialSizes() {
+  private setInitialSizes(): void {
     const { mode, initialSizes } = this.props;
     const sections = this.warpper?.children;
-    // console.log("");
-    // console.log("child", mode, this.warpper);
-    // console.log("");
 
-    if (this.props.id) {
-      SplitUtils.setSplitPaneInstance({
-        [this.props.id]: this.warpper,
-      });
-    }
+    if (sections && sections.length > 0) {
+      // on the basis of given id by user setting instance. Id is the key to correctly access the instance.
+      if (this.props.id) {
+        SplitUtils.setSplitPaneInstance({
+          [this.props.id]: this.warpper,
+        });
+      }
 
-    if (sections && initialSizes && initialSizes.length > 0) {
       const userLayoutDefault = this.userSession.GetSession(mode!);
       const totalPaneSize = (sections.length + 1) / 2;
       const totalHandleCount = Math.abs((sections.length + 1) / 2 - sections.length);
@@ -258,14 +268,16 @@ export default class Split extends React.Component<SplitProps, SplitState> {
       let collapsedcounter = 0;
       let sectionCounter = 1;
 
-      for (let i = 0; i < initialSizes.length; i++) {
-        const size = initialSizes[i];
-        const sectionIndex = i * 2; // Each section has a content and separator element
+      // if initialSize props are given distributing the width and height.
+      if (initialSizes && initialSizes.length > 0) {
+        for (let i = 0; i < initialSizes.length; i++) {
+          const size = initialSizes[i];
+          const sectionIndex = i * 2; // Each section has a content and separator element
 
-        if (sections.length > sectionIndex) {
-          const contentTarget = sections[sectionIndex] as HTMLDivElement;
+          if (sections.length > sectionIndex) {
+            const contentTarget = sections[sectionIndex] as HTMLDivElement;
 
-          if (mode === this.HORIZONTAL && contentTarget) {
+            // if localStorage storage is enabled then check localStorage have some stored data related to splitter and set the size
             if (userLayoutDefault && userLayoutDefault.length > 0 && this.props.enableSessionStorage) {
               if (userLayoutDefault[i]["flexGrow"] === "-1") {
                 contentTarget.style.flexBasis = userLayoutDefault[i]["flexBasis"];
@@ -280,7 +292,10 @@ export default class Split extends React.Component<SplitProps, SplitState> {
               const getDimension = contentTarget.parentElement?.getBoundingClientRect();
               if (sizeToReduce > -1) {
                 if (size && size.includes("%")) {
-                  contentTarget.style.flexBasis = `${parseFloat(size) - SplitUtils.pixelToPercentage(sizeToReduce, `${getDimension?.width}px`)}%`;
+                  contentTarget.style.flexBasis = `${
+                    parseFloat(size) -
+                    SplitUtils.pixelToPercentage(sizeToReduce, `${mode === this.HORIZONTAL ? getDimension?.width : getDimension.height}px`)
+                  }%`;
                 } else {
                   contentTarget.style.flexBasis = `${parseFloat(size) - sizeToReduce}px`;
                 }
@@ -302,107 +317,29 @@ export default class Split extends React.Component<SplitProps, SplitState> {
             // setting min and max limit by default 0 and 100
             contentTarget.setAttribute("min-size", `${this.props.minSizes![i] || 0}`);
             contentTarget.setAttribute("max-size", `${this.props.maxSizes![i] || 100}`);
-            // remove horizontal handlebar icons if some sections are closed
+
+            // remove handlebar icons if some sections are closed
             ManageHandleBar.removeHandleIconOnClose(
               this.warpper,
               sectionCounter++,
               SplitUtils.modeWrapper,
               SplitUtils.cachedMappedSplitPanePosition,
-              "horizontal"
-            );
-          } else if (mode === this.VERTICAL && contentTarget) {
-            if (userLayoutDefault && userLayoutDefault.length > 0 && this.props.enableSessionStorage) {
-              if (userLayoutDefault[i]["flexGrow"] === "-1") {
-                contentTarget.style.flexBasis = userLayoutDefault[i]["flexBasis"];
-              } else {
-                if (userLayoutDefault[i]["flexGrow"] === "0") {
-                  contentTarget.classList.add("a-split-hidden");
-                }
-                contentTarget.style.flexBasis = userLayoutDefault[i]["flexBasis"];
-                contentTarget.style.flexGrow = userLayoutDefault[i]["flexGrow"];
-              }
-            } else {
-              const getDimension = contentTarget.parentElement?.getBoundingClientRect();
-              if (sizeToReduce > -1) {
-                if (size && size.includes("%")) {
-                  contentTarget.style.flexBasis = `${parseFloat(size) - SplitUtils.pixelToPercentage(sizeToReduce, `${getDimension?.height}px`)}%`;
-                } else {
-                  contentTarget.style.flexBasis = `${parseFloat(size) - sizeToReduce}px`;
-                }
-              } else {
-                contentTarget.style.flexBasis = `${size}`;
-              }
-              // checks for collaped props
-              if (collapsedcounter > 0) {
-                contentTarget.style.flexGrow = "1";
-                collapsedcounter = 0;
-              }
-              // by default not collapsing any vertical section
-              if ((this.props.collapsed![i] || false) && collapsedcounter === 0) {
-                contentTarget.style.flexGrow = "0";
-                contentTarget.classList.add("a-split-hidden");
-                collapsedcounter++;
-              }
-            }
-            // setting min and max limit by default 0 and 100
-            contentTarget.setAttribute("min-size", `${this.props.minSizes![i] || 0}`);
-            contentTarget.setAttribute("max-size", `${this.props.maxSizes![i] || 100}`);
-            // remove vertical handlebar icons if some sections are closed
-            ManageHandleBar.removeHandleIconOnClose(
-              this.warpper,
-              sectionCounter++,
-              SplitUtils.modeWrapper,
-              SplitUtils.cachedMappedSplitPanePosition,
-              "vertical"
+              mode === this.HORIZONTAL ? "horizontal" : "vertical"
             );
           }
         }
       }
 
-      // check for opened section
-      let openSectionCounter = 0;
-      if (sections && sections.length > 0) {
-        for (let pane = 0; pane < initialSizes.length; pane++) {
-          if (SplitUtils.isSectionOpen(this.warpper, pane + 1, mode!)) {
-            openSectionCounter++;
-          }
-        }
-      }
-
-      // corner case: if only one section is opened then grow first section
-      if (openSectionCounter === 1 && !this.props.collapsed![0]) {
-        if (sections[0]) {
-          (sections[0] as HTMLDivElement).style.flexGrow = "1";
-        }
-      }
-
-      if (userLayoutDefault && userLayoutDefault.length === 0) {
-        if (mode === this.HORIZONTAL) {
-          SplitUtils.saveHorizontalSizesToLocalStorage();
-        } else {
-          SplitUtils.saveVerticalSizesToLocalStorage();
-        }
-      }
-    }
-
-    if (sections && sections.length > 0 && initialSizes && initialSizes.length === 0) {
-      const userLayoutDefault = this.userSession.GetSession(mode!);
-      const totalPaneSize = (sections.length + 1) / 2;
-      const totalHandleCount = Math.abs((sections.length + 1) / 2 - sections.length);
-      // for maintaing perfect size, exclude the handle bar sizes which can not be calculated dynamically.
-      // Because pseudo element can not be accessed by javascript.
-      // Noteable issue: If user tries to modify the css of handlebar this size will cause issue and splitter can show unexpected behaviour.
-      const totalHandleBarLayoutValue =
-        (this.handleBarLayoutInfo.marginLeft + this.handleBarLayoutInfo.marginRight + this.handleBarLayoutInfo.width) * totalHandleCount;
-      const sizeToReduce = totalHandleBarLayoutValue / totalPaneSize;
-      let counter = 0;
-      let collapsedcounter = 0;
-      let sectionCounter = 1;
-      for (let pane = 0; pane < sections.length; pane += 2) {
-        const contentTarget = sections[pane] as HTMLDivElement;
-        if (mode === this.HORIZONTAL) {
+      // if initialSize props are not given
+      // this will dynamically distribute the layout width according to parent width and height.
+      if (initialSizes && initialSizes.length === 0) {
+        let counter = 0;
+        for (let pane = 0; pane < sections.length; pane += 2) {
+          const contentTarget = sections[pane] as HTMLDivElement;
           const getDimension = contentTarget.parentElement?.getBoundingClientRect();
-          contentTarget.style.flexBasis = `${getDimension?.width! / totalPaneSize - sizeToReduce}px`;
+          contentTarget.style.flexBasis = `${
+            mode === this.HORIZONTAL ? getDimension?.width! : getDimension?.height! / totalPaneSize - sizeToReduce
+          }px`;
           // setting min and max limit by default 0 and 100
           contentTarget.setAttribute("min-size", `${this.props.minSizes![counter] || 0}`);
           contentTarget.setAttribute("max-size", `${this.props.maxSizes![counter] || 100}`);
@@ -419,41 +356,13 @@ export default class Split extends React.Component<SplitProps, SplitState> {
             collapsedcounter++;
           }
           ++counter;
-          // remove horizontal handlebar icons if some sections are closed
+          // remove handlebar icons if some sections are closed
           ManageHandleBar.removeHandleIconOnClose(
             this.warpper,
             sectionCounter++,
             SplitUtils.modeWrapper,
             SplitUtils.cachedMappedSplitPanePosition,
-            "horizontal"
-          );
-        }
-        if (mode === this.VERTICAL) {
-          const getDimension = contentTarget.parentElement?.getBoundingClientRect();
-          contentTarget.style.flexBasis = `${getDimension?.height! / totalPaneSize - sizeToReduce}px`;
-          // setting min and max limit by default 0 and 100
-          contentTarget.setAttribute("min-size", `${this.props.minSizes![counter] || 0}`);
-          contentTarget.setAttribute("max-size", `${this.props.maxSizes![counter] || 100}`);
-
-          // checks for collaped props
-          if (collapsedcounter > 0) {
-            contentTarget.style.flexGrow = "1";
-            collapsedcounter = 0;
-          }
-          // by default not collapsing any vertical section
-          if ((this.props.collapsed![counter] || false) && collapsedcounter === 0) {
-            contentTarget.style.flexGrow = "0";
-            contentTarget.classList.add("a-split-hidden");
-            collapsedcounter++;
-          }
-          ++counter;
-          // remove vertical handlebar icons if some sections are closed
-          ManageHandleBar.removeHandleIconOnClose(
-            this.warpper,
-            sectionCounter++,
-            SplitUtils.modeWrapper,
-            SplitUtils.cachedMappedSplitPanePosition,
-            "vertical"
+            mode === this.HORIZONTAL ? "horizontal" : "vertical"
           );
         }
       }
@@ -492,7 +401,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
    * @param prevTarget - The previous target HTMLElement.
    * @param mode - The layout mode, either "horizontal" or "vertical".
    */
-  private setResizingLayout(nextTarget: HTMLElement, prevTarget: HTMLElement, mode: "horizontal" | "vertical") {
+  private setResizingLayout(nextTarget: HTMLElement, prevTarget: HTMLElement, mode: "horizontal" | "vertical"): void {
     // Determine the reference width based on the layout mode
     const referenceWidth = String(
       mode === "horizontal"

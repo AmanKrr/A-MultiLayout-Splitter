@@ -62,19 +62,9 @@ function DragHandle({
     (((e.target as HTMLDivElement).parentElement as HTMLDivElement).lastChild as HTMLElement)?.classList.add("a-icon-hide");
   }
 
-  // console.log("inside handle", props);
   return (
     <div
       {...props}
-      // className={
-
-      //   `splitterHandleBarContainer-` +
-      //   mode +
-      //   ` splitterHandleBarContainer-` +
-      //   mode +
-      //   "-" +
-      //   position
-      // }
       onMouseDown={props.className.includes("a-split-handle-disable") ? () => {} : onMouseDown}
       onTouchStart={props.className.includes("a-split-handle-disable") ? () => {} : onTouchStart}
       onMouseOver={props.className.includes("a-split-handle-disable") ? () => {} : handleMouseOverParent}
