@@ -4,7 +4,7 @@
     "target": "es2015",
     "module": "esnext",
     "declaration": true,
-    "outDir": "./dist",
+    "outDir": "./ts-build",
     "strict": false,
     "lib": ["dom", "dom.iterable", "esnext"],
     "jsx": "react-jsx",
