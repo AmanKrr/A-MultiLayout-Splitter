@@ -1,8 +1,17 @@
 /* Horizontal */
 .a-split-bar {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
   display: flex;
   flex: 0 0 auto;
+  -webkit-box-pack: center;
+  -moz-box-pack: center;
+  -ms-flex-pack: center;
   justify-content: center;
+  -webkit-box-align: center;
+  -moz-box-align: center;
+  -ms-flex-align: center;
   align-items: center;
   position: relative;
   -webkit-user-select: none;
@@ -17,6 +26,11 @@
 }
 
 .a-split-horizontal>.a-split-bar {
+  -webkit-box-orient: horizontal;
+  -moz-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -moz-box-direction: normal;
+  -webkit-flex-direction: row;
   flex-direction: row;
   height: inherit !important;
   width: 1px;
@@ -165,10 +179,13 @@ button.splitter-horizontal-right-icon::after {
   margin-right: 27px;
 }
 
-
-
 /* Vertical */
 .a-split-vertical>.a-split-bar {
+  -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -moz-box-direction: normal;
+  -webkit-flex-direction: column;
   flex-direction: column;
   width: inherit !important;
   height: 1px;
