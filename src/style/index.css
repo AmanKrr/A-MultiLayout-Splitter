@@ -26,7 +26,7 @@
 .a-split.a-split-vertical {
   border-width: 1px;
   display: flex;
-  overflow: hidden !important;
+  overflow: hidden;
   position: relative;
   touch-action: none;
   width: 100%;
