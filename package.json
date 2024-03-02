@@ -1,7 +1,7 @@
 {
   "name": "a-multilayout-splitter",
   "description": "A React package designed to facilitate the division of your views into distinct sections, offering effortless resizing and support for intricate layouts.",
-  "main": "dist/index.js",
+  "main": "dist/index.min.js",
   "types": "dist/index.d.ts",
   "author": "Aman Kumar",
   "private": false,
