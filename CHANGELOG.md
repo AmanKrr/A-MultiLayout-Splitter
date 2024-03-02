@@ -1,3 +1,10 @@
+## [4.0.5](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.0.4...v4.0.5) (2024-03-02)
+
+
+### Bug Fixes
+
+* Circumvent npm's 24-hour version name reuse policy with dummy version increment commits ([69f05ab](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/69f05abf6e00ea90fea285d51ed8a2696874826b))
+
 ## [4.0.4](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.0.3...v4.0.4) (2024-03-02)
 
 
