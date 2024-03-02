@@ -1,3 +1,24 @@
+# [4.0.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v3.0.2...v4.0.0) (2024-03-02)
+
+
+### Bug Fixes
+
+* Add cross browser css properties ([496f68c](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/496f68c6bfc99ea18ca0a67046e31704774be2ba))
+* Fix issue where nested layout handlebar arrow icons trigger different split pane behavior ([aec74fb](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/aec74fb8ffeee68b3f946038e07ac840ad7e882e))
+* Layout issues. ([e1d2a87](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/e1d2a877164e099ce0bec36a32d674c4e718f005))
+* Move lodash to dependencies from peerDependencies and add lodash type as devDependencies ([8db4558](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/8db4558025ccca279df7761de7aefbf3090438de))
+* overflow container issue. ([a195595](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/a1955950b1262b736d106e223d1dbec2d359cdd9))
+
+
+### Performance Improvements
+
+* Code refactor ([0577ad1](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/0577ad1652bdbf4e0f4359f8f68c7b7f70c50495))
+
+
+### BREAKING CHANGES
+
+* Splitter component now requires providing an ID, and the openSplitter and closeSplitter methods now require an instance of the split pane.
+
 ## [3.0.2](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v3.0.1...v3.0.2) (2024-02-26)
 
 
