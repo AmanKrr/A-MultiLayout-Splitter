@@ -1,7 +1,7 @@
 {
   "name": "a-multilayout-splitter",
   "description": "A React package designed to facilitate the division of your views into distinct sections, offering effortless resizing and support for intricate layouts.",
-  "main": "dist/index.min.js",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "author": "Aman Kumar",
   "private": false,
@@ -16,7 +16,7 @@
     "url": "git+https://github.com/AmanKrr/A-MultiLayout-Splitter.git"
   },
   "scripts": {
-    "clean": "rimraf ts-build/",
+    "clean": "rimraf dist/ ts-build/",
     "copy-files": "copyfiles -u 1 src/**/*.css src/assets/**/* ts-build/",
     "build": "npm run clean && tsc && npm run copy-files && node minifyBuild.js",
     "semantic-release": "semantic-release"

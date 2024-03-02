@@ -31,7 +31,7 @@ function minifyFiles(dir) {
       // Ensure parent directories exist
       fs.mkdirSync(outputFileDir, { recursive: true });
       // Minify the JavaScript file using UglifyJS and save the minified file
-      execSync(`npx uglifyjs ${filePath} -c -m -o ${outputFilePath.replace(".js", ".min.js")}`);
+      execSync(`npx uglifyjs ${filePath} -c -m -o ${outputFilePath}`);
     }
     // Check if the current item is a CSS file
     else if (file.endsWith(".css")) {
@@ -41,7 +41,7 @@ function minifyFiles(dir) {
       fs.mkdirSync(outputFileDir, { recursive: true });
       // Minify the CSS file using uglifycss and save the minified file
       const minifiedCss = uglifycss.processString(fs.readFileSync(filePath, "utf8"));
-      fs.writeFileSync(outputFilePath.replace(".css", ".min.css"), minifiedCss, "utf8");
+      fs.writeFileSync(outputFilePath, minifiedCss, "utf8");
     }
     // Check if the current item is a TypeScript declaration file
     else if (file.endsWith(".d.ts")) {
