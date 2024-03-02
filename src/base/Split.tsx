@@ -1,12 +1,12 @@
 import React, { TouchEvent } from "react";
 import "./style/index.css";
-import SplitUtils from "./utils/SplitUtils";
-import SplitSessionStorage, { ISplitSessionStorage } from "./utils/SplitSessionStorage";
+import SplitUtils from "../utils/SplitUtils";
+import SplitSessionStorage, { ISplitSessionStorage } from "../utils/SplitSessionStorage";
 
 import throttle from "lodash/throttle";
 import debounce from "lodash/debounce";
-import ManageHandleBar from "./helper/ManageHandleBar";
-import DragHandle from "./DragHandle/DragHandle";
+import ManageHandleBar from "../helper/ManageHandleBar";
+import DragHandle from "../DragHandle/DragHandle";
 
 export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onDragEnd"> {
   style?: React.CSSProperties;
