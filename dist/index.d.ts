@@ -3,8 +3,16 @@ import "./style/index.css";
 export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onDragEnd"> {
     style?: React.CSSProperties;
     className?: string;
+    /**
+     * Helps in identifying unique Splitter instance
+     */
+    id: string;
+    /**
+     * Fix layout issues for deep nested layout
+     */
     prefixCls?: string;
     childPrefixCls?: string;
+    fixClass?: boolean;
     /**
      * Drag width/height change callback function,
      * the width or height is determined according to the mode parameter
@@ -53,11 +61,24 @@ export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
     /**
      * Height for splitter parent
      */
-    height?: string;
+    height?: null | string;
     /**
      * Width for splitter parent
      */
-    width?: string;
+    width?: null | string;
+}
+interface DefaultProps {
+    prefixCls: string;
+    childPrefixCls: string;
+    visiable: boolean;
+    mode: string;
+    initialSizes: string[] | [];
+    minSizes: number[] | [];
+    maxSizes: number[] | [];
+    enableSessionStorage: boolean;
+    collapsed: boolean[] | [];
+    height: string | null;
+    width: string | null;
 }
 /**
  * State for the Split component.
@@ -75,7 +96,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     private RIGHT;
     private HORIZONTAL;
     private VERTICAL;
-    static defaultProps: SplitProps;
+    static defaultProps: DefaultProps;
     state: SplitState;
     warpper: HTMLDivElement | null;
     paneNumber: number;
@@ -110,6 +131,10 @@ export default class Split extends React.Component<SplitProps, SplitState> {
      * Initialization: Set up initial sizes and wrapper based on the provided mode.
      */
     componentDidMount(): void;
+    /**
+     * Checks if the current device supports touch input.
+     * @returns {boolean} Returns true if the device supports touch input, otherwise false.
+     */
     private checkTouchDevice;
     /**
      * add touch event listeners.
@@ -126,7 +151,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     /**
      * Set initial sizes for the panes.
      */
-    setInitialSizes(): void;
+    private setInitialSizes;
     /**
      * This function adjusts the layout of two adjacent elements while resizing,
      * ensuring that the flex basis of the elements is updated correctly based on the resizing mode.
@@ -152,3 +177,4 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     onDragEnd(): void;
     render(): JSX.Element;
 }
+export {};
