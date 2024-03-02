@@ -1,3 +1,10 @@
+## [4.0.4](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.0.3...v4.0.4) (2024-03-02)
+
+
+### Bug Fixes
+
+* CSS import issue. ([12206f6](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/12206f6ddb1e2378aef490cc863f256568729b8c))
+
 ## [4.0.3](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.0.2...v4.0.3) (2024-03-02)
 
 
