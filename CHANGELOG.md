@@ -1,3 +1,10 @@
+## [4.0.2](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.0.1...v4.0.2) (2024-03-02)
+
+
+### Bug Fixes
+
+* Import errors while working in containers like codesanbox or stackblitz ([e5c892e](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/e5c892e07aec102c60e8f72ae7efb29fdca75b21))
+
 ## [4.0.1](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.0.0...v4.0.1) (2024-03-02)
 
 
