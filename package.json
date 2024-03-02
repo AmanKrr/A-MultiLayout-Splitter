@@ -13,7 +13,7 @@
   "license": "MIT",
   "homepage": "https://amankrr.github.io/react-multilayout-split/",
   "repository": {
-    "url": "https://github.com/AmanKrr/A-MultiLayout-Splitter.git"
+    "url": "git+https://github.com/AmanKrr/A-MultiLayout-Splitter.git"
   },
   "scripts": {
     "clean": "rimraf ts-build/",
