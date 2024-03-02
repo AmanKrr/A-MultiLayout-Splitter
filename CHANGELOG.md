@@ -1,3 +1,11 @@
+## [4.0.1](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.0.0...v4.0.1) (2024-03-02)
+
+
+### Bug Fixes
+
+* pkg error ([d0b0fbc](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/d0b0fbc77f48e360aed64cbaa1ba7a91af31e6cf))
+* SplitUtils import fix ([4981c11](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/4981c116fc46b8e71f4d95af88dbdd84b61cd8a1))
+
 # [4.0.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v3.0.2...v4.0.0) (2024-03-02)
 
 
