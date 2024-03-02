@@ -1,3 +1,10 @@
+## [4.0.3](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.0.2...v4.0.3) (2024-03-02)
+
+
+### Bug Fixes
+
+* Resolve import issues encountered in build due to file rename during minification ([04e6605](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/04e6605b441e801c8a5817a4f0e32a86b0dd44d7))
+
 ## [4.0.2](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.0.1...v4.0.2) (2024-03-02)
 
 
