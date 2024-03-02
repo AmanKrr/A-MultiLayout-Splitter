@@ -1,5 +1,5 @@
 import React, { TouchEvent } from "react";
-import "./style/index.css";
+import "../style/index.css";
 import SplitUtils from "../utils/SplitUtils";
 import SplitSessionStorage, { ISplitSessionStorage } from "../utils/SplitSessionStorage";
 
