@@ -1,5 +1,5 @@
 import React, { TouchEvent } from "react";
-import "./style/index.css";
+import "../style/index.css";
 export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onDragEnd"> {
     style?: React.CSSProperties;
     className?: string;
