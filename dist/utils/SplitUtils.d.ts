@@ -42,7 +42,7 @@ declare class SplitUtils {
      * Gets the split pane instance.
      * @returns {Record<string, Instance>} The split pane instance.
      */
-    static getSplitPaneInstance(): Record<string, Element>;
+    static getSplitPaneInstance(): Record<string, Instance> | null;
     /**
      * Calculates the position of the handlebar based on the position of the section.
      * @param handlePosition The position of the section.
@@ -78,21 +78,21 @@ declare class SplitUtils {
      * @param splitMode The mode of splitting, either "horizontal" or "vertical".
      * @returns -1 if the wrapper is not set, otherwise no return value.
      */
-    static reCheckPaneOpening(instance: Instance, splitMode: Orientation): number;
+    static reCheckPaneOpening(instance: Instance, splitMode: Orientation): -1 | undefined;
     /**
      * Closes a specific split section.
      * @param sectionNumber - The section number to be closed.
      * @param splitMode - Split mode, either "horizontal" or "vertical".
      * @param direction - The direction of the close operation, either "left", "right", "top", "bottom" or "null". Direction null is used only when not using arrow icon of handlebar to close the splitter.
      */
-    static closeSplitter(instance: Instance, sectionNumber: number, splitMode: Orientation, direction?: "left" | "right" | "top" | "bottom" | null): void;
+    static closeSplitter(instance: Instance | undefined, sectionNumber: number, splitMode: Orientation, direction?: "left" | "right" | "top" | "bottom" | null): void;
     /**
      * Opens a specific split section with a new size.
      * @param sectionNumber - The section number to be opened.
      * @param splitMode - Split mode, either "horizontal" or "vertical".
      * @param direction - The direction of the open operation, either "left" or "right".
      */
-    static openSplitter(instance: Instance, sectionNumber: number, splitMode: Orientation, direction?: "left" | "right" | "top" | "bottom" | null): void;
+    static openSplitter(instance: Instance | undefined, sectionNumber: number, splitMode: Orientation, direction?: "left" | "right" | "top" | "bottom" | null): void;
     /**
      * Calculates the total number of panes in the split panes based on the split mode.
      * @param splitMode The mode of splitting, either "horizontal" or "vertical".

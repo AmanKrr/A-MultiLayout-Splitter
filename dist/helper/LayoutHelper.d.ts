@@ -16,7 +16,7 @@ declare class LayoutHelper {
      * @param {"horizontal" | "vertical"} splitMode - The split mode, either "horizontal" or "vertical".
      * @returns {number | undefined} The total size of remaining sections, or undefined if an error occurs.
      */
-    static calculateRemainingSectionSize(wrapper: Record<string, HTMLDivElement | HTMLElement>, skipSections: number[], splitMode: "horizontal" | "vertical"): number;
+    static calculateRemainingSectionSize(wrapper: Record<string, HTMLDivElement | HTMLElement>, skipSections: number[], splitMode: "horizontal" | "vertical"): number | undefined;
     /**
      * Gets the section index based on the provided parameters.
      * @param {Record<string, Record<string, string | null> | null>} cachedMappedSplitPanePosition - The cached mapped split pane position.
@@ -24,6 +24,6 @@ declare class LayoutHelper {
      * @param {number} sectionNumber - The section number to retrieve.
      * @returns {number | null} The section index, or null if not found.
      */
-    static getSection(cachedMappedSplitPanePosition: Record<string, Record<string, string | null> | null>, splitMode: "horizontal" | "vertical", sectionNumber: number): number;
+    static getSection(cachedMappedSplitPanePosition: Record<string, Record<string, string | null> | null>, splitMode: "horizontal" | "vertical", sectionNumber: number): number | null;
 }
 export default LayoutHelper;
