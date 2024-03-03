@@ -21,6 +21,7 @@
   - [Nested Layout](#Nested-Layout)
 - [Features](#features)
 - [License](#license)
+- [Limitations](#limitations)
 
 ## Installation
 
@@ -58,7 +59,7 @@ import { Split } from "a-multilayout-splitter";
 <Split mode="horizontal" id="split1">
   <div>Pane 1</div>
   <div>Pane 2</div>
-</Split>;
+</Split>
 ```
 
 ### Orientation
@@ -137,7 +138,7 @@ import { Split } from "a-multilayout-splitter";
 </Split>;
 ```
 
-#### Sizes in pixel and percentage both.
+#### Sizes in pixel and percentage both
 
 ```jsx
 <Split mode="horizontal" width="200px" height="100px" initialSizes={["100%", "50%"]}>
