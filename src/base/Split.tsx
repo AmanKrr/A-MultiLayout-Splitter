@@ -294,7 +294,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
                 if (size && size.includes("%")) {
                   contentTarget.style.flexBasis = `${
                     parseFloat(size) -
-                    SplitUtils.pixelToPercentage(sizeToReduce, `${mode === this.HORIZONTAL ? getDimension?.width : getDimension.height}px`)
+                    SplitUtils.pixelToPercentage(sizeToReduce, `${mode === this.HORIZONTAL ? getDimension?.width : getDimension?.height}px`)
                   }%`;
                 } else {
                   contentTarget.style.flexBasis = `${parseFloat(size) - sizeToReduce}px`;
@@ -338,7 +338,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
           const contentTarget = sections[pane] as HTMLDivElement;
           const getDimension = contentTarget.parentElement?.getBoundingClientRect();
           contentTarget.style.flexBasis = `${
-            mode === this.HORIZONTAL ? getDimension?.width! : getDimension?.height! / totalPaneSize - sizeToReduce
+            (mode === this.HORIZONTAL ? getDimension?.width! : getDimension?.height!) / totalPaneSize - sizeToReduce
           }px`;
           // setting min and max limit by default 0 and 100
           contentTarget.setAttribute("min-size", `${this.props.minSizes![counter] || 0}`);
@@ -369,11 +369,13 @@ export default class Split extends React.Component<SplitProps, SplitState> {
 
       // check for opened section
       let openSectionCounter = 0;
+      let paneCounter = 0;
       if (sections && sections.length > 0) {
-        for (let pane = 0; pane < initialSizes.length; pane++) {
-          if (SplitUtils.isSectionOpen(this.warpper, pane + 1, mode!)) {
+        for (let pane = 0; pane < sections.length; pane += 2) {
+          if (SplitUtils.isSectionOpen(this.warpper, paneCounter + 1, mode!)) {
             openSectionCounter++;
           }
+          paneCounter++;
         }
       }
 

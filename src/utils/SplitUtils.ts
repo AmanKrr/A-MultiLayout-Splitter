@@ -98,7 +98,7 @@ class SplitUtils {
    * Gets the split pane instance.
    * @returns {Record<string, Instance>} The split pane instance.
    */
-  public static getSplitPaneInstance(): Record<string, Element> {
+  public static getSplitPaneInstance() {
     return this.splitPaneInstance;
   }
 

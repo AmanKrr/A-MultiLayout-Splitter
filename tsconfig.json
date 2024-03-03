@@ -5,7 +5,7 @@
     "module": "esnext",
     "declaration": true,
     "outDir": "./ts-build",
-    "strict": false,
+    "strict": true,
     "lib": ["dom", "dom.iterable", "esnext"],
     "jsx": "react-jsx",
     "moduleResolution": "node",
