@@ -46,12 +46,14 @@ Please note that the documentation for this project is currently a work in progr
 
 To add a splitter to your application, use the `<Split>` component with child elements representing the components you want to split. By default, the splitter will occupy 100% of the height and width of its parent container.
 
+[CodeSanbox Example](#https://codesandbox.io/p/sandbox/react-splitter-multilayout-pjfxss?file=%2Fsrc%2FApp.tsx%3A1%2C1-24%2C1&layout=%257B%2522sidebarPanel%2522%253A%2522EXPLORER%2522%252C%2522rootPanelGroup%2522%253A%257B%2522direction%2522%253A%2522horizontal%2522%252C%2522contentType%2522%253A%2522UNKNOWN%2522%252C%2522type%2522%253A%2522PANEL_GROUP%2522%252C%2522id%2522%253A%2522ROOT_LAYOUT%2522%252C%2522panels%2522%253A%255B%257B%2522type%2522%253A%2522PANEL_GROUP%2522%252C%2522contentType%2522%253A%2522UNKNOWN%2522%252C%2522direction%2522%253A%2522vertical%2522%252C%2522id%2522%253A%2522cltb6t9bt00063b6qxz52lvdx%2522%252C%2522sizes%2522%253A%255B100%252C0%255D%252C%2522panels%2522%253A%255B%257B%2522type%2522%253A%2522PANEL_GROUP%2522%252C%2522contentType%2522%253A%2522EDITOR%2522%252C%2522direction%2522%253A%2522horizontal%2522%252C%2522id%2522%253A%2522EDITOR%2522%252C%2522panels%2522%253A%255B%257B%2522type%2522%253A%2522PANEL%2522%252C%2522contentType%2522%253A%2522EDITOR%2522%252C%2522id%2522%253A%2522cltb6t9bt00023b6qz2mrxv6y%2522%257D%255D%257D%252C%257B%2522type%2522%253A%2522PANEL_GROUP%2522%252C%2522contentType%2522%253A%2522SHELLS%2522%252C%2522direction%2522%253A%2522horizontal%2522%252C%2522id%2522%253A%2522SHELLS%2522%252C%2522panels%2522%253A%255B%257B%2522type%2522%253A%2522PANEL%2522%252C%2522contentType%2522%253A%2522SHELLS%2522%252C%2522id%2522%253A%2522cltb6t9bt00033b6qg2au12so%2522%257D%255D%252C%2522sizes%2522%253A%255B100%255D%257D%255D%257D%252C%257B%2522type%2522%253A%2522PANEL_GROUP%2522%252C%2522contentType%2522%253A%2522DEVTOOLS%2522%252C%2522direction%2522%253A%2522vertical%2522%252C%2522id%2522%253A%2522DEVTOOLS%2522%252C%2522panels%2522%253A%255B%257B%2522type%2522%253A%2522PANEL%2522%252C%2522contentType%2522%253A%2522DEVTOOLS%2522%252C%2522id%2522%253A%2522cltb6t9bt00053b6qa2a0xn2d%2522%257D%255D%252C%2522sizes%2522%253A%255B100%255D%257D%255D%252C%2522sizes%2522%253A%255B50%252C50%255D%257D%252C%2522tabbedPanels%2522%253A%257B%2522cltb6t9bt00023b6qz2mrxv6y%2522%253A%257B%2522id%2522%253A%2522cltb6t9bt00023b6qz2mrxv6y%2522%252C%2522tabs%2522%253A%255B%257B%2522id%2522%253A%2522cltbb2lsv00023b6kbjwstzv9%2522%252C%2522mode%2522%253A%2522permanent%2522%252C%2522type%2522%253A%2522FILE%2522%252C%2522initialSelections%2522%253A%255B%257B%2522startLineNumber%2522%253A1%252C%2522startColumn%2522%253A1%252C%2522endLineNumber%2522%253A24%252C%2522endColumn%2522%253A1%257D%255D%252C%2522filepath%2522%253A%2522%252Fsrc%252FApp.tsx%2522%252C%2522state%2522%253A%2522IDLE%2522%257D%255D%252C%2522activeTabId%2522%253A%2522cltbb2lsv00023b6kbjwstzv9%2522%257D%252C%2522cltb6t9bt00053b6qa2a0xn2d%2522%253A%257B%2522tabs%2522%253A%255B%257B%2522id%2522%253A%2522cltb6t9bt00043b6qnn4yedvy%2522%252C%2522mode%2522%253A%2522permanent%2522%252C%2522type%2522%253A%2522UNASSIGNED_PORT%2522%252C%2522port%2522%253A0%252C%2522path%2522%253A%2522%252F%2522%257D%255D%252C%2522id%2522%253A%2522cltb6t9bt00053b6qa2a0xn2d%2522%252C%2522activeTabId%2522%253A%2522cltb6t9bt00043b6qnn4yedvy%2522%257D%252C%2522cltb6t9bt00033b6qg2au12so%2522%253A%257B%2522tabs%2522%253A%255B%255D%252C%2522id%2522%253A%2522cltb6t9bt00033b6qg2au12so%2522%257D%257D%252C%2522showDevtools%2522%253Atrue%252C%2522showShells%2522%253Afalse%252C%2522showSidebar%2522%253Atrue%252C%2522sidebarPanelSize%2522%253A15%257D)
+
 ### Note:
 
 The `id` prop is crucial as it helps you easily identify the instance of each split. You can refer to the [Programmatic Collapse and Expand](#programmatic-collapse-and-expand) section for more information.
 
 ```jsx
-import Split from "a-multilayout-splitter";
+import { Split } from "a-multilayout-splitter";
 
 <Split mode="horizontal" id="split1">
   <div>Pane 1</div>
@@ -64,10 +66,12 @@ import Split from "a-multilayout-splitter";
 Control the orientation of the panes by setting the `mode` property to either `'horizontal'` or `'vertical'`.
 
 ```jsx
+import { Split } from "a-multilayout-splitter";
+
 <Split mode="vertical" id="split1">
   <div>Pane 1</div>
   <div>Pane 2</div>
-</Split>
+</Split>;
 ```
 
 ### Collapsible Panes
@@ -78,6 +82,8 @@ Enable or disable the collapsible functionality using the `lineBar` property.
 - To disable, set `lineBar` without any value or with specific handlebar positions.
 
 ```jsx
+import { Split } from "a-multilayout-splitter";
+
 <Split id='split1' mode='horizontal' lineBar>
   <div>Pane 1</div>
   <div>Pane 2</div>
@@ -96,11 +102,13 @@ Enable or disable the collapsible functionality using the `lineBar` property.
 Define initial sizes and collapsed state for panes to enhance user experience.
 
 ```jsx
+import { Split } from "a-multilayout-splitter";
+
 <Split id="split1" mode="horizontal" initialSizes={["200px", "200px", "200px"]} collapsed={[true, false, true]} width="600px" height="100px">
   <div>Pane 1</div>
   <div>Pane 2</div>
   <div>Pane 3</div>
-</Split>
+</Split>;
 ```
 
 ### Pixel and percentage support
@@ -110,19 +118,23 @@ You can also define the sizes for splitter pane using initialSizes property. It 
 #### Sizes in pixel
 
 ```jsx
+import { Split } from "a-multilayout-splitter";
+
 <Split mode="horizontal" width="200px" height="100px" initialSizes={["100px", "100px"]}>
   <div>Pane 1</div>
   <div>Pane 2</div>
-</Split>
+</Split>;
 ```
 
 #### Sizes in percentage
 
 ```jsx
+import { Split } from "a-multilayout-splitter";
+
 <Split mode="horizontal" width="200px" height="100px" initialSizes={["50%", "50%"]}>
   <div>Pane 1</div>
   <div>Pane 2</div>
-</Split>
+</Split>;
 ```
 
 #### Sizes in pixel and percentage both.
@@ -143,6 +155,8 @@ Use `SplitUtils` to programmatically control the panes.
 For collapsing and expanding split panes, it's necessary to provide the instance. Each split instance is stored under the given split ID, allowing you to easily use that ID and pass the instance when needed. To retrieve all splitter instances, you can utilize `SplitUtils.getSplitInstance()` by providing the key (i.e., the ID) of the specific splitter on which you want to expand or collapse. This approach ensures precise control over the behavior of split panes.
 
 ```jsx
+import { Split, SplitUtils } from "a-multilayout-splitter";
+
 <Split mode='horizontal' id='split1'>
   <div>Pane 1</div>
   <div>Pane 2</div>
@@ -158,10 +172,12 @@ For collapsing and expanding split panes, it's necessary to provide the instance
 Restrict pane sizes with minimum and maximum values.
 
 ```jsx
+import { Split } from "a-multilayout-splitter";
+
 <Split id="split1" mode="horizontal" minSizes={[20, 20]} maxSizes={[80, 80]}>
   <div>Pane 1</div>
   <div>Pane 2</div>
-</Split>
+</Split>;
 ```
 
 ### Disabling Resize
@@ -169,19 +185,23 @@ Restrict pane sizes with minimum and maximum values.
 Disable resizing entirely or for specific handlebars.
 
 ```jsx
+import { Split } from "a-multilayout-splitter";
+
 <Split id="split1" mode="horizontal" disable>
   <div>Pane 1</div>
   <div>Pane 2</div>
-</Split>
+</Split>;
 ```
 
 ```jsx
+import { Split } from "a-multilayout-splitter";
+
 <Split id="split1" mode="horizontal" disable={[1, 2]}>
   <div>Pane 1</div>
   <div>Pane 2</div>
   <div>Pane 3</div>
   <div>Pane 4</div>
-</Split>
+</Split>;
 ```
 
 ### Custom Handlebar
@@ -189,6 +209,8 @@ Disable resizing entirely or for specific handlebars.
 Implement custom handlebars with the `renderBar` property. Currently, custom handlebars do not support the 'disable' and 'lineBar' properties.
 
 ```jsx
+import { Split } from "a-multilayout-splitter";
+
 <Split id='split1' mode="horizontal" renderBar={() => /* Custom render function */}>
   <div>Pane 1</div>
   <div>Pane 2</div>
@@ -200,6 +222,8 @@ Implement custom handlebars with the `renderBar` property. Currently, custom han
 When dealing with deeply nested layouts, you may encounter resizing issues where the layout does not expand or grow as expected. To address this issue, the fixClass property and SplitUtils.fixClass() method are provided as solutions. By applying the fixClass property to the appropriate splitter, you can dynamically adjust the layout to ensure proper resizing behavior.
 
 ```jsx
+import { Split } from "a-multilayout-splitter";
+
 <div className="App" style={{ width: "100%", height: "500px" }}>
   <Split mode="vertical" id="splitter1">
     <Split mode="horizontal" id="splitter2" collapsed={[false, false]}>
@@ -218,7 +242,7 @@ When dealing with deeply nested layouts, you may encounter resizing issues where
       <div>Pane 7</div>
     </Split>
   </Split>
-</div>
+</div>;
 ```
 
 ## Local Storage
