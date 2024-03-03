@@ -1,3 +1,10 @@
+## [4.0.6](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.0.5...v4.0.6) (2024-03-03)
+
+
+### Bug Fixes
+
+* Size distribution calculation when no initialSizes porps is given ([44c59e0](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/44c59e096dcd1afdc753910b61b033642f092a55))
+
 ## [4.0.5](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.0.4...v4.0.5) (2024-03-02)
 
 
