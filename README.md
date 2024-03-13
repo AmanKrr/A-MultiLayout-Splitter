@@ -13,14 +13,15 @@
   - [Pixel and Percentage Support](#pixel-and-percentage-support)
     - [Sizes in Pixel](#sizes-in-pixel)
     - [Sizes in Percentage](#sizes-in-percentage)
-    - [Sizes in Pixel and Percentage both](#size-in-pixel-and-percentage-both)
+    - [Sizes in Pixel and Percentage both](#sizes-in-pixel-and-percentage-both)
   - [Programmatic Collapse and Expand](#programmatic-collapse-and-expand)
   - [Min and Max Sizes](#min-and-max-sizes)
   - [Disabling Resize](#disabling-resize)
   - [Custom Handlebar](#custom-handlebar)
-  - [Nested Layout](#Nested-Layout)
+  - [Nested Layout](#nested-layout)
 - [Features](#features)
 - [License](#license)
+- [Limitations](#limitations)
 
 ## Installation
 
@@ -58,7 +59,7 @@ import { Split } from "a-multilayout-splitter";
 <Split mode="horizontal" id="split1">
   <div>Pane 1</div>
   <div>Pane 2</div>
-</Split>;
+</Split>
 ```
 
 ### Orientation
@@ -137,7 +138,7 @@ import { Split } from "a-multilayout-splitter";
 </Split>;
 ```
 
-#### Sizes in pixel and percentage both.
+#### Sizes in pixel and percentage both
 
 ```jsx
 <Split mode="horizontal" width="200px" height="100px" initialSizes={["100%", "50%"]}>
