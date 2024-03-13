@@ -3,6 +3,7 @@ export interface ISplitSessionStorage {
     GetSession(mode: "horizontal" | "vertical", closeSection?: boolean): any[];
 }
 declare class SplitSessionStorage implements ISplitSessionStorage {
+    private sessionKeyIdentifier;
     private splitterLocalIdentifierPrefix;
     private openPrefix;
     private closePrefix;
