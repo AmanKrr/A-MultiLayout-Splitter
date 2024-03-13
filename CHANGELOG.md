@@ -1,3 +1,15 @@
+# [4.1.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.0.6...v4.1.0) (2024-03-13)
+
+
+### Bug Fixes
+
+* Prevent creation of new local storage keys on changing search parameters ([076bff0](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/076bff09356136e283229319820d94c49caaff1e))
+
+
+### Features
+
+* Export specific functions from SplitUtils and add SplitSessionStorage ([a4cd17a](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/a4cd17a208465d5f1a3be050b5ae5def4d4e081e))
+
 ## [4.0.6](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.0.5...v4.0.6) (2024-03-03)
 
 
