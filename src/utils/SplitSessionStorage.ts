@@ -1,12 +1,7 @@
-// @ts-nocheck
 // Define the interface for SplitSessionStorage
 export interface ISplitSessionStorage {
   // Method to set session data
-  SetSession(
-    size: any[],
-    mode: "horizontal" | "vertical",
-    closeSection?: boolean
-  ): void;
+  SetSession(size: any[], mode: "horizontal" | "vertical", closeSection?: boolean): void;
 
   // Method to get session data
   GetSession(mode: "horizontal" | "vertical", closeSection?: boolean): any[];
@@ -14,6 +9,7 @@ export interface ISplitSessionStorage {
 
 // Implement the interface in the SplitSessionStorage class
 class SplitSessionStorage implements ISplitSessionStorage {
+  private sessionKeyIdentifier = "@a-multilayout-splitter";
   private splitterLocalIdentifierPrefix = "alphaFact";
   private openPrefix = "open";
   private closePrefix = "close";
@@ -25,9 +21,16 @@ class SplitSessionStorage implements ISplitSessionStorage {
   }
 
   // Private method to get an item from localStorage
-  private getItem(name: string): any {
-    const data = localStorage.getItem(name);
-    return JSON.parse(data);
+  private getItem(name: string) {
+    const data = localStorage.getItem(this.sessionKeyIdentifier);
+    let tempItem = null;
+    if (data) {
+      tempItem = JSON.parse(data);
+    }
+    return {
+      allItem: tempItem,
+      item: (tempItem && tempItem[name]) || null,
+    };
   }
 
   // Private method to remove an item from localStorage
@@ -48,33 +51,26 @@ class SplitSessionStorage implements ISplitSessionStorage {
    * @param splitMode - Split mode, either "horizontal" or "vertical".
    * @param closeSection - Is section is closed or not. either "true" or "false".
    */
-  public SetSession(
-    size: any[],
-    splitMode: "horizontal" | "vertical",
-    closeSection = false
-  ): void {
-    function set(key: string, sectionSize: number[]) {
+  public SetSession(size: any[], splitMode: "horizontal" | "vertical", closeSection = false): void {
+    function set(this: any, key: string, sectionSize: number[]) {
       // Check if session is not available for the current URL
-      if (!this.getItem(btoa(this.splitterLocalIdentifierPrefix + key))) {
+      const sessionData = this.getItem(btoa(this.splitterLocalIdentifierPrefix + key))?.allItem;
+      if (!sessionData) {
         // Encode URL and set session data
-        this.setItem(
-          btoa(this.splitterLocalIdentifierPrefix + key),
-          sectionSize
-        );
+        this.setItem(this.sessionKeyIdentifier, { [btoa(this.splitterLocalIdentifierPrefix + key)]: sectionSize });
       } else {
         // If session data exists, update it
-        this.setItem(
-          btoa(this.splitterLocalIdentifierPrefix + key),
-          sectionSize
-        );
+        this.setItem(this.sessionKeyIdentifier, { ...sessionData, [btoa(this.splitterLocalIdentifierPrefix + key)]: sectionSize });
       }
     }
 
     const _set = set.bind(this);
+    const location = window.location;
+    const tabLocator = location.host + location.pathname;
     if (closeSection) {
-      _set(window.location.href + splitMode + this.closePrefix, size);
+      _set(tabLocator + splitMode + this.closePrefix, size);
     } else {
-      _set(window.location.href + splitMode, size);
+      _set(tabLocator + splitMode, size);
     }
   }
 
@@ -84,28 +80,14 @@ class SplitSessionStorage implements ISplitSessionStorage {
    * @@param closeSection - Is section is closed or not. either "true" or "false".
    * @returns An array of numbers representing session data.
    */
-  public GetSession(
-    splitMode: "horizontal" | "vertical",
-    closeSection = false
-  ): any[] {
-    function get(
-      key: string,
-      splitMode: "horizontal" | "vertical",
-      prefix: string = ""
-    ) {
-      const finalKey =
-        this.splitterLocalIdentifierPrefix + key + splitMode + prefix;
-      const sessionData = this.getItem(btoa(finalKey));
+  public GetSession(splitMode: "horizontal" | "vertical", closeSection = false): any[] {
+    function get(this: any, key: string, splitMode: "horizontal" | "vertical", prefix: string = "") {
+      const finalKey = this.splitterLocalIdentifierPrefix + key + splitMode + prefix;
+      const sessionData = this.getItem(btoa(finalKey))?.item;
+      const location = window.location;
 
       // Check if the stored URL matches the current URL and sessionData is available
-      if (
-        atob(btoa(finalKey)) ===
-          this.splitterLocalIdentifierPrefix +
-            window.location.href +
-            splitMode +
-            prefix &&
-        sessionData
-      ) {
+      if (atob(btoa(finalKey)) === this.splitterLocalIdentifierPrefix + location.host + location.pathname + splitMode + prefix && sessionData) {
         return sessionData as any[];
       }
       // Return an empty array if no valid session data is found
@@ -113,19 +95,14 @@ class SplitSessionStorage implements ISplitSessionStorage {
     }
 
     const _get = get.bind(this);
+    const location = window.location;
+    const tabLocator = location.host + location.pathname;
     if (closeSection) {
       const layout = _get(window.location.href, splitMode, this.closePrefix);
-      this.removeItem(
-        btoa(
-          this.splitterLocalIdentifierPrefix +
-            window.location.href +
-            splitMode +
-            this.closePrefix
-        )
-      );
+      this.removeItem(btoa(this.splitterLocalIdentifierPrefix + tabLocator + splitMode + this.closePrefix));
       return layout;
     } else {
-      return _get(window.location.href, splitMode);
+      return _get(tabLocator, splitMode);
     }
   }
 }
