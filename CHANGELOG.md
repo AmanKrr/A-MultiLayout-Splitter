@@ -1,3 +1,10 @@
+## [4.1.1](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.1.0...v4.1.1) (2024-03-14)
+
+
+### Bug Fixes
+
+* **utils:** Bind SplitUtils methods in export ([0d94cb7](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/0d94cb7cae841ffd5e81396f4265423a976f5715))
+
 # [4.1.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.0.6...v4.1.0) (2024-03-13)
 
 
