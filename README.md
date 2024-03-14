@@ -72,7 +72,7 @@ import { Split } from "a-multilayout-splitter";
 <Split mode="vertical" id="split1">
   <div>Pane 1</div>
   <div>Pane 2</div>
-</Split>;
+</Split>
 ```
 
 ### Collapsible Panes
@@ -89,6 +89,10 @@ import { Split } from "a-multilayout-splitter";
   <div>Pane 1</div>
   <div>Pane 2</div>
 </Split>
+```
+
+```jsx
+import { Split } from "a-multilayout-splitter";
 
 <Split id='split1' mode='horizontal' lineBar={[1, 3]}>
   <div>Pane 1</div>
@@ -109,7 +113,7 @@ import { Split } from "a-multilayout-splitter";
   <div>Pane 1</div>
   <div>Pane 2</div>
   <div>Pane 3</div>
-</Split>;
+</Split>
 ```
 
 ### Pixel and percentage support
@@ -124,7 +128,7 @@ import { Split } from "a-multilayout-splitter";
 <Split mode="horizontal" width="200px" height="100px" initialSizes={["100px", "100px"]}>
   <div>Pane 1</div>
   <div>Pane 2</div>
-</Split>;
+</Split>
 ```
 
 #### Sizes in percentage
@@ -135,7 +139,7 @@ import { Split } from "a-multilayout-splitter";
 <Split mode="horizontal" width="200px" height="100px" initialSizes={["50%", "50%"]}>
   <div>Pane 1</div>
   <div>Pane 2</div>
-</Split>;
+</Split>
 ```
 
 #### Sizes in pixel and percentage both
@@ -156,7 +160,7 @@ Use `SplitUtils` to programmatically control the panes.
 For collapsing and expanding split panes, it's necessary to provide the instance. Each split instance is stored under the given split ID, allowing you to easily use that ID and pass the instance when needed. To retrieve all splitter instances, you can utilize `SplitUtils.getSplitInstance()` by providing the key (i.e., the ID) of the specific splitter on which you want to expand or collapse. This approach ensures precise control over the behavior of split panes.
 
 ```jsx
-import { Split, SplitUtils } from "a-multilayout-splitter";
+import { Split, closeSplitter, openSplitter, getSplitInstance } from "a-multilayout-splitter";
 
 <Split mode='horizontal' id='split1'>
   <div>Pane 1</div>
@@ -164,8 +168,8 @@ import { Split, SplitUtils } from "a-multilayout-splitter";
   <div>Pane 3</div>
   <div>Pane 4</div>
 </Split>
-<button onClick={() => SplitUtils.closeSplitter(SplitUtils.getSplitInstance()['split1'], 2,"horizontal")}>Collapse</button>
-<button onClick={() => SplitUtils.openSplitter(SplitUtils.getSplitInstance()['split1'], 2, "horizontal")}>Expand</button>
+<button onClick={() => closeSplitter(getSplitInstance()['split1'], 2,"horizontal")}>Collapse</button>
+<button onClick={() => openSplitter(getSplitInstance()['split1'], 2, "horizontal")}>Expand</button>
 ```
 
 ### Min and Max Sizes
@@ -178,7 +182,7 @@ import { Split } from "a-multilayout-splitter";
 <Split id="split1" mode="horizontal" minSizes={[20, 20]} maxSizes={[80, 80]}>
   <div>Pane 1</div>
   <div>Pane 2</div>
-</Split>;
+</Split>
 ```
 
 ### Disabling Resize
@@ -191,7 +195,7 @@ import { Split } from "a-multilayout-splitter";
 <Split id="split1" mode="horizontal" disable>
   <div>Pane 1</div>
   <div>Pane 2</div>
-</Split>;
+</Split>
 ```
 
 ```jsx
@@ -202,7 +206,7 @@ import { Split } from "a-multilayout-splitter";
   <div>Pane 2</div>
   <div>Pane 3</div>
   <div>Pane 4</div>
-</Split>;
+</Split>
 ```
 
 ### Custom Handlebar
