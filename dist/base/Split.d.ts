@@ -22,6 +22,10 @@ export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
     onDragEnd?: (preSize: number, nextSize: number, paneNumber: number) => void;
     /** Support custom drag and drop toolbar */
     renderBar?: (props: React.HTMLAttributes<HTMLDivElement>, position: number) => JSX.Element;
+    /**
+     * Callback function for layout change. Triggered only on closing and opening of pane.
+     */
+    onLayoutChange?: (size: number, sectionNumber: number, paneId: string, reason: string | "default") => void | null;
     /** Set the drag and drop toolbar as a line style. */
     lineBar?: boolean | number[];
     /** Set the dragged toolbar, whether it is visible or not */
@@ -90,10 +94,6 @@ export interface SplitState {
  * Split component for creating resizable split panes.
  */
 export default class Split extends React.Component<SplitProps, SplitState> {
-    private TOP;
-    private BOTTOM;
-    private LEFT;
-    private RIGHT;
     private HORIZONTAL;
     private VERTICAL;
     static defaultProps: DefaultProps;
@@ -116,7 +116,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     private initDragging;
     private nextToNext;
     private prevToPrev;
-    private breaker;
+    private paneConfig;
     private handleBarLayoutInfo;
     private onDraggingThrottled;
     private onDragEndThrottled;
@@ -160,6 +160,15 @@ export default class Split extends React.Component<SplitProps, SplitState> {
      * @param mode - The layout mode, either "horizontal" or "vertical".
      */
     private setResizingLayout;
+    /**
+     * Checks if resizing boundaries are reached for the previous and next targets.
+     * @param prevTarget - The previous target HTMLDivElement.
+     * @param nextTarget - The next target HTMLDivElement.
+     * @param preSize - The size of the previous target.
+     * @param nextSize - The size of the next target.
+     * @returns 1 if resizing boundary is reached, otherwise 0.
+     */
+    private checkResizingBound;
     /**
      * Handle mouse down event to start dragging.
      * @param paneNumber - The number of the pane being dragged.
