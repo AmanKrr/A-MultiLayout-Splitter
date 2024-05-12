@@ -18,11 +18,11 @@ function DragHandle({
   function handleTopAndLeftArrowClick(event: any, mode: "horizontal" | "vertical", position: number, direction: "left" | "right" | "top" | "bottom") {
     const wrapper = event.target.parentElement.parentElement;
     if (SplitUtils.isSectionOpen(wrapper, position + 1, mode) && SplitUtils.isSectionOpen(wrapper, position, mode)) {
-      SplitUtils.closeSplitter(wrapper, position, mode, "default", direction);
+      SplitUtils.closeSplitter(wrapper, position, mode, direction);
     } else if (!SplitUtils.isSectionOpen(wrapper, position + 1, mode) && SplitUtils.isSectionOpen(wrapper, position, mode)) {
-      SplitUtils.openSplitter(wrapper, position + 1, mode, "default", direction);
+      SplitUtils.openSplitter(wrapper, position + 1, mode, direction);
     } else {
-      SplitUtils.openSplitter(wrapper, position, mode, "default", direction);
+      SplitUtils.openSplitter(wrapper, position, mode, direction);
     }
   }
 
@@ -34,11 +34,11 @@ function DragHandle({
   ) {
     const wrapper = event.target.parentElement.parentElement;
     if (SplitUtils.isSectionOpen(wrapper, position + 1, mode) && SplitUtils.isSectionOpen(wrapper, position, mode)) {
-      SplitUtils.closeSplitter(wrapper, position + 1, mode, "default", direction);
+      SplitUtils.closeSplitter(wrapper, position + 1, mode, direction);
     } else if (SplitUtils.isSectionOpen(wrapper, position + 1, mode) && !SplitUtils.isSectionOpen(wrapper, position, mode)) {
-      SplitUtils.openSplitter(wrapper, position, mode, "default", direction);
+      SplitUtils.openSplitter(wrapper, position, mode, direction);
     } else {
-      SplitUtils.openSplitter(wrapper, position, mode, "default", direction);
+      SplitUtils.openSplitter(wrapper, position, mode, direction);
     }
   }
 
