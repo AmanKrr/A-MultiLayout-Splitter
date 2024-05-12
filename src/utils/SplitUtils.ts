@@ -601,6 +601,64 @@ class SplitUtils {
   }
 
   /**
+   * Sets the size of individual panes within a split layout.
+   * @param instance - The instance of the pane or null.
+   * @param sizes - An object containing pane section numbers as keys and their respective sizes as values.
+   * @param splitMode - The split mode (horizontal or vertical).
+   */
+  static setPaneSize(instance: Instance = null, sizes: { [key: number]: number }, splitMode: Orientation): void {
+    // Determine the mode to use
+    const mode = splitMode || this.mode;
+
+    // Throw an error if the wrapper is not set
+    if (!this.modeWrapper[splitMode] && !instance) {
+      console.error("Wrapper not set. Call setWrapper before using setPaneSize.");
+      return;
+    }
+
+    // Retrieve the sections based on the instance or split mode
+    const sections = instance?.children || this.modeWrapper[splitMode]?.children;
+
+    // Update the cached mapped split-pane position
+    LayoutHelper.mapElementPosition(instance, this.modeWrapper, splitMode, this.cachedMappedSplitPanePosition, true);
+
+    // Proceed if sections, sizes, and keys are available
+    if (sections && sizes && Object.keys(sizes).length > 0) {
+      // Determine the reference width based on the mode and instance
+      const referenceWidth = String(
+        mode === "horizontal"
+          ? instance?.getBoundingClientRect().width || this.modeWrapper["horizontal"]?.getBoundingClientRect().width
+          : instance?.getBoundingClientRect().height || this.modeWrapper["vertical"]?.getBoundingClientRect().height
+      );
+
+      // Iterate through the sizes and update the corresponding pane sizes
+      const panes = Object.keys(sizes);
+      for (let paneSectionIdx = 0; paneSectionIdx < panes.length; paneSectionIdx++) {
+        // Retrieve the section index using the cached mapped split-pane position
+        let sectionIndex = LayoutHelper.getSection(this.cachedMappedSplitPanePosition, splitMode, parseInt(panes[paneSectionIdx]));
+
+        // Throw an error if the section index is null or undefined
+        if (sectionIndex === null || sectionIndex === undefined) {
+          console.error(`Section number ${sectionIndex}. Provide correct section number.`);
+          return;
+        }
+
+        // Update the size of the current section
+        if (sectionIndex !== null && sectionIndex !== undefined) {
+          const currentTarget = sections[sectionIndex] as HTMLDivElement; // Current section
+
+          // Check if the flex basis includes pixels and convert percentage to pixels accordingly
+          if (currentTarget.style.flexBasis.includes("px")) {
+            currentTarget.style.flexBasis = `${SplitUtils.percentageToPixel(sizes[parseInt(panes[paneSectionIdx])], referenceWidth)}px`;
+          } else {
+            currentTarget.style.flexBasis = `${sizes[parseInt(panes[paneSectionIdx])]}%`;
+          }
+        }
+      }
+    }
+  }
+
+  /**
    * Calculates the total number of panes in the split panes based on the split mode.
    * @param splitMode The mode of splitting, either "horizontal" or "vertical".
    * @returns The total number of panes, or -1 if the wrapper is not set.
