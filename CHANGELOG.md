@@ -1,3 +1,15 @@
+## [4.1.2](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.1.1...v4.1.2) (2024-05-12)
+
+
+### Bug Fixes
+
+* Resolve collapse bug when only one pane is closed ([945f3f7](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/945f3f75f0e548cc27c0b3b9c616c62b8fbfdc33))
+
+
+### Performance Improvements
+
+* Improve performance by caching DOM elements ([6562f7d](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/6562f7decf3bf86b8a1928f635a3166fda069a57))
+
 ## [4.1.1](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.1.0...v4.1.1) (2024-03-14)
 
 
