@@ -11,6 +11,9 @@ declare class SplitUtils {
     private static SECTION_CLASS_HIDE;
     private static FIX_CLASS;
     private static FIX_HELPER_CLASS;
+    static layoutCallback?: {
+        [key: string]: (size: number, sectionNumber: number, paneId: string, reason: string | "default") => void | null | undefined;
+    };
     static wrapper: HTMLDivElement | null;
     static mode: string;
     static modeWrapper: Record<string, HTMLDivElement | HTMLElement | null>;
@@ -27,7 +30,9 @@ declare class SplitUtils {
      * @param mode - Split mode, either "horizontal" or "vertical".
      * @param enableSessionStorage - Flag to enable session storage for storing split sizes.
      */
-    static setWrapper(wrapper: HTMLDivElement | null, mode?: Orientation, enableSessionStorage?: boolean): void;
+    static setWrapper(wrapper: HTMLDivElement | null, mode: Orientation | undefined, callback: {
+        [key: string]: (size: number, sectionNumber: number, paneId: string, reason: string | "default") => void | null | undefined;
+    }, enableSessionStorage?: boolean): void;
     /**
      * Returns the combined class names for fixing purposes.
      * @returns {string} Combined class names.
@@ -80,19 +85,36 @@ declare class SplitUtils {
      */
     static reCheckPaneOpening(instance: Instance, splitMode: Orientation): -1 | undefined;
     /**
+     * Invokes the layout callback function for the specified pane or mode wrapper.
+     * @param instance - The instance of the pane or null.
+     * @param sectionNumber - The section number.
+     * @param splitMode - The split mode (horizontal or vertical).
+     * @param reason - The reason for invoking the layout callback.
+     */
+    static invokeLayoutCallback(instance: Instance | undefined, sectionNumber: number, splitMode: Orientation, reason?: string | "default"): void;
+    /**
      * Closes a specific split section.
      * @param sectionNumber - The section number to be closed.
      * @param splitMode - Split mode, either "horizontal" or "vertical".
      * @param direction - The direction of the close operation, either "left", "right", "top", "bottom" or "null". Direction null is used only when not using arrow icon of handlebar to close the splitter.
      */
-    static closeSplitter(instance: Instance | undefined, sectionNumber: number, splitMode: Orientation, direction?: "left" | "right" | "top" | "bottom" | null): void;
+    static closeSplitter(instance: Instance | undefined, sectionNumber: number, splitMode: Orientation, reason?: string | "default", direction?: "left" | "right" | "top" | "bottom" | null): void;
     /**
      * Opens a specific split section with a new size.
      * @param sectionNumber - The section number to be opened.
      * @param splitMode - Split mode, either "horizontal" or "vertical".
      * @param direction - The direction of the open operation, either "left" or "right".
      */
-    static openSplitter(instance: Instance | undefined, sectionNumber: number, splitMode: Orientation, direction?: "left" | "right" | "top" | "bottom" | null): void;
+    static openSplitter(instance: Instance | undefined, sectionNumber: number, splitMode: Orientation, reason?: string | "default", direction?: "left" | "right" | "top" | "bottom" | null): void;
+    /**
+     * Sets the size of individual panes within a split layout.
+     * @param instance - The instance of the pane or null.
+     * @param sizes - An object containing pane section numbers as keys and their respective sizes as values.
+     * @param splitMode - The split mode (horizontal or vertical).
+     */
+    static setPaneSize(instance: Instance | undefined, sizes: {
+        [key: number]: number;
+    }, splitMode: Orientation): void;
     /**
      * Calculates the total number of panes in the split panes based on the split mode.
      * @param splitMode The mode of splitting, either "horizontal" or "vertical".
