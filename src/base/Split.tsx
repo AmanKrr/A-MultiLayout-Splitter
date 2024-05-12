@@ -101,10 +101,6 @@ export interface SplitState {
  * Split component for creating resizable split panes.
  */
 export default class Split extends React.Component<SplitProps, SplitState> {
-  private TOP = "top";
-  private BOTTOM = "bottom";
-  private LEFT = "left";
-  private RIGHT = "right";
   private HORIZONTAL = "horizontal";
   private VERTICAL = "vertical";
 
@@ -145,7 +141,21 @@ export default class Split extends React.Component<SplitProps, SplitState> {
 
   private nextToNext!: HTMLElement;
   private prevToPrev!: HTMLElement;
-  private breaker: number = 0;
+  private paneConfig: {
+    minPrevSize: null | string;
+    maxPrevSize: null | string;
+    minNextSize: null | string;
+    maxNextSize: null | string;
+    prevElement: HTMLDivElement | null;
+    nextElement: HTMLDivElement | null;
+  } = {
+    minPrevSize: null,
+    maxPrevSize: null,
+    minNextSize: null,
+    maxNextSize: null,
+    prevElement: null,
+    nextElement: null,
+  };
 
   // fixed computed layout of handlebar
   private handleBarLayoutInfo = {
@@ -620,6 +630,31 @@ export default class Split extends React.Component<SplitProps, SplitState> {
   }
 
   /**
+   * Checks if resizing boundaries are reached for the previous and next targets.
+   * @param prevTarget - The previous target HTMLDivElement.
+   * @param nextTarget - The next target HTMLDivElement.
+   * @param preSize - The size of the previous target.
+   * @param nextSize - The size of the next target.
+   * @returns 1 if resizing boundary is reached, otherwise 0.
+   */
+  private checkResizingBound(prevTarget: HTMLDivElement | null, nextTarget: HTMLDivElement | null, preSize: number, nextSize: number) {
+    // Check if both previous and next targets exist.
+    if (prevTarget && nextTarget) {
+      // Check if minimum size constraints are set and reached.
+      if (this.paneConfig["minPrevSize"] && preSize <= parseInt(this.paneConfig["minPrevSize"])) return 1;
+      if (this.paneConfig["minNextSize"] && nextSize <= parseInt(this.paneConfig["minNextSize"])) return 1;
+    }
+    // Check if both previous and next targets exist.
+    if (prevTarget && nextTarget) {
+      // Check if maximum size constraints are set and reached.
+      if (this.paneConfig["maxPrevSize"] && preSize >= parseInt(this.paneConfig["maxPrevSize"])) return 1;
+      if (this.paneConfig["maxNextSize"] && nextSize >= parseInt(this.paneConfig["maxNextSize"])) return 1;
+    }
+
+    return 0;
+  }
+
+  /**
    * Handle mouse down event to start dragging.
    * @param paneNumber - The number of the pane being dragged.
    * @param env - MouseEvent.
@@ -651,15 +686,30 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     }
     const prevTarget = this.target.previousElementSibling;
     const nextTarget = this.target.nextElementSibling;
+    this.paneConfig = {
+      ...this.paneConfig,
+      prevElement: prevTarget as HTMLDivElement,
+      nextElement: nextTarget as HTMLDivElement,
+    };
     this.boxWidth = this.warpper.offsetWidth;
     this.boxHeight = this.warpper.offsetHeight;
     if (prevTarget) {
       this.preWidth = (prevTarget as HTMLElement).offsetWidth;
       this.preHeight = (prevTarget as HTMLElement).offsetHeight;
+      this.paneConfig = {
+        ...this.paneConfig,
+        minPrevSize: prevTarget.getAttribute("min-size"),
+        maxPrevSize: prevTarget.getAttribute("max-size"),
+      };
     }
     if (nextTarget) {
       this.nextWidth = (nextTarget as HTMLElement).offsetWidth;
       this.nextHeight = (nextTarget as HTMLElement).offsetHeight;
+      this.paneConfig = {
+        ...this.paneConfig,
+        minNextSize: nextTarget.getAttribute("min-size"),
+        maxNextSize: nextTarget.getAttribute("max-size"),
+      };
     }
 
     /* 
@@ -697,8 +747,8 @@ export default class Split extends React.Component<SplitProps, SplitState> {
       this.setState({ dragging: true });
     }
     const { mode, onDragging } = this.props;
-    const nextTarget = this.target.nextElementSibling as HTMLDivElement;
-    const prevTarget = this.target.previousElementSibling as HTMLDivElement;
+    const nextTarget = this.paneConfig.nextElement;
+    const prevTarget = this.paneConfig.prevElement;
 
     if (nextTarget && prevTarget) {
       if (nextTarget.classList.contains("a-split-hidden") || prevTarget.classList.contains("a-split-hidden")) return;
@@ -725,19 +775,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
         this.preSize = (this.preSize / this.boxWidth >= 1 ? 1 : this.preSize / this.boxWidth) * 100;
         this.nextSize = (this.nextSize / this.boxWidth >= 1 ? 1 : this.nextSize / this.boxWidth) * 100;
         // checks for controlling dragging for max check
-        if (prevTarget && nextTarget) {
-          const minPrevSize = prevTarget.getAttribute("min-size");
-          const minNextSize = nextTarget.getAttribute("min-size");
-          if (minPrevSize && this.preSize <= parseInt(minPrevSize)) return;
-          if (minNextSize && this.nextSize <= parseInt(minNextSize)) return;
-        }
-        // checks for controlling dragging for min check
-        if (prevTarget && nextTarget) {
-          const maxPrevSize = prevTarget.getAttribute("max-size");
-          const maxNextSize = nextTarget.getAttribute("max-size");
-          if (maxPrevSize && this.preSize >= parseInt(maxPrevSize)) return;
-          if (maxNextSize && this.nextSize >= parseInt(maxNextSize)) return;
-        }
+        if (this.checkResizingBound(prevTarget, nextTarget, this.preSize, this.nextSize)) return;
         // set layout size
         if (prevTarget && nextTarget) {
           this.setResizingLayout(nextTarget, prevTarget, this.HORIZONTAL);
@@ -757,19 +795,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
         if (Math.abs(this.preSize - this.preHeight) <= 1) return; // check to ensure there is no unecessary displacement
         if (Math.abs(this.nextSize - this.nextHeight) <= 1) return; // check to ensure there is no unecessary displacement
         // checks for controlling dragging for max check
-        if (prevTarget && nextTarget) {
-          const minPrevSize = prevTarget.getAttribute("min-size");
-          const minNextSize = nextTarget.getAttribute("min-size");
-          if (minPrevSize && this.preSize <= parseInt(minPrevSize)) return;
-          if (minNextSize && this.nextSize <= parseInt(minNextSize)) return;
-        }
-        // checks for controlling dragging for min check
-        if (prevTarget && nextTarget) {
-          const maxPrevSize = prevTarget.getAttribute("max-size");
-          const maxNextSize = nextTarget.getAttribute("max-size");
-          if (maxPrevSize && this.preSize >= parseInt(maxPrevSize)) return;
-          if (maxNextSize && this.nextSize >= parseInt(maxNextSize)) return;
-        }
+        if (this.checkResizingBound(prevTarget, nextTarget, this.preSize, this.nextSize)) return;
         // set layout size
         if (prevTarget && nextTarget) {
           this.setResizingLayout(nextTarget, prevTarget, this.VERTICAL);
@@ -801,6 +827,14 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     this.removeTouchEvent();
     this.removeEvent();
     this.setState({ dragging: false });
+    this.paneConfig = {
+      maxNextSize: null,
+      maxPrevSize: null,
+      minNextSize: null,
+      minPrevSize: null,
+      prevElement: null,
+      nextElement: null,
+    };
     if (this.props.enableSessionStorage && this.initDragging) {
       if (this.props.mode === this.HORIZONTAL) {
         this.saveHorizontalSizesToLocalStorageDebounced();
