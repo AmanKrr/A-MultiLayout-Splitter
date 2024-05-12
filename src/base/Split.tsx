@@ -30,6 +30,10 @@ export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
   onDragEnd?: (preSize: number, nextSize: number, paneNumber: number) => void;
   /** Support custom drag and drop toolbar */
   renderBar?: (props: React.HTMLAttributes<HTMLDivElement>, position: number) => JSX.Element;
+  /**
+   * Callback function for layout change. Triggered only on closing and opening of pane.
+   */
+  onLayoutChange?: (size: number, sectionNumber: number, paneId: string, reason: string | "default") => void | null;
   /** Set the drag and drop toolbar as a line style. */
   lineBar?: boolean | number[];
   /** Set the dragged toolbar, whether it is visible or not */
@@ -202,7 +206,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
    */
   public componentDidMount() {
     const { mode } = this.props;
-    SplitUtils.setWrapper(this.warpper, mode, this.props.enableSessionStorage);
+    SplitUtils.setWrapper(this.warpper, mode, { [this.props.id]: this.props.onLayoutChange } as any, this.props.enableSessionStorage);
     // Set initial sizes when the component mounts
     this.setInitialSizes();
   }
@@ -877,7 +881,7 @@ export default class Split extends React.Component<SplitProps, SplitState> {
       .trim();
     const child = React.Children.toArray(children);
     // Extract needed props from the remaining props
-    const { initialSizes, minSizes, maxSizes, enableSessionStorage, collapsed, height, width, ...neededProps } = other;
+    const { initialSizes, minSizes, maxSizes, enableSessionStorage, collapsed, height, width, onLayoutChange, ...neededProps } = other;
     return (
       <div
         className={cls}

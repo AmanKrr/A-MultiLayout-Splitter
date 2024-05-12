@@ -18,6 +18,11 @@ class SplitUtils {
   private static FIX_CLASS = "a-split-pane-fix";
   private static FIX_HELPER_CLASS = "a-split-pane-helper-fix";
 
+  // callback prop
+  static layoutCallback?: {
+    [key: string]: (size: number, sectionNumber: number, paneId: string, reason: string | "default") => void | null | undefined;
+  } = {};
+
   // Reference to the HTML wrapper element for split panes
   static wrapper: HTMLDivElement | null = null;
 
@@ -53,7 +58,12 @@ class SplitUtils {
    * @param mode - Split mode, either "horizontal" or "vertical".
    * @param enableSessionStorage - Flag to enable session storage for storing split sizes.
    */
-  static setWrapper(wrapper: HTMLDivElement | null, mode: Orientation = "horizontal", enableSessionStorage = false): void {
+  static setWrapper(
+    wrapper: HTMLDivElement | null,
+    mode: Orientation = "horizontal",
+    callback: { [key: string]: (size: number, sectionNumber: number, paneId: string, reason: string | "default") => void | null | undefined },
+    enableSessionStorage = false
+  ): void {
     // Set the wrapper, mode, and other configurations
     this.wrapper = wrapper;
     this.mode = mode;
@@ -65,6 +75,10 @@ class SplitUtils {
     this.enableSessionStorage[mode] = enableSessionStorage;
     this.cachedMappedSplitPanePosition[mode] = null;
     LayoutHelper.mapElementPosition(null, this.modeWrapper, mode, this.cachedMappedSplitPanePosition);
+    this.layoutCallback = {
+      ...this.layoutCallback,
+      ...callback,
+    };
   }
 
   /**
@@ -255,6 +269,41 @@ class SplitUtils {
   }
 
   /**
+   * Invokes the layout callback function for the specified pane or mode wrapper.
+   * @param instance - The instance of the pane or null.
+   * @param sectionNumber - The section number.
+   * @param splitMode - The split mode (horizontal or vertical).
+   * @param reason - The reason for invoking the layout callback.
+   */
+  static invokeLayoutCallback(
+    instance: Instance = null,
+    sectionNumber: number,
+    splitMode: Orientation,
+    reason: string | "default" = "default"
+  ): void {
+    if (!instance && !this.modeWrapper[splitMode]) {
+      console.error("Missing instance.");
+      return;
+    }
+
+    if (this.layoutCallback && !this.layoutCallback[instance!.getAttribute("id")!]) return;
+
+    // If instance is provided, invoke layout callback for the specific pane.
+    if (instance) {
+      const paneId = instance.getAttribute("id");
+      if (paneId) {
+        this.layoutCallback?.[paneId](0, sectionNumber, paneId, reason);
+      }
+    } else {
+      // If instance is not provided, invoke layout callback for the mode wrapper.
+      const paneId = this.modeWrapper[splitMode]?.getAttribute("id");
+      if (paneId) {
+        this.layoutCallback?.[paneId](0, sectionNumber, paneId, reason);
+      }
+    }
+  }
+
+  /**
    * Closes a specific split section.
    * @param sectionNumber - The section number to be closed.
    * @param splitMode - Split mode, either "horizontal" or "vertical".
@@ -264,6 +313,7 @@ class SplitUtils {
     instance: Instance = null,
     sectionNumber: number,
     splitMode: Orientation,
+    reason: string | "default" = "default",
     direction: "left" | "right" | "top" | "bottom" | null = null
   ): void {
     // Implementation for closing a specific split section
@@ -375,6 +425,8 @@ class SplitUtils {
           // on close storing user layout
           this.saveSizesToLocalStorage(this.VERTICAL);
         }
+
+        this.invokeLayoutCallback(instance, sectionNumber, splitMode, reason);
       }
     }
   }
@@ -389,6 +441,7 @@ class SplitUtils {
     instance: Instance = null,
     sectionNumber: number,
     splitMode: Orientation,
+    reason: string | "default" = "default",
     direction: "left" | "right" | "top" | "bottom" | null = null
   ): void {
     // Implementation for opening a specific split section with a new size
@@ -541,6 +594,8 @@ class SplitUtils {
           // after opening saving the layout
           this.saveSizesToLocalStorage(mode);
         }
+
+        this.invokeLayoutCallback(instance, sectionNumber, splitMode, reason);
       }
     }
   }
