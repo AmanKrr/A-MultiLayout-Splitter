@@ -265,8 +265,9 @@ export default class Split extends React.Component<SplitProps, SplitState> {
       const totalHandleBarLayoutValue =
         (this.handleBarLayoutInfo.marginLeft + this.handleBarLayoutInfo.marginRight + this.handleBarLayoutInfo.width) * totalHandleCount;
       const sizeToReduce = totalHandleBarLayoutValue / totalPaneSize;
-      let collapsedcounter = 0;
       let sectionCounter = 1;
+      let lastNonCollapsiblePane = -1,
+        encounterCollapse = false;
 
       // if initialSize props are given distributing the width and height.
       if (initialSizes && initialSizes.length > 0) {
@@ -302,18 +303,19 @@ export default class Split extends React.Component<SplitProps, SplitState> {
               } else {
                 contentTarget.style.flexBasis = `${size}`;
               }
-              // checks for collaped props
-              if (collapsedcounter > 0) {
-                contentTarget.style.flexGrow = "1";
-                collapsedcounter = 0;
+
+              if (!this.props.collapsed![i] || false) {
+                lastNonCollapsiblePane = sectionIndex;
               }
+
               // by default not collapsing any horizontal
-              if ((this.props.collapsed![i] || false) && collapsedcounter === 0) {
+              if (this.props.collapsed![i] || false) {
                 contentTarget.style.flexGrow = "0";
                 contentTarget.classList.add("a-split-hidden");
-                collapsedcounter++;
+                encounterCollapse = true;
               }
             }
+
             // setting min and max limit by default 0 and 100
             contentTarget.setAttribute("min-size", `${this.props.minSizes![i] || 0}`);
             contentTarget.setAttribute("max-size", `${this.props.maxSizes![i] || 100}`);
@@ -344,17 +346,17 @@ export default class Split extends React.Component<SplitProps, SplitState> {
           contentTarget.setAttribute("min-size", `${this.props.minSizes![counter] || 0}`);
           contentTarget.setAttribute("max-size", `${this.props.maxSizes![counter] || 100}`);
 
-          // checks for collaped props
-          if (collapsedcounter > 0) {
-            contentTarget.style.flexGrow = "1";
-            collapsedcounter = 0;
+          if (!this.props.collapsed![counter] || false) {
+            lastNonCollapsiblePane = pane;
           }
-          // by default not collapsing any vertical section
-          if ((this.props.collapsed![counter] || false) && collapsedcounter === 0) {
+
+          // by default not collapsing any horizontal
+          if (this.props.collapsed![counter] || false) {
             contentTarget.style.flexGrow = "0";
             contentTarget.classList.add("a-split-hidden");
-            collapsedcounter++;
+            encounterCollapse = true;
           }
+
           ++counter;
           // remove handlebar icons if some sections are closed
           ManageHandleBar.removeHandleIconOnClose(
@@ -367,22 +369,10 @@ export default class Split extends React.Component<SplitProps, SplitState> {
         }
       }
 
-      // check for opened section
-      let openSectionCounter = 0;
-      let paneCounter = 0;
-      if (sections && sections.length > 0) {
-        for (let pane = 0; pane < sections.length; pane += 2) {
-          if (SplitUtils.isSectionOpen(this.warpper, paneCounter + 1, mode!)) {
-            openSectionCounter++;
-          }
-          paneCounter++;
-        }
-      }
-
-      // corner case: if only one section is opened then grow first section
-      if (openSectionCounter === 1 && !this.props.collapsed![0]) {
-        if (sections[0]) {
-          (sections[0] as HTMLDivElement).style.flexGrow = "1";
+      if (lastNonCollapsiblePane > -1 && encounterCollapse) {
+        if (sections[lastNonCollapsiblePane]) {
+          (sections[lastNonCollapsiblePane] as HTMLDivElement).style.flexGrow = "1";
+          encounterCollapse = false;
         }
       }
 
