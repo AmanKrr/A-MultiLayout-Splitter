@@ -1,3 +1,27 @@
+# [4.2.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.1.1...v4.2.0) (2024-05-12)
+
+
+### Bug Fixes
+
+* Resolve collapse bug when only one pane is closed ([945f3f7](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/945f3f75f0e548cc27c0b3b9c616c62b8fbfdc33))
+
+
+### Features
+
+* Add setResizePane method to splitUtils class ([2927dc4](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/2927dc47c7ae2359a5e6fe5012e01bc15df16ab2))
+* Introduce callback props for pane open/close events ([6ee4088](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/6ee40880e2e9f4ddb4e5c79b6ec21541eca77ccc))
+* Introduce callback props for pane open/close events ([12f06ea](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/12f06eab1b813f864ec6b6528dfe43ade62de5f1))
+
+
+### Performance Improvements
+
+* Improve performance by caching DOM elements ([6562f7d](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/6562f7decf3bf86b8a1928f635a3166fda069a57))
+
+
+### Reverts
+
+* Revert "feature: Introduce callback props for pane open/close events" ([426eee5](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/426eee551813a390d60717193a29453d580f21b6))
+
 ## [4.1.2](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.1.1...v4.1.2) (2024-05-12)
 
 
