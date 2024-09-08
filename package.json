@@ -52,7 +52,7 @@
     "branches": [
       "main",
       {
-        "name": "beta",
+        "name": "beta-release",
         "prerelease": true
       }
     ],
