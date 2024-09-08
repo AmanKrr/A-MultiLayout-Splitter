@@ -5,6 +5,9 @@ export interface ISplitSessionStorage {
 
   // Method to get session data
   GetSession(mode: "horizontal" | "vertical", closeSection?: boolean): any[];
+
+  // Method to remove stored user layout data
+  removeStoredSession(mode: "horizontal" | "vertical"): void;
 }
 
 // Implement the interface in the SplitSessionStorage class
@@ -44,6 +47,28 @@ class SplitSessionStorage implements ISplitSessionStorage {
   private decodeBase64 = (data: string) => {
     return Buffer.from(data, "base64").toString("ascii");
   };
+
+  /**
+   * Removes a stored session related to a specific split mode ("horizontal" or "vertical") from local storage.
+   * @param splitMode The split mode for which to remove the stored session data.
+   */
+  public removeStoredSession(splitMode: "horizontal" | "vertical"): void {
+    // Construct the unique key based on the current location and split mode
+    const location = window.location;
+    const finalKey = this.splitterLocalIdentifierPrefix + location.host + location.pathname + splitMode;
+
+    // Retrieve current session data from local storage
+    const sectionSize = this.getItem("");
+
+    // Check if the session data exists and contains the specific key to delete
+    if (sectionSize && sectionSize["allItem"] && sectionSize["allItem"][btoa(finalKey)]) {
+      // Delete the specific key from the session data
+      delete sectionSize["allItem"][btoa(finalKey)];
+
+      // Update the session data in local storage
+      this.setItem(this.sessionKeyIdentifier, { [btoa(finalKey)]: sectionSize });
+    }
+  }
 
   /**
    * Public method from the interface to set session data.

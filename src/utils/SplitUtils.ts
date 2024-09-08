@@ -775,6 +775,16 @@ class SplitUtils {
     // Call saveSizesToLocalStorage with "vertical" mode
     this.saveSizesToLocalStorage("vertical");
   }
+
+  /**
+   * Static method to reset stored session data when adding or removing a pane in a split mode.
+   * Clears relevant data from local storage.
+   * @param splitMode The split mode ("horizontal" or "vertical") for which to reset stored session data.
+   */
+  static resetLocalStorageOnPaneAddOrRemove(splitMode: "horizontal" | "vertical") {
+    // Remove stored session data related to the given split mode
+    this.userSession.removeStoredSession(splitMode);
+  }
 }
 
 export default SplitUtils;
