@@ -50,7 +50,11 @@
   "release": {
     "repositoryUrl": "https://github.com/AmanKrr/A-MultiLayout-Splitter.git",
     "branches": [
-      "main"
+      "main",
+      {
+        "name": "beta",
+        "prerelease": true
+      }
     ],
     "plugins": [
       "@semantic-release/commit-analyzer",
