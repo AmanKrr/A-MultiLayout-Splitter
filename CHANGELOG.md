@@ -1,3 +1,10 @@
+# [4.3.0-beta.1](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.2.0...v4.3.0-beta.1) (2024-09-08)
+
+
+### Features
+
+* Add or remove pane (dummy commit test to trigger semantic-release on beta-release branch) ([1dc8a25](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/1dc8a2563f7d295ca6082443b3cbffd0530fc069))
+
 # [4.2.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.1.1...v4.2.0) (2024-05-12)
 
 
