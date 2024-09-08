@@ -255,7 +255,6 @@ class Split extends React.Component<SplitProps & { splitStateContext: SplitState
       prevProps.splitStateContext.splitState.children !== splitState.children ||
       this.arraysAreEqual(prevProps.splitStateContext.splitState.initialSize, splitState.initialSize) ||
       this.arraysAreEqual(prevProps.splitStateContext.splitState.collapsed, splitState.collapsed)
-      // prevProps.splitStateContext.splitState
     ) {
       this.resetInitialSizes();
     }
