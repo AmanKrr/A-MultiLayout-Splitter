@@ -142,5 +142,11 @@ declare class SplitUtils {
      * Saves sizes to local storage for vertical layout mode.
      */
     static saveVerticalSizesToLocalStorage(): void;
+    /**
+     * Static method to reset stored session data when adding or removing a pane in a split mode.
+     * Clears relevant data from local storage.
+     * @param splitMode The split mode ("horizontal" or "vertical") for which to reset stored session data.
+     */
+    static resetLocalStorageOnPaneAddOrRemove(splitMode: "horizontal" | "vertical"): void;
 }
 export default SplitUtils;
