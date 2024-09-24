@@ -7,6 +7,7 @@ import throttle from "lodash/throttle";
 import debounce from "lodash/debounce";
 import ManageHandleBar from "../helper/ManageHandleBar";
 import DragHandle from "../DragHandle/DragHandle";
+import { SplitState, SplitStateContextType, withSplitState } from "./SplitProvider";
 
 export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onDragEnd"> {
   style?: React.CSSProperties;
@@ -94,17 +95,14 @@ interface DefaultProps {
   width: string | null;
 }
 
-/**
- * State for the Split component.
- */
-export interface SplitState {
+interface ISplitState {
   dragging: boolean;
 }
 
 /**
  * Split component for creating resizable split panes.
  */
-export default class Split extends React.Component<SplitProps, SplitState> {
+class Split extends React.Component<SplitProps & { splitStateContext: SplitStateContextType }, ISplitState> {
   private HORIZONTAL = "horizontal";
   private VERTICAL = "vertical";
 
@@ -121,8 +119,20 @@ export default class Split extends React.Component<SplitProps, SplitState> {
     height: null,
     width: null,
   };
-  public state: SplitState = {
+  public state: ISplitState = {
     dragging: false,
+  };
+  private currentInstanceProps: SplitState = {
+    children: null,
+    disable: null,
+    lineBar: null,
+    visible: null,
+    initialSize: null,
+    collapsed: null,
+    maxSize: null,
+    minSize: null,
+    modes: null,
+    enableLocalStorage: null,
   };
   public warpper!: HTMLDivElement | null;
   public paneNumber!: number;
@@ -174,8 +184,32 @@ export default class Split extends React.Component<SplitProps, SplitState> {
   private saveHorizontalSizesToLocalStorageDebounced: () => void;
   private saveVerticalSizesToLocalStorageDebounced: () => void;
 
-  constructor(props: SplitProps) {
+  constructor(props: SplitProps & { splitStateContext: SplitStateContextType }) {
     super(props);
+
+    this.currentInstanceProps = {
+      ...props.splitStateContext.splitState,
+      modes: { ...props.splitStateContext.splitState.modes, [props.id]: props.mode! },
+      children: { ...props.splitStateContext.splitState.children, [props.id]: React.Children.toArray(props.children) },
+      collapsed: { ...props.splitStateContext.splitState.collapsed, [props.id]: props.collapsed! },
+      visible: { ...props.splitStateContext.splitState.visible, [props.id]: props.visible ?? props.visiable },
+      disable: { ...props.splitStateContext.splitState.disable, [props.id]: props.disable },
+      lineBar: { ...props.splitStateContext.splitState.lineBar, [props.id]: props.lineBar },
+      maxSize: {
+        ...props.splitStateContext.splitState.maxSize,
+        [props.id]:
+          !props.maxSizes === undefined || (Array.isArray(props.maxSizes) && props.maxSizes.length === 0)
+            ? [...Array(React.Children.toArray(props.children).length).fill(100)]
+            : props.maxSizes,
+      },
+      minSize: {
+        ...props.splitStateContext.splitState.minSize,
+        [props.id]:
+          props.minSizes === undefined || (Array.isArray(props.minSizes) && props.minSizes.length === 0)
+            ? [...Array(React.Children.toArray(props.children).length).fill(0)]
+            : props.minSizes,
+      },
+    };
 
     // Throttle the dragging and drag end functions to control the frequency of execution
     this.onDraggingThrottled = throttle(this.onDragging.bind(this), 16);
@@ -205,10 +239,45 @@ export default class Split extends React.Component<SplitProps, SplitState> {
    * Initialization: Set up initial sizes and wrapper based on the provided mode.
    */
   public componentDidMount() {
-    const { mode } = this.props;
-    SplitUtils.setWrapper(this.warpper, mode, { [this.props.id]: this.props.onLayoutChange } as any, this.props.enableSessionStorage);
+    this.props.splitStateContext.setSplitState((prev) => ({ ...prev, ...this.currentInstanceProps }));
     // Set initial sizes when the component mounts
     this.setInitialSizes();
+  }
+
+  public componentDidUpdate(
+    prevProps: Readonly<SplitProps & { splitStateContext: SplitStateContextType }>,
+    prevState: Readonly<ISplitState>,
+    snapshot?: any
+  ): void {
+    const { splitState } = this.props.splitStateContext;
+
+    if (
+      prevProps.splitStateContext.splitState.children !== splitState.children &&
+      this.arraysAreEqual(prevProps.splitStateContext.splitState.initialSize, splitState.initialSize) &&
+      this.arraysAreEqual(prevProps.splitStateContext.splitState.collapsed, splitState.collapsed)
+    ) {
+      this.resetInitialSizes();
+    }
+  }
+
+  arraysAreEqual(arr1: any, arr2: any) {
+    if (!arr1) return false;
+    if (!arr2) return false;
+
+    // Check if the arrays are the same length
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+
+    // Compare each element in the arrays
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i] === arr2[i]) {
+        return false;
+      }
+    }
+
+    // If no elements are different, the arrays are equal
+    return true;
   }
 
   /**
@@ -256,19 +325,380 @@ export default class Split extends React.Component<SplitProps, SplitState> {
   }
 
   /**
+   * Adds a new pane to the state based on provided configurations.
+   * @param id Identifier for the new pane.
+   * @param newChild React node representing the content of the new pane.
+   * @param setcurrentPaneSize Array of strings representing current pane sizes.
+   * @param newPaneConfig Configuration object for the new pane (optional).
+   */
+  public addPane(
+    id: string,
+    newChild: React.ReactNode,
+    setcurrentPaneSize: Array<string>,
+    newPaneConfig: {
+      newChildPosition: number | -1;
+      collapsed: boolean;
+      initialSize: string;
+      minSize: number;
+      maxSize: number;
+      lineBar: number | null;
+      visible: number | null;
+      disable: number | null;
+    } = {
+      collapsed: false,
+      disable: null,
+      initialSize: "",
+      lineBar: null,
+      maxSize: 100,
+      minSize: 0,
+      visible: null,
+      newChildPosition: -1,
+    }
+  ) {
+    const { setSplitState, splitState } = this.props.splitStateContext;
+    // Check if this.state and this.state.modes are defined
+    if (splitState && splitState.modes) {
+      // Reset local storage related to the mode of the pane being added
+      SplitUtils.resetLocalStorageOnPaneAddOrRemove(splitState.modes[id]);
+      if (newPaneConfig["newChildPosition"] !== -1) {
+        newPaneConfig["newChildPosition"] -= 1;
+      }
+      // Update state using functional setState to ensure correct previous state handling
+      setSplitState((prevState) => {
+        // Convert newChild to an array of React elements
+        const newChildEle = React.Children.toArray(newChild);
+
+        // Clone necessary collections from prevState or initialize them if undefined
+        const collapsedCollection = [...prevState.collapsed![id]];
+        let disabledCollection =
+          prevState.disable && prevState.disable[id] !== undefined && prevState.disable[id] !== null
+            ? Array.isArray(prevState.disable[id])
+              ? [...(prevState.disable[id] as number[])]
+              : prevState.disable[id]
+            : null;
+        let visibleCollection =
+          prevState.visible && prevState.visible[id] !== undefined && prevState.visible[id] !== null
+            ? Array.isArray(prevState.visible[id])
+              ? [...(prevState.visible[id] as number[])]
+              : prevState.visible[id]
+            : null;
+        let lineBarCollection =
+          prevState.lineBar && prevState.lineBar[id] !== undefined && prevState.lineBar[id] !== null
+            ? Array.isArray(prevState.lineBar)
+              ? [...(prevState.lineBar[id] as number[])]
+              : prevState.lineBar[id]
+            : null;
+        const initialSizeCollection = [...setcurrentPaneSize];
+        const maxSizeCollection =
+          prevState.maxSize && prevState.maxSize[id] !== undefined && prevState.maxSize[id] !== null
+            ? [...(prevState.maxSize[id] as number[])]
+            : undefined;
+        const minSizeCollection =
+          prevState.minSize && prevState.minSize[id] !== undefined && prevState.minSize[id] !== null
+            ? [...(prevState.minSize[id] as number[])]
+            : undefined;
+
+        // Update disabledCollection based on newPaneConfig
+        if (newPaneConfig && newPaneConfig["disable"] != null) {
+          if (Array.isArray(disabledCollection)) {
+            disabledCollection =
+              newPaneConfig["newChildPosition"] !== -1
+                ? [
+                    ...disabledCollection.slice(0, newPaneConfig["newChildPosition"]),
+                    newPaneConfig["disable"],
+                    ...disabledCollection.slice(newPaneConfig["newChildPosition"]),
+                  ]
+                : [...disabledCollection, newPaneConfig["disable"]];
+          } else if (typeof disabledCollection === "boolean") {
+            disabledCollection = [newPaneConfig["disable"]];
+          }
+        }
+
+        // Update visibleCollection based on newPaneConfig
+        if (newPaneConfig && newPaneConfig["visible"] != null) {
+          if (Array.isArray(visibleCollection)) {
+            visibleCollection =
+              newPaneConfig["newChildPosition"] !== -1
+                ? [
+                    ...visibleCollection.slice(0, newPaneConfig["newChildPosition"]),
+                    newPaneConfig["visible"],
+                    ...visibleCollection.slice(newPaneConfig["newChildPosition"]),
+                  ]
+                : [...visibleCollection, newPaneConfig["visible"]];
+          } else if (typeof visibleCollection === "boolean") {
+            visibleCollection = [newPaneConfig["visible"]];
+          }
+        }
+
+        // Update lineBarCollection based on newPaneConfig
+        if (newPaneConfig && newPaneConfig["lineBar"] != null) {
+          if (Array.isArray(lineBarCollection)) {
+            lineBarCollection =
+              newPaneConfig["newChildPosition"] !== -1
+                ? [
+                    ...lineBarCollection.slice(0, newPaneConfig["newChildPosition"]),
+                    newPaneConfig["lineBar"],
+                    ...lineBarCollection.slice(newPaneConfig["newChildPosition"]),
+                  ]
+                : [...lineBarCollection, newPaneConfig["lineBar"]];
+          } else if (typeof lineBarCollection === "boolean") {
+            lineBarCollection = [newPaneConfig["lineBar"]];
+          }
+        }
+
+        // Check if prevState contains children for the specified id
+        if (prevState && prevState["children"] && prevState["children"][id]) {
+          // Clone childrenCollection from prevState
+          const childrenCollection = [...prevState.children[id]];
+
+          // Return updated state object
+          return {
+            ...prevState,
+            children: {
+              ...prevState.children,
+              [id]:
+                newPaneConfig["newChildPosition"] !== -1
+                  ? [
+                      ...childrenCollection.slice(0, newPaneConfig["newChildPosition"]),
+                      ...newChildEle,
+                      ...childrenCollection.slice(newPaneConfig["newChildPosition"]),
+                    ]
+                  : [...prevState.children[id], ...newChildEle],
+            },
+            collapsed: {
+              ...prevState.collapsed,
+              [id]:
+                newPaneConfig["newChildPosition"] !== -1
+                  ? [
+                      ...collapsedCollection.slice(0, newPaneConfig["newChildPosition"]),
+                      newPaneConfig["collapsed"],
+                      ...collapsedCollection.slice(newPaneConfig["newChildPosition"]),
+                    ]
+                  : [...collapsedCollection, newPaneConfig["collapsed"]],
+            },
+            disable: { ...prevState.disable, [id]: disabledCollection },
+            visible: { ...prevState.visible, [id]: visibleCollection },
+            lineBar: { ...prevState.lineBar, [id]: lineBarCollection },
+            initialSize: {
+              ...prevState.initialSize,
+              [id]:
+                newPaneConfig["newChildPosition"] !== -1
+                  ? [
+                      ...initialSizeCollection.slice(0, newPaneConfig["newChildPosition"]),
+                      newPaneConfig["initialSize"],
+                      ...initialSizeCollection.slice(newPaneConfig["newChildPosition"]),
+                    ]
+                  : [...initialSizeCollection, newPaneConfig["initialSize"]],
+            },
+            maxSize: {
+              ...prevState.maxSize,
+              [id]: maxSizeCollection
+                ? newPaneConfig["newChildPosition"] !== -1
+                  ? [
+                      ...maxSizeCollection.slice(0, newPaneConfig["newChildPosition"]),
+                      newPaneConfig["maxSize"],
+                      ...maxSizeCollection.slice(newPaneConfig["newChildPosition"]),
+                    ]
+                  : [...maxSizeCollection, newPaneConfig["maxSize"]]
+                : undefined,
+            },
+            minSize: {
+              ...prevState.minSize,
+              [id]: minSizeCollection
+                ? newPaneConfig["newChildPosition"] !== -1
+                  ? [
+                      ...minSizeCollection.slice(0, newPaneConfig["newChildPosition"]),
+                      newPaneConfig["minSize"],
+                      ...minSizeCollection.slice(newPaneConfig["newChildPosition"]),
+                    ]
+                  : [...minSizeCollection, newPaneConfig["minSize"]]
+                : undefined,
+            },
+          };
+        }
+
+        // Fallback return in case prevState or prevState.children[id] is undefined
+        return {
+          ...splitState,
+          children: {
+            ...splitState.children,
+            [id]: [newChild],
+          },
+          collapsed: {
+            ...prevState.collapsed,
+            [id]:
+              newPaneConfig["newChildPosition"] !== -1
+                ? [
+                    ...collapsedCollection.slice(0, newPaneConfig["newChildPosition"]),
+                    newPaneConfig["collapsed"],
+                    ...collapsedCollection.slice(newPaneConfig["newChildPosition"]),
+                  ]
+                : [...collapsedCollection, newPaneConfig["collapsed"]],
+          },
+          disable: { ...prevState.disable, [id]: disabledCollection },
+          visible: { ...prevState.visible, [id]: visibleCollection },
+          lineBar: { ...prevState.lineBar, [id]: lineBarCollection },
+          initialSize: {
+            ...prevState.initialSize,
+            [id]:
+              newPaneConfig["newChildPosition"] !== -1
+                ? [
+                    ...initialSizeCollection.slice(0, newPaneConfig["newChildPosition"]),
+                    newPaneConfig["initialSize"],
+                    ...initialSizeCollection.slice(newPaneConfig["newChildPosition"]),
+                  ]
+                : [...initialSizeCollection, newPaneConfig["initialSize"]],
+          },
+          maxSize: {
+            ...prevState.maxSize,
+            [id]: maxSizeCollection
+              ? newPaneConfig["newChildPosition"] !== -1
+                ? [
+                    ...maxSizeCollection.slice(0, newPaneConfig["newChildPosition"]),
+                    newPaneConfig["maxSize"],
+                    ...maxSizeCollection.slice(newPaneConfig["newChildPosition"]),
+                  ]
+                : [...maxSizeCollection, newPaneConfig["maxSize"]]
+              : undefined,
+          },
+          minSize: {
+            ...prevState.minSize,
+            [id]: minSizeCollection
+              ? newPaneConfig["newChildPosition"] !== -1
+                ? [
+                    ...minSizeCollection.slice(0, newPaneConfig["newChildPosition"]),
+                    newPaneConfig["minSize"],
+                    ...minSizeCollection.slice(newPaneConfig["newChildPosition"]),
+                  ]
+                : [...minSizeCollection, newPaneConfig["minSize"]]
+              : undefined,
+          },
+        };
+      });
+    }
+  }
+
+  /**
+   * Removes a pane at the specified position from the state, distributing its size among remaining panes.
+   * @param id - The identifier of the pane to remove.
+   * @param panePosition - The position of the pane to remove.
+   */
+  public removePane(id: string, panePosition: number): void {
+    /**
+     * Distributes the size of the removed pane among the remaining panes.
+     * @param sizes - Array of sizes to distribute.
+     * @param position - Position of the removed pane.
+     * @returns Updated array of sizes after distribution.
+     */
+    function distributeSize(sizes: string[], position: number): string[] {
+      const removedSize = sizes.splice(position, 1); // Remove the size at the specified position
+      const distributeSizeValue = parseFloat(removedSize[0]) / sizes.length; // Calculate size to distribute
+      for (let i = 0; i < sizes.length; i++) {
+        // Distribute the size among remaining panes
+        sizes[i] = `${parseFloat(sizes[i]) + distributeSizeValue}${sizes[i].includes("%") ? "%" : "px"}`;
+      }
+      return sizes;
+    }
+
+    const { setSplitState } = this.props.splitStateContext;
+    // Update the state using prevState to ensure state consistency
+    setSplitState((prevState) => {
+      if (prevState) {
+        // Destructure state properties
+
+        const { children, collapsed, disable, lineBar, maxSize, minSize, visible } = prevState;
+
+        // Create deep copies of state properties to avoid mutation
+        const newCollapsed = collapsed ? { ...collapsed, [id]: [...collapsed[id]] } : {};
+        const newMaxSize = maxSize ? { ...maxSize, [id]: maxSize[id] ? [...(maxSize[id] as number[])] : [] } : {};
+        const newMinSize = minSize ? { ...minSize, [id]: minSize[id] ? [...(minSize[id] as number[])] : [] } : {};
+        const newChildren = children ? { ...children, [id]: [...children[id]] } : {};
+        const newLineBar = lineBar ? { ...lineBar, [id]: Array.isArray(lineBar[id]) ? [...(lineBar[id] as number[])] : lineBar[id] } : {};
+        const newVisible = visible ? { ...visible, [id]: Array.isArray(visible[id]) ? [...(visible[id] as number[])] : visible[id] } : {};
+        const newDisable = disable ? { ...disable, [id]: Array.isArray(disable[id]) ? [...(disable[id] as number[])] : disable[id] } : {};
+
+        // Remove the pane from respective arrays
+        newCollapsed[id].splice(panePosition - 1, 1);
+        newMaxSize[id]?.splice(panePosition - 1, 1);
+        newMinSize[id]?.splice(panePosition - 1, 1);
+        newChildren[id].splice(panePosition - 1, 1);
+        if (Array.isArray(newLineBar[id])) (newLineBar[id] as number[])?.splice(panePosition - 1, 1);
+        if (Array.isArray(newVisible[id])) (newVisible[id] as number[])?.splice(panePosition - 1, 1);
+        if (Array.isArray(newDisable[id])) (newDisable[id] as number[])?.splice(panePosition - 1, 1);
+
+        // Return updated state object with modified pane sizes
+        return {
+          ...prevState,
+          initialSize:
+            prevState.initialSize && prevState.initialSize[id]
+              ? {
+                  ...prevState.initialSize,
+                  [id]: distributeSize([...prevState.initialSize[id]], panePosition),
+                }
+              : { ...prevState.initialSize },
+          collapsed: { ...newCollapsed },
+          maxSize: { ...newMaxSize },
+          minSize: { ...newMinSize },
+          children: { ...newChildren },
+          lineBar: { ...newLineBar },
+          visible: { ...newVisible },
+          disable: { ...newDisable },
+        };
+      }
+
+      return prevState; // Return previous state if undefined
+    });
+  }
+
+  /**
+   * Invoke Set initial sizes for the panes on state updates.
+   */
+  private resetInitialSizes(): void {
+    const { splitState } = this.props.splitStateContext;
+
+    if (splitState.modes && splitState.initialSize) {
+      splitState.children &&
+        Object.keys(splitState.children).map((item: any, index: number) => {
+          this.setInitialSizes({
+            mode: splitState.modes![item],
+            initialSizesConfig: splitState.initialSize?.[item],
+            collapseConfig: splitState.collapsed?.[item],
+            maxSizeConfig: splitState.maxSize?.[item],
+            minSizeConfig: splitState.minSize?.[item],
+          });
+          return item;
+        });
+    }
+  }
+
+  /**
    * Set initial sizes for the panes.
    */
-  private setInitialSizes(): void {
+  private setInitialSizes(
+    config: {
+      mode: "horizontal" | "vertical";
+      initialSizesConfig: string[] | undefined;
+      collapseConfig: boolean[] | undefined;
+      maxSizeConfig: number[] | undefined;
+      minSizeConfig: number[] | undefined;
+    } | null = null
+  ): void {
     const { mode, initialSizes } = this.props;
     const sections = this.warpper?.children;
 
     if (sections && sections.length > 0) {
+      SplitUtils.setWrapper(this.warpper, mode, { [this.props.id]: this.props.onLayoutChange } as any, this.props.enableSessionStorage);
       // on the basis of given id by user setting instance. Id is the key to correctly access the instance.
       if (this.props.id) {
         SplitUtils.setSplitPaneInstance({
           [this.props.id]: this.warpper,
         });
       }
+
+      const initialSizeProps = config?.["initialSizesConfig"] || initialSizes;
+      const collpasedProps = config?.["collapseConfig"] || this.props.collapsed;
+      const maxSizeProps = config?.["maxSizeConfig"] || this.props.maxSizes;
+      const minSizeProps = config?.["minSizeConfig"] || this.props.minSizes;
 
       const userLayoutDefault = this.userSession.GetSession(mode!);
       const totalPaneSize = (sections.length + 1) / 2;
@@ -284,56 +714,100 @@ export default class Split extends React.Component<SplitProps, SplitState> {
         encounterCollapse = false;
 
       // if initialSize props are given distributing the width and height.
-      if (initialSizes && initialSizes.length > 0) {
-        for (let i = 0; i < initialSizes.length; i++) {
-          const size = initialSizes[i];
-          const sectionIndex = i * 2; // Each section has a content and separator element
+      if (initialSizeProps && initialSizeProps.length > 0) {
+        let indexCounter = 0;
+        for (let i = 0; i < sections.length; i++) {
+          if (sections[i].classList.contains("a-split-control-pane")) {
+            const size = initialSizeProps[indexCounter];
+            const sectionIndex = i; // Each section has a content and separator element
 
-          if (sections.length > sectionIndex) {
-            const contentTarget = sections[sectionIndex] as HTMLDivElement;
+            if (sections.length > sectionIndex) {
+              const contentTarget = sections[sectionIndex] as HTMLDivElement;
 
-            // if localStorage storage is enabled then check localStorage have some stored data related to splitter and set the size
-            if (userLayoutDefault && userLayoutDefault.length > 0 && this.props.enableSessionStorage) {
-              if (userLayoutDefault[i]["flexGrow"] === "-1") {
-                contentTarget.style.flexBasis = userLayoutDefault[i]["flexBasis"];
-              } else {
-                if (userLayoutDefault[i]["flexGrow"] === "0") {
-                  contentTarget.classList.add("a-split-hidden");
-                }
-                contentTarget.style.flexBasis = userLayoutDefault[i]["flexBasis"];
-                contentTarget.style.flexGrow = userLayoutDefault[i]["flexGrow"];
-              }
-            } else {
-              const getDimension = contentTarget.parentElement?.getBoundingClientRect();
-              if (sizeToReduce > -1) {
-                if (size && size.includes("%")) {
-                  contentTarget.style.flexBasis = `${
-                    parseFloat(size) -
-                    SplitUtils.pixelToPercentage(sizeToReduce, `${mode === this.HORIZONTAL ? getDimension?.width : getDimension?.height}px`)
-                  }%`;
+              // if localStorage storage is enabled then check localStorage have some stored data related to splitter and set the size
+              if (userLayoutDefault && userLayoutDefault.length > 0 && this.props.enableSessionStorage) {
+                if (userLayoutDefault[indexCounter]["flexGrow"] === "-1") {
+                  contentTarget.style.flexBasis = userLayoutDefault[indexCounter]["flexBasis"];
                 } else {
-                  contentTarget.style.flexBasis = `${parseFloat(size) - sizeToReduce}px`;
+                  if (userLayoutDefault[indexCounter]["flexGrow"] === "0") {
+                    contentTarget.classList.add("a-split-hidden");
+                  }
+                  contentTarget.style.flexBasis = userLayoutDefault[indexCounter]["flexBasis"];
+                  contentTarget.style.flexGrow = userLayoutDefault[indexCounter]["flexGrow"];
                 }
               } else {
-                contentTarget.style.flexBasis = `${size}`;
+                const getDimension = contentTarget.parentElement?.getBoundingClientRect();
+                if (sizeToReduce > -1) {
+                  if (size && size.includes("%")) {
+                    contentTarget.style.flexBasis = `${
+                      parseFloat(size) -
+                      SplitUtils.pixelToPercentage(sizeToReduce, `${mode === this.HORIZONTAL ? getDimension?.width : getDimension?.height}px`)
+                    }%`;
+                  } else {
+                    contentTarget.style.flexBasis = `${parseFloat(size) - sizeToReduce}px`;
+                  }
+                } else {
+                  contentTarget.style.flexBasis = `${size}`;
+                }
+
+                if (!collpasedProps![indexCounter] || false) {
+                  lastNonCollapsiblePane = sectionIndex;
+                }
+
+                // by default not collapsing any horizontal
+                if (collpasedProps![indexCounter] || false) {
+                  contentTarget.style.flexGrow = "0";
+                  contentTarget.classList.add("a-split-hidden");
+                  encounterCollapse = true;
+                }
               }
 
-              if (!this.props.collapsed![i] || false) {
-                lastNonCollapsiblePane = sectionIndex;
-              }
+              // setting min and max limit by default 0 and 100
+              contentTarget.setAttribute("min-size", `${minSizeProps![indexCounter] || 0}`);
+              contentTarget.setAttribute("max-size", `${maxSizeProps![indexCounter] || 100}`);
 
-              // by default not collapsing any horizontal
-              if (this.props.collapsed![i] || false) {
-                contentTarget.style.flexGrow = "0";
-                contentTarget.classList.add("a-split-hidden");
-                encounterCollapse = true;
-              }
+              // remove handlebar icons if some sections are closed
+              ManageHandleBar.removeHandleIconOnClose(
+                this.warpper,
+                sectionCounter++,
+                SplitUtils.modeWrapper,
+                SplitUtils.cachedMappedSplitPanePosition,
+                mode === this.HORIZONTAL ? "horizontal" : "vertical"
+              );
+
+              ++indexCounter;
+            }
+          }
+        }
+      }
+
+      // if initialSize props are not given
+      // this will dynamically distribute the layout width according to parent width and height.
+      if (initialSizeProps && initialSizeProps.length === 0) {
+        let counter = 0;
+        for (let pane = 0; pane < sections.length; pane++) {
+          if (sections[pane].classList.contains("a-split-control-pane")) {
+            const contentTarget = sections[pane] as HTMLDivElement;
+            const getDimension = contentTarget.parentElement?.getBoundingClientRect();
+            contentTarget.style.flexBasis = `${
+              (mode === this.HORIZONTAL ? getDimension?.width! : getDimension?.height!) / totalPaneSize - sizeToReduce
+            }px`;
+            // setting min and max limit by default 0 and 100
+            contentTarget.setAttribute("min-size", `${minSizeProps![counter] || 0}`);
+            contentTarget.setAttribute("max-size", `${maxSizeProps![counter] || 100}`);
+
+            if (!collpasedProps![counter] || false) {
+              lastNonCollapsiblePane = pane;
             }
 
-            // setting min and max limit by default 0 and 100
-            contentTarget.setAttribute("min-size", `${this.props.minSizes![i] || 0}`);
-            contentTarget.setAttribute("max-size", `${this.props.maxSizes![i] || 100}`);
+            // by default not collapsing any horizontal
+            if (collpasedProps![counter] || false) {
+              contentTarget.style.flexGrow = "0";
+              contentTarget.classList.add("a-split-hidden");
+              encounterCollapse = true;
+            }
 
+            ++counter;
             // remove handlebar icons if some sections are closed
             ManageHandleBar.removeHandleIconOnClose(
               this.warpper,
@@ -343,43 +817,6 @@ export default class Split extends React.Component<SplitProps, SplitState> {
               mode === this.HORIZONTAL ? "horizontal" : "vertical"
             );
           }
-        }
-      }
-
-      // if initialSize props are not given
-      // this will dynamically distribute the layout width according to parent width and height.
-      if (initialSizes && initialSizes.length === 0) {
-        let counter = 0;
-        for (let pane = 0; pane < sections.length; pane += 2) {
-          const contentTarget = sections[pane] as HTMLDivElement;
-          const getDimension = contentTarget.parentElement?.getBoundingClientRect();
-          contentTarget.style.flexBasis = `${
-            (mode === this.HORIZONTAL ? getDimension?.width! : getDimension?.height!) / totalPaneSize - sizeToReduce
-          }px`;
-          // setting min and max limit by default 0 and 100
-          contentTarget.setAttribute("min-size", `${this.props.minSizes![counter] || 0}`);
-          contentTarget.setAttribute("max-size", `${this.props.maxSizes![counter] || 100}`);
-
-          if (!this.props.collapsed![counter] || false) {
-            lastNonCollapsiblePane = pane;
-          }
-
-          // by default not collapsing any horizontal
-          if (this.props.collapsed![counter] || false) {
-            contentTarget.style.flexGrow = "0";
-            contentTarget.classList.add("a-split-hidden");
-            encounterCollapse = true;
-          }
-
-          ++counter;
-          // remove handlebar icons if some sections are closed
-          ManageHandleBar.removeHandleIconOnClose(
-            this.warpper,
-            sectionCounter++,
-            SplitUtils.modeWrapper,
-            SplitUtils.cachedMappedSplitPanePosition,
-            mode === this.HORIZONTAL ? "horizontal" : "vertical"
-          );
         }
       }
 
@@ -854,7 +1291,6 @@ export default class Split extends React.Component<SplitProps, SplitState> {
       prefixCls,
       childPrefixCls,
       className,
-      children,
       mode,
       visiable,
       visible = this.props.visible ?? this.props.visiable,
@@ -868,6 +1304,8 @@ export default class Split extends React.Component<SplitProps, SplitState> {
       ...other
     } = this.props;
     const { dragging } = this.state;
+    const { splitState } = this.props.splitStateContext;
+    const { children } = splitState;
     // Generate CSS classes based on component state
     const cls = [
       prefixCls,
@@ -879,87 +1317,105 @@ export default class Split extends React.Component<SplitProps, SplitState> {
       .filter(Boolean)
       .join(" ")
       .trim();
-    const child = React.Children.toArray(children);
-    // Extract needed props from the remaining props
-    const { initialSizes, minSizes, maxSizes, enableSessionStorage, collapsed, height, width, onLayoutChange, ...neededProps } = other;
-    return (
-      <div
-        className={cls}
-        {...neededProps}
-        ref={(node) => (this.warpper = node)}
-        style={{ height: height || "", width: width || "", ...neededProps.style }}
-        id={id}
-      >
-        {React.Children.map(child, (element: any, idx: number) => {
-          const props = Object.assign({}, element.props, {
-            className: [
-              childPrefixCls,
-              `${prefixCls}-pane`,
-              element && element.props && element.props.mode !== "horizontal" && element.props.mode !== "vertical" && "a-split-scrollable",
-              element.props.className,
-            ]
-              .filter(Boolean)
-              .join(" ")
-              .trim(),
-            style: { ...element.props.style },
-          });
-          const visibleBar = visible === true || (visible && visible.includes((idx + 1) as never)) || false;
-          const barProps = {
-            className: [`${prefixCls}-bar`].filter(Boolean).join(" ").trim(),
-          };
-          // lineBar ? `${prefixCls}-line-bar` : null, !lineBar ? `${prefixCls}-large-bar` : null
-          if (idx !== 0 && (lineBar === true || (lineBar && lineBar.includes(idx)))) {
-            barProps.className = [barProps.className, lineBar ? `${prefixCls}-line-bar` : null].filter(Boolean).join(" ").trim();
-          }
-          if (idx !== 0 && (disable === true || (disable && disable.includes(idx)))) {
-            barProps.className = [barProps.className, disable ? "a-split-handle-disable" : null].filter(Boolean).join(" ").trim();
-          }
-          let BarCom = null;
-          if (idx !== 0 && visibleBar && renderBar) {
-            BarCom = renderBar(
-              {
-                ...barProps,
-                onMouseDown: this.onMouseDown.bind(this, idx + 1),
-                onTouchStart: this.onMouseDown.bind(this, idx + 1),
-              },
-              idx
-            );
-          } else if (idx !== 0 && visibleBar) {
-            // BarCom = React.createElement(
-            //   "div",
-            //   { ...barProps },
-            //   <div
-            //     onMouseDown={this.onMouseDown.bind(this, idx + 1)}
-            //     onTouchStart={this.onMouseDown.bind(this, idx + 1)}
-            //   />
-            // );
-            BarCom = (
-              <DragHandle
-                key={idx}
-                props={barProps}
-                mode={this.props.mode!}
-                onMouseDown={this.onMouseDown.bind(this, idx + 1)}
-                onTouchStart={this.onMouseDown.bind(this, idx + 1)}
-                position={idx}
-              />
-            );
-          }
+    if (children) {
+      const child = React.Children.toArray(children[id]);
+      // Extract needed props from the remaining props
+      const { initialSizes, minSizes, maxSizes, enableSessionStorage, collapsed, height, width, onLayoutChange, splitStateContext, ...neededProps } =
+        other;
+      return (
+        <div
+          className={cls}
+          {...neededProps}
+          ref={(node) => (this.warpper = node)}
+          style={{ height: height || "", width: width || "", ...neededProps.style }}
+          id={id}
+        >
+          {React.Children.map(child, (element: any, idx: number) => {
+            const props = Object.assign({}, element.props, {
+              className: [
+                childPrefixCls,
+                `${prefixCls}-pane`,
+                element && element.props && element.props.mode !== "horizontal" && element.props.mode !== "vertical" && "a-split-scrollable",
+                element.props.className,
+              ]
+                .filter(Boolean)
+                .join(" ")
+                .trim(),
+              style: { ...element.props.style },
+            });
+            const visibleBar =
+              splitState.visible?.[id] === true ||
+              (splitState.visible &&
+                Array.isArray(splitState.visible?.[id]) &&
+                (splitState.visible?.[id] as number[])?.includes((idx + 1) as never)) ||
+              false;
+            const barProps = {
+              className: [`${prefixCls}-bar`].filter(Boolean).join(" ").trim(),
+            };
+            // lineBar ? `${prefixCls}-line-bar` : null, !lineBar ? `${prefixCls}-large-bar` : null
+            if (
+              idx !== 0 &&
+              (splitState.lineBar?.[id] === true ||
+                (splitState.lineBar && Array.isArray(splitState.lineBar?.[id]) && (splitState.lineBar?.[id] as number[])?.includes(idx)))
+            ) {
+              barProps.className = [barProps.className, splitState.lineBar?.[id] ? `${prefixCls}-line-bar` : null].filter(Boolean).join(" ").trim();
+            }
+            if (
+              idx !== 0 &&
+              (splitState.disable?.[id] === true ||
+                (splitState.disable && Array.isArray(splitState.disable?.[id]) && (splitState.disable?.[id] as number[])?.includes(idx)))
+            ) {
+              barProps.className = [barProps.className, splitState.disable?.[id] ? "a-split-handle-disable" : null].filter(Boolean).join(" ").trim();
+            }
+            let BarCom = null;
+            if (idx !== 0 && visibleBar && renderBar) {
+              BarCom = renderBar(
+                {
+                  ...barProps,
+                  onMouseDown: this.onMouseDown.bind(this, idx + 1),
+                  onTouchStart: this.onMouseDown.bind(this, idx + 1),
+                },
+                idx
+              );
+            } else if (idx !== 0 && visibleBar) {
+              // BarCom = React.createElement(
+              //   "div",
+              //   { ...barProps },
+              //   <div
+              //     onMouseDown={this.onMouseDown.bind(this, idx + 1)}
+              //     onTouchStart={this.onMouseDown.bind(this, idx + 1)}
+              //   />
+              // );
+              BarCom = (
+                <DragHandle
+                  key={idx}
+                  props={barProps}
+                  mode={this.props.mode!}
+                  onMouseDown={this.onMouseDown.bind(this, idx + 1)}
+                  onTouchStart={this.onMouseDown.bind(this, idx + 1)}
+                  position={idx}
+                />
+              );
+            }
 
-          return (
-            <React.Fragment key={idx}>
-              {BarCom}
-              {React.cloneElement(
-                element && element.props && (element.props.mode === "horizontal" || element.props.mode === "vertical") ? (
-                  element
-                ) : (
-                  <div>{element}</div>
-                ),
-                { ...props }
-              )}
-            </React.Fragment>
-          );
-        })}
-      </div>
-    );
+            return (
+              <React.Fragment key={idx}>
+                {BarCom}
+                {React.cloneElement(
+                  element && element.props && (element.props.mode === "horizontal" || element.props.mode === "vertical") ? (
+                    element
+                  ) : (
+                    <div>{element}</div>
+                  ),
+                  { ...props }
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+      );
+    }
   }
 }
+
+export default withSplitState(Split);
