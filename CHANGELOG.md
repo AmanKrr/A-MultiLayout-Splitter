@@ -1,3 +1,10 @@
+# [4.3.0-beta-preview.1](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.2.0...v4.3.0-beta-preview.1) (2024-09-24)
+
+
+### Features
+
+* Add or Remove Pane from split. ([bf6de05](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/bf6de055e6f9031bb551fff2c4de7fa780dafa52))
+
 # [4.2.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.1.1...v4.2.0) (2024-05-12)
 
 
