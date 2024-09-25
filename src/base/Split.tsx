@@ -85,7 +85,7 @@ interface DefaultProps {
   prefixCls: string;
   childPrefixCls: string;
   visiable: boolean;
-  mode: string;
+  mode: "horizontal" | "vertical" | undefined;
   initialSizes: string[] | []; // Default to an empty array
   minSizes: number[] | []; // Default to an empty array
   maxSizes: number[] | [];
