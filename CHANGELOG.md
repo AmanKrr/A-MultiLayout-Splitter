@@ -1,3 +1,10 @@
+# [4.3.0-beta-preview.3](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.3.0-beta-preview.2...v4.3.0-beta-preview.3) (2024-09-25)
+
+
+### Bug Fixes
+
+* local storage removal while adding or removing pane ([642b5bf](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/642b5bf3300ca3e64a815bf3bd2dc1f1dea089f2))
+
 # [4.3.0-beta-preview.2](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.3.0-beta-preview.1...v4.3.0-beta-preview.2) (2024-09-25)
 
 
