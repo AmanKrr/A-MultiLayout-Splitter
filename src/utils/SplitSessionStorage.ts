@@ -38,7 +38,7 @@ class SplitSessionStorage implements ISplitSessionStorage {
 
   // Private method to remove an item from localStorage
   private removeItem(name: string): void {
-    return localStorage.removeItem(name);
+    localStorage.removeItem(name);
   }
 
   private encodeBase64 = (data: string) => {
@@ -54,20 +54,22 @@ class SplitSessionStorage implements ISplitSessionStorage {
    */
   public removeStoredSession(splitMode: "horizontal" | "vertical"): void {
     // Construct the unique key based on the current location and split mode
-    const location = window.location;
-    const finalKey = this.splitterLocalIdentifierPrefix + location.host + location.pathname + splitMode;
+    // const location = window.location;
+    // const finalKey = this.splitterLocalIdentifierPrefix + location.host + location.pathname + splitMode;
+
+    this.removeItem(this.sessionKeyIdentifier);
 
     // Retrieve current session data from local storage
-    const sectionSize = this.getItem("");
+    // const sectionSize = this.getItem("");
 
-    // Check if the session data exists and contains the specific key to delete
-    if (sectionSize && sectionSize["allItem"] && sectionSize["allItem"][btoa(finalKey)]) {
-      // Delete the specific key from the session data
-      delete sectionSize["allItem"][btoa(finalKey)];
+    // // Check if the session data exists and contains the specific key to delete
+    // if (sectionSize && sectionSize["allItem"] && sectionSize["allItem"][btoa(finalKey)]) {
+    //   // Delete the specific key from the session data
+    //   delete sectionSize["allItem"][btoa(finalKey)];
 
-      // Update the session data in local storage
-      this.setItem(this.sessionKeyIdentifier, { [btoa(finalKey)]: sectionSize });
-    }
+    //   // Update the session data in local storage
+    //   this.setItem(this.sessionKeyIdentifier, { [btoa(finalKey)]: sectionSize });
+    // }
   }
 
   /**
