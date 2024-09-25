@@ -51,5 +51,5 @@ export declare const SplitStateConsumer: React.Consumer<SplitStateContextType | 
 export interface WithSplitStateProps {
     splitStateContext: SplitStateContextType;
 }
-export declare function withSplitState(Component: any): React.ForwardRefExoticComponent<React.RefAttributes<unknown>>;
+export declare function withSplitState<T extends {}>(Component: React.ComponentType<T & WithSplitStateProps>): React.ForwardRefExoticComponent<React.PropsWithoutRef<T> & React.RefAttributes<unknown>>;
 export {};

@@ -71,5 +71,5 @@ export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
      */
     width?: null | string;
 }
-declare const _default: React.ForwardRefExoticComponent<React.RefAttributes<unknown>>;
+declare const _default: React.ForwardRefExoticComponent<SplitProps & React.RefAttributes<unknown>>;
 export default _default;
