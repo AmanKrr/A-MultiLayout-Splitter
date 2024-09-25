@@ -1,3 +1,10 @@
+# [4.3.0-beta-preview.2](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.3.0-beta-preview.1...v4.3.0-beta-preview.2) (2024-09-25)
+
+
+### Bug Fixes
+
+* Type fix and context export fix ([d3eef28](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/d3eef28147aa174240a127ad3efa0aff46f36722))
+
 # [4.3.0-beta-preview.1](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.2.0...v4.3.0-beta-preview.1) (2024-09-24)
 
 
