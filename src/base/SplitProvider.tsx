@@ -112,14 +112,14 @@ export interface WithSplitStateProps {
   splitStateContext: SplitStateContextType;
 }
 
-export function withSplitState(Component: any) {
-  return React.forwardRef((props, ref) => (
+export function withSplitState<T extends {}>(Component: React.ComponentType<T & WithSplitStateProps>) {
+  return React.forwardRef<unknown, T>((props, ref) => (
     <SplitStateConsumer>
       {(context) => {
         if (context === undefined) {
           throw new Error("withSplitState must be used within a SplitStateProvider");
         }
-        return <Component {...props} ref={ref} splitStateContext={context} />;
+        return <Component {...(props as T)} ref={ref} splitStateContext={context} />;
       }}
     </SplitStateConsumer>
   ));
