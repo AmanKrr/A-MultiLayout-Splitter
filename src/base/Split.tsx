@@ -683,8 +683,10 @@ class Split extends React.Component<SplitProps & { splitStateContext: SplitState
       minSizeConfig: number[] | undefined;
     } | null = null
   ): void {
-    const { mode, initialSizes } = this.props;
+    let { mode, initialSizes } = this.props;
     const sections = this.warpper?.children;
+
+    mode = config?.["mode"] || mode;
 
     if (sections && sections.length > 0) {
       SplitUtils.setWrapper(this.warpper, mode, { [this.props.id]: this.props.onLayoutChange } as any, this.props.enableSessionStorage);
@@ -827,13 +829,15 @@ class Split extends React.Component<SplitProps & { splitStateContext: SplitState
         }
       }
 
-      if (userLayoutDefault && userLayoutDefault.length === 0) {
-        if (mode === this.HORIZONTAL) {
-          SplitUtils.saveHorizontalSizesToLocalStorage();
-        } else {
-          SplitUtils.saveVerticalSizesToLocalStorage();
+      setTimeout(() => {
+        if (userLayoutDefault && userLayoutDefault.length === 0) {
+          if (mode === this.HORIZONTAL) {
+            SplitUtils.saveHorizontalSizesToLocalStorage();
+          } else {
+            SplitUtils.saveVerticalSizesToLocalStorage();
+          }
         }
-      }
+      }, 600);
     }
   }
 
