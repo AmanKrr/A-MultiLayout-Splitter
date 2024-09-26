@@ -191,6 +191,7 @@ class Split extends React.Component<SplitProps & { splitStateContext: SplitState
       ...props.splitStateContext.splitState,
       modes: { ...props.splitStateContext.splitState.modes, [props.id]: props.mode! },
       children: { ...props.splitStateContext.splitState.children, [props.id]: React.Children.toArray(props.children) },
+      initialSize: { ...props.splitStateContext.splitState.initialSize, [props.id]: props.initialSizes! },
       collapsed: { ...props.splitStateContext.splitState.collapsed, [props.id]: props.collapsed! },
       visible: { ...props.splitStateContext.splitState.visible, [props.id]: props.visible ?? props.visiable },
       disable: { ...props.splitStateContext.splitState.disable, [props.id]: props.disable },
@@ -601,6 +602,8 @@ class Split extends React.Component<SplitProps & { splitStateContext: SplitState
     }
 
     const { setSplitState } = this.props.splitStateContext;
+    // remove local storage for removing conflict with previous layout which does not match with current layout
+    SplitUtils.resetLocalStorageOnPaneAddOrRemove("horizontal");
     // Update the state using prevState to ensure state consistency
     setSplitState((prevState) => {
       if (prevState) {
