@@ -1,3 +1,10 @@
+# [4.3.0-beta-preview.4](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.3.0-beta-preview.3...v4.3.0-beta-preview.4) (2024-09-26)
+
+
+### Bug Fixes
+
+* Remove pane method do not resize the pane. ([13dc7b8](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/13dc7b8126162cdbcb5b4ca3438d555481dd3694))
+
 # [4.3.0-beta-preview.3](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.3.0-beta-preview.2...v4.3.0-beta-preview.3) (2024-09-25)
 
 
