@@ -691,6 +691,16 @@ class Split extends React.Component<SplitProps & { splitStateContext: SplitState
 
     mode = config?.["mode"] || mode;
 
+    if (mode === this.HORIZONTAL && this.warpper) {
+      if (!this.warpper.classList.contains("a-split-horizontal")) {
+        return;
+      }
+    } else {
+      if (this.warpper && !this.warpper.classList.contains("a-split-vertical")) {
+        return;
+      }
+    }
+
     if (sections && sections.length > 0) {
       SplitUtils.setWrapper(this.warpper, mode, { [this.props.id]: this.props.onLayoutChange } as any, this.props.enableSessionStorage);
       // on the basis of given id by user setting instance. Id is the key to correctly access the instance.
