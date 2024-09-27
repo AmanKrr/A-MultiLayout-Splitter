@@ -1,3 +1,10 @@
+# [4.3.0-beta-preview.5](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.3.0-beta-preview.4...v4.3.0-beta-preview.5) (2024-09-27)
+
+
+### Bug Fixes
+
+* set local storage layout if current layout pane count match ([7261b9e](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/7261b9e6c5f2e13c337cf120b4da9106652d3fd4))
+
 # [4.3.0-beta-preview.4](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.3.0-beta-preview.3...v4.3.0-beta-preview.4) (2024-09-26)
 
 
