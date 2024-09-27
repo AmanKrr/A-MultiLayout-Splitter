@@ -730,7 +730,12 @@ class Split extends React.Component<SplitProps & { splitStateContext: SplitState
               const contentTarget = sections[sectionIndex] as HTMLDivElement;
 
               // if localStorage storage is enabled then check localStorage have some stored data related to splitter and set the size
-              if (userLayoutDefault && userLayoutDefault.length > 0 && this.props.enableSessionStorage) {
+              if (
+                userLayoutDefault &&
+                userLayoutDefault.length > 0 &&
+                userLayoutDefault.length === initialSizeProps.length &&
+                this.props.enableSessionStorage
+              ) {
                 if (userLayoutDefault[indexCounter]["flexGrow"] === "-1") {
                   contentTarget.style.flexBasis = userLayoutDefault[indexCounter]["flexBasis"];
                 } else {
