@@ -1,3 +1,10 @@
+# [4.3.0-beta-preview.6](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.3.0-beta-preview.5...v4.3.0-beta-preview.6) (2024-09-27)
+
+
+### Bug Fixes
+
+* mis configuration of pane while initialize ([8bb4e02](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/8bb4e02538342a1cb99b5f396d31ce2c37458d3c))
+
 # [4.3.0-beta-preview.5](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.3.0-beta-preview.4...v4.3.0-beta-preview.5) (2024-09-27)
 
 
