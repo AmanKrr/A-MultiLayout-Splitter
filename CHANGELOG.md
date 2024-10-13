@@ -1,3 +1,10 @@
+# [4.3.0-beta-preview.7](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.3.0-beta-preview.6...v4.3.0-beta-preview.7) (2024-10-13)
+
+
+### Bug Fixes
+
+* draghandle open/close direction, onLayoutChange callback size and reason argument improvement. ([a8bd83c](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/a8bd83c09865215b3b54ad9b60b3b429416cbe07))
+
 # [4.3.0-beta-preview.6](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.3.0-beta-preview.5...v4.3.0-beta-preview.6) (2024-09-27)
 
 
