@@ -4,6 +4,7 @@ import SplitSessionStorage, { ISplitSessionStorage } from "./SplitSessionStorage
 
 type Orientation = "horizontal" | "vertical";
 type Instance = Element | null;
+export type paneStatus = "open" | "close" | "added" | "removed" | "unknown";
 
 // Define the SplitUtils class
 class SplitUtils {
@@ -20,7 +21,7 @@ class SplitUtils {
 
   // callback prop
   static layoutCallback?: {
-    [key: string]: (size: number, sectionNumber: number, paneId: string, reason: string | "default") => void | null | undefined;
+    [key: string]: (sectionNumber: number, paneId: string, reason: string | paneStatus) => void | null | undefined;
   } = {};
 
   // Reference to the HTML wrapper element for split panes
@@ -61,7 +62,7 @@ class SplitUtils {
   static setWrapper(
     wrapper: HTMLDivElement | null,
     mode: Orientation = "horizontal",
-    callback: { [key: string]: (size: number, sectionNumber: number, paneId: string, reason: string | "default") => void | null | undefined },
+    callback: { [key: string]: (sectionNumber: number, paneId: string, reason: string | paneStatus) => void | null | undefined },
     enableSessionStorage = false
   ): void {
     // Set the wrapper, mode, and other configurations
@@ -279,7 +280,7 @@ class SplitUtils {
     instance: Instance = null,
     sectionNumber: number,
     splitMode: Orientation,
-    reason: string | "default" = "default"
+    reason: string | paneStatus = "unknown"
   ): void {
     if (!instance && !this.modeWrapper[splitMode]) {
       console.error("Missing instance.");
@@ -292,13 +293,13 @@ class SplitUtils {
     if (instance) {
       const paneId = instance.getAttribute("id");
       if (paneId) {
-        this.layoutCallback?.[paneId](0, sectionNumber, paneId, reason);
+        this.layoutCallback?.[paneId](sectionNumber, paneId, reason);
       }
     } else {
       // If instance is not provided, invoke layout callback for the mode wrapper.
       const paneId = this.modeWrapper[splitMode]?.getAttribute("id");
       if (paneId) {
-        this.layoutCallback?.[paneId](0, sectionNumber, paneId, reason);
+        this.layoutCallback?.[paneId](sectionNumber, paneId, reason);
       }
     }
   }
@@ -313,7 +314,7 @@ class SplitUtils {
     instance: Instance = null,
     sectionNumber: number,
     splitMode: Orientation,
-    reason: string | "default" = "default",
+    reason: string | paneStatus = "close",
     direction: "left" | "right" | "top" | "bottom" | null = null
   ): void {
     // Implementation for closing a specific split section
@@ -441,7 +442,7 @@ class SplitUtils {
     instance: Instance = null,
     sectionNumber: number,
     splitMode: Orientation,
-    reason: string | "default" = "default",
+    reason: string | paneStatus = "open",
     direction: "left" | "right" | "top" | "bottom" | null = null
   ): void {
     // Implementation for opening a specific split section with a new size
