@@ -1,5 +1,6 @@
 import React from "react";
 import "../style/index.css";
+import { paneStatus } from "../utils/SplitUtils";
 export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onDragEnd"> {
     style?: React.CSSProperties;
     className?: string;
@@ -25,7 +26,7 @@ export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
     /**
      * Callback function for layout change. Triggered only on closing and opening of pane.
      */
-    onLayoutChange?: (size: number, sectionNumber: number, paneId: string, reason: string | "default") => void | null;
+    onLayoutChange?: (sectionNumber: number, paneId: string, reason: string | paneStatus) => void | null;
     /** Set the drag and drop toolbar as a line style. */
     lineBar?: boolean | number[];
     /** Set the dragged toolbar, whether it is visible or not */
