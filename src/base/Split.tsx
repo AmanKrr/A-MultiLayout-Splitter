@@ -1,6 +1,6 @@
 import React, { TouchEvent } from "react";
 import "../style/index.css";
-import SplitUtils from "../utils/SplitUtils";
+import SplitUtils, { paneStatus } from "../utils/SplitUtils";
 import SplitSessionStorage, { ISplitSessionStorage } from "../utils/SplitSessionStorage";
 
 import throttle from "lodash/throttle";
@@ -34,7 +34,7 @@ export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
   /**
    * Callback function for layout change. Triggered only on closing and opening of pane.
    */
-  onLayoutChange?: (size: number, sectionNumber: number, paneId: string, reason: string | "default") => void | null;
+  onLayoutChange?: (sectionNumber: number, paneId: string, reason: string | paneStatus) => void | null;
   /** Set the drag and drop toolbar as a line style. */
   lineBar?: boolean | number[];
   /** Set the dragged toolbar, whether it is visible or not */
