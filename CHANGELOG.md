@@ -1,3 +1,25 @@
+# [5.0.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.2.0...v5.0.0) (2024-10-14)
+
+
+### Bug Fixes
+
+* draghandle open/close direction, onLayoutChange callback size and reason argument improvement. ([478d274](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/478d274844862b8e2606b5bcb783a12963270978))
+* local storage removal while adding or removing pane ([b6f810a](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/b6f810ab2012922b8be41a4d86829ba388cfdcc7))
+* mis configuration of pane while initialize ([07e33fb](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/07e33fbc4f367d88c465f38337aa32e99f19b365))
+* Remove pane method do not resize the pane. ([8589b94](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/8589b94a337aecd68ae404b942903e1d3def9a48))
+* set local storage layout if current layout pane count match ([6b99a9a](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/6b99a9a7893a4f60c15520811380c91672e001b4))
+* Type fix and context export fix ([02e67f4](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/02e67f4c0c3695edf60c3d57fd242fa8e2b83abb))
+
+
+### Features
+
+* add and remove panes with context provider. ([ce9604e](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/ce9604e1d848f287c9e191d367a5d015544f3f0f))
+
+
+### BREAKING CHANGES
+
+* The Split component must now be wrapped in SplitStateProvider for proper state management.
+
 # [4.3.0-beta-preview.7](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.3.0-beta-preview.6...v4.3.0-beta-preview.7) (2024-10-13)
 
 

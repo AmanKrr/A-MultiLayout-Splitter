@@ -5,7 +5,7 @@
   "types": "dist/index.d.ts",
   "author": "Aman Kumar",
   "private": false,
-  "version": "4.3.0-beta-preview.7",
+  "version": "5.0.0",
   "keywords": [
     "splitter",
     "react"
