@@ -1,3 +1,15 @@
+## [4.2.1](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.2.0...v4.2.1) (2024-10-14)
+
+
+### Bug Fixes
+
+* draghandle open/close direction, onLayoutChange callback size and reason argument improvement. ([a1120b5](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/a1120b50a1f8d8d57b00ca99146cb149e9c7890e))
+* local storage removal while adding or removing pane ([8d648fd](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/8d648fda0c2b55679b6edd01e9624979efeb1247))
+* mis configuration of pane while initialize ([1796e83](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/1796e83306b90515bbd77a2090c58c1d9da500ad))
+* Remove pane method do not resize the pane. ([23d0f82](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/23d0f82e2eb5b49e92cb9d9e604b540a3ec4902c))
+* set local storage layout if current layout pane count match ([05e8c6c](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/05e8c6ccbb6aacddf2c3a6446027232a794b96cd))
+* Type fix and context export fix ([31a5ad7](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/31a5ad7c190243686a7e643aa976c6490fa9c009))
+
 # [4.3.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.2.0...v4.3.0) (2024-10-14)
 
 
