@@ -1,3 +1,10 @@
+# [5.1.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v5.0.0...v5.1.0) (2024-11-14)
+
+
+### Features
+
+* Add direction argument in onLayoutChange callback ([fffc4bb](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/fffc4bba357a227be806038c1008e55e62cf8e2d))
+
 # [5.0.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v4.2.0...v5.0.0) (2024-10-14)
 
 
