@@ -13,7 +13,7 @@ declare class SplitUtils {
     private static FIX_CLASS;
     private static FIX_HELPER_CLASS;
     static layoutCallback?: {
-        [key: string]: (sectionNumber: number, paneId: string, reason: string | paneStatus) => void | null | undefined;
+        [key: string]: (sectionNumber: number, paneId: string, reason: string | paneStatus, direction: "left" | "right" | "top" | "bottom" | null) => void | null | undefined;
     };
     static wrapper: HTMLDivElement | null;
     static mode: string;
@@ -32,7 +32,7 @@ declare class SplitUtils {
      * @param enableSessionStorage - Flag to enable session storage for storing split sizes.
      */
     static setWrapper(wrapper: HTMLDivElement | null, mode: Orientation | undefined, callback: {
-        [key: string]: (sectionNumber: number, paneId: string, reason: string | paneStatus) => void | null | undefined;
+        [key: string]: (sectionNumber: number, paneId: string, reason: string | paneStatus, direction: "left" | "right" | "top" | "bottom" | null) => void | null | undefined;
     }, enableSessionStorage?: boolean): void;
     /**
      * Returns the combined class names for fixing purposes.
@@ -92,7 +92,7 @@ declare class SplitUtils {
      * @param splitMode - The split mode (horizontal or vertical).
      * @param reason - The reason for invoking the layout callback.
      */
-    static invokeLayoutCallback(instance: Instance | undefined, sectionNumber: number, splitMode: Orientation, reason?: string | paneStatus): void;
+    static invokeLayoutCallback(instance: Instance | undefined, sectionNumber: number, splitMode: Orientation, reason?: string | paneStatus, direction?: "left" | "right" | "top" | "bottom" | null): void;
     /**
      * Closes a specific split section.
      * @param sectionNumber - The section number to be closed.
