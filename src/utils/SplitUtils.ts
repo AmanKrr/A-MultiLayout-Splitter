@@ -21,7 +21,12 @@ class SplitUtils {
 
   // callback prop
   static layoutCallback?: {
-    [key: string]: (sectionNumber: number, paneId: string, reason: string | paneStatus) => void | null | undefined;
+    [key: string]: (
+      sectionNumber: number,
+      paneId: string,
+      reason: string | paneStatus,
+      direction: "left" | "right" | "top" | "bottom" | null
+    ) => void | null | undefined;
   } = {};
 
   // Reference to the HTML wrapper element for split panes
@@ -62,7 +67,14 @@ class SplitUtils {
   static setWrapper(
     wrapper: HTMLDivElement | null,
     mode: Orientation = "horizontal",
-    callback: { [key: string]: (sectionNumber: number, paneId: string, reason: string | paneStatus) => void | null | undefined },
+    callback: {
+      [key: string]: (
+        sectionNumber: number,
+        paneId: string,
+        reason: string | paneStatus,
+        direction: "left" | "right" | "top" | "bottom" | null
+      ) => void | null | undefined;
+    },
     enableSessionStorage = false
   ): void {
     // Set the wrapper, mode, and other configurations
@@ -280,7 +292,8 @@ class SplitUtils {
     instance: Instance = null,
     sectionNumber: number,
     splitMode: Orientation,
-    reason: string | paneStatus = "unknown"
+    reason: string | paneStatus = "unknown",
+    direction: "left" | "right" | "top" | "bottom" | null = null
   ): void {
     if (!instance && !this.modeWrapper[splitMode]) {
       console.error("Missing instance.");
@@ -293,13 +306,13 @@ class SplitUtils {
     if (instance) {
       const paneId = instance.getAttribute("id");
       if (paneId) {
-        this.layoutCallback?.[paneId](sectionNumber, paneId, reason);
+        this.layoutCallback?.[paneId](sectionNumber, paneId, reason, direction);
       }
     } else {
       // If instance is not provided, invoke layout callback for the mode wrapper.
       const paneId = this.modeWrapper[splitMode]?.getAttribute("id");
       if (paneId) {
-        this.layoutCallback?.[paneId](sectionNumber, paneId, reason);
+        this.layoutCallback?.[paneId](sectionNumber, paneId, reason, direction);
       }
     }
   }
@@ -427,7 +440,7 @@ class SplitUtils {
           this.saveSizesToLocalStorage(this.VERTICAL);
         }
 
-        this.invokeLayoutCallback(instance, sectionNumber, splitMode, reason);
+        this.invokeLayoutCallback(instance, sectionNumber, splitMode, reason, direction);
       }
     }
   }
@@ -596,7 +609,7 @@ class SplitUtils {
           this.saveSizesToLocalStorage(mode);
         }
 
-        this.invokeLayoutCallback(instance, sectionNumber, splitMode, reason);
+        this.invokeLayoutCallback(instance, sectionNumber, splitMode, reason, direction);
       }
     }
   }

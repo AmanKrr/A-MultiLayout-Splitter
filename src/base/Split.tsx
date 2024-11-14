@@ -34,7 +34,12 @@ export interface SplitProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "
   /**
    * Callback function for layout change. Triggered only on closing and opening of pane.
    */
-  onLayoutChange?: (sectionNumber: number, paneId: string, reason: string | paneStatus) => void | null;
+  onLayoutChange?: (
+    sectionNumber: number,
+    paneId: string,
+    reason: string | paneStatus,
+    direction: "left" | "right" | "top" | "bottom" | null
+  ) => void | null;
   /** Set the drag and drop toolbar as a line style. */
   lineBar?: boolean | number[];
   /** Set the dragged toolbar, whether it is visible or not */
