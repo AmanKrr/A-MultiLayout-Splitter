@@ -1119,6 +1119,17 @@ class Split extends React.Component<SplitProps & { splitStateContext: SplitState
       if (this.paneConfig["maxNextSize"] && nextSize >= parseInt(this.paneConfig["maxNextSize"])) return 1;
     }
 
+    // Ensure the paneConfig is properly initialized before updating pane sizes.
+    // Issue: During rapid or sudden mouse movements, the paneConfig may become null or invalid (missing nextElement or prevElement).
+    // This causes unintended behavior where the pane moves beyond the specified min and max boundaries.
+    // Resolution: Prevent updating pane sizes unless paneConfig has valid references to both previous and next elements.
+    // This safeguard ensures resizing logic only operates on properly initialized and updated elements.
+    if (prevTarget && nextTarget) {
+      if (!this.paneConfig["nextElement"] && !this.paneConfig["prevElement"]) {
+        return 1;
+      }
+    }
+
     return 0;
   }
 
