@@ -1,3 +1,10 @@
+## [5.1.1](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v5.1.0...v5.1.1) (2024-11-18)
+
+
+### Bug Fixes
+
+* prevent pane movement beyond min/max on sudden mouse up ([b6006a7](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/b6006a75e547470c059cc3216665e370901fc8ba))
+
 # [5.1.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v5.0.0...v5.1.0) (2024-11-14)
 
 
