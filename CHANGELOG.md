@@ -1,3 +1,15 @@
+# [5.2.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v5.1.1...v5.2.0) (2024-12-11)
+
+
+### Bug Fixes
+
+* reset localStorage when pane count changes ([50ecddf](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/50ecddfdc874288944b77c3ce33ef68c26e2fa5a))
+
+
+### Features
+
+* export panel size saving utilities ([d430f33](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/d430f33411cd0753d1d31bc7a5243861093cdd3c))
+
 ## [5.1.1](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v5.1.0...v5.1.1) (2024-11-18)
 
 
