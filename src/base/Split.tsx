@@ -852,6 +852,16 @@ class Split extends React.Component<SplitProps & { splitStateContext: SplitState
         }
       }
 
+      // Remove the stored layout from localStorage if the current splitter panes configuration differs
+      // from the stored configuration (e.g., the number of panes does not match).
+      if (userLayoutDefault && initialSizeProps && userLayoutDefault.length > 0 && userLayoutDefault.length !== initialSizeProps.length) {
+        if (mode === this.HORIZONTAL) {
+          SplitUtils.resetLocalStorageOnPaneAddOrRemove("horizontal");
+        } else {
+          SplitUtils.resetLocalStorageOnPaneAddOrRemove("vertical");
+        }
+      }
+
       setTimeout(() => {
         if (userLayoutDefault && userLayoutDefault.length === 0) {
           if (mode === this.HORIZONTAL) {
