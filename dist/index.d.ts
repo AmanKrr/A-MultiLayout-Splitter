@@ -8,4 +8,6 @@ declare const getSplitPaneInstance: typeof SplitUtils.getSplitPaneInstance;
 declare const isSectionOpen: typeof SplitUtils.isSectionOpen;
 declare const setPaneSize: typeof SplitUtils.setPaneSize;
 declare const fixClass: string;
-export { Split, openSplitter, closeSplitter, getSplitPaneInstance, isSectionOpen, fixClass, setPaneSize, SplitSessionStorage, SplitStateProvider };
+declare const saveHorizontalPanelSizes: typeof SplitUtils.saveHorizontalSizesToLocalStorage;
+declare const saveVerticalPanelSizes: typeof SplitUtils.saveVerticalSizesToLocalStorage;
+export { Split, openSplitter, closeSplitter, getSplitPaneInstance, isSectionOpen, fixClass, setPaneSize, SplitSessionStorage, saveHorizontalPanelSizes, saveVerticalPanelSizes, SplitStateProvider, };
