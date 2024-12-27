@@ -13,11 +13,17 @@
     "split",
     "panes",
     "react-splitter",
-    "resizable"
+    "resizable",
+    "multilayout",
+    "react-layout",
+    "UI components",
+    "layout management",
+    "react resizable splitter"
   ],
   "license": "MIT",
   "homepage": "https://amankrr.github.io/react-multilayout-split/",
   "repository": {
+    "type": "git",
     "url": "git+https://github.com/AmanKrr/A-MultiLayout-Splitter.git"
   },
   "scripts": {
