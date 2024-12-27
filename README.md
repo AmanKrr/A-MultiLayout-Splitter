@@ -41,7 +41,7 @@ yarn add a-multilayout-splitter
 
 ### Note:
 
-Please note that the documentation for this project is currently a work in progress and needs updates. Kindly follow the instructions provided below in the README for usage and guidance.
+This project is actively maintained, and the documentation is regularly updated. For now, the examples and guidance provided here should help you get started.
 
 ### Basic Example
 
