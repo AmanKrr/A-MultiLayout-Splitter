@@ -8,7 +8,12 @@
   "version": "5.2.0",
   "keywords": [
     "splitter",
-    "react"
+    "react",
+    "layout",
+    "split",
+    "panes",
+    "react-splitter",
+    "resizable"
   ],
   "license": "MIT",
   "homepage": "https://amankrr.github.io/react-multilayout-split/",
