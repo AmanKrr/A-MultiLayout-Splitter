@@ -29,16 +29,16 @@ const SplitStateContext = React.createContext<SplitStateContextType | undefined>
 
 export class SplitStateProvider extends React.Component<ISplitStateProvider> {
   state: SplitState = {
-    children: null,
-    disable: null,
-    lineBar: null,
-    visible: null,
-    initialSize: null,
-    collapsed: null,
-    maxSize: null,
-    minSize: null,
-    modes: null,
-    enableLocalStorage: null,
+    children: {},
+    disable: {},
+    lineBar: {},
+    visible: {},
+    initialSize: {},
+    collapsed: {},
+    maxSize: {},
+    minSize: {},
+    modes: {},
+    enableLocalStorage: {},
   };
 
   setStateWrapper = (newState: Partial<SplitState> | ((prevState: SplitState) => Partial<SplitState>)) => {
@@ -98,11 +98,7 @@ export class SplitStateProvider extends React.Component<ISplitStateProvider> {
   }
 
   render() {
-    return (
-      <SplitStateContext.Provider value={{ splitState: this.state, setSplitState: this.setStateWrapper }}>
-        {this.props.children}
-      </SplitStateContext.Provider>
-    );
+    return <SplitStateContext.Provider value={{ splitState: this.state, setSplitState: this.setStateWrapper }}>{this.props.children}</SplitStateContext.Provider>;
   }
 }
 
