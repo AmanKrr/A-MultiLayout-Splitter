@@ -1,3 +1,10 @@
+## [5.2.1](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v5.2.0...v5.2.1) (2025-02-05)
+
+
+### Bug Fixes
+
+* context state logical render ([eabeaa3](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/eabeaa353cfd617e3ff32e3a3262ceece024b7bc))
+
 # [5.2.0](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v5.1.1...v5.2.0) (2024-12-11)
 
 
