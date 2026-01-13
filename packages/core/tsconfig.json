@@ -14,14 +14,14 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    /* Linting - Temporarily relaxed for Phase 1, will enable strict in Phase 2 */
-    "strict": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    /* Linting - Strict mode enabled in Phase 2 */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": false,
-    "noImplicitOverride": false,
-    "exactOptionalPropertyTypes": false,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": false, // Keep disabled for React props flexibility
 
     /* Path resolution */
     "baseUrl": ".",

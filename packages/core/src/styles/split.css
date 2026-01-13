@@ -1,0 +1,164 @@
+/**
+ * Split Component Styles v6
+ *
+ * Core CSS for the split pane component.
+ * Preserves v5 performance characteristics via CSS-based state management.
+ */
+
+/* Container */
+.a-split-container {
+  position: relative;
+  box-sizing: border-box;
+}
+
+.a-split-container * {
+  box-sizing: border-box;
+}
+
+/* Vertical mode */
+.a-split-vertical {
+  flex-direction: column;
+}
+
+/* Fix class for nested layouts */
+.a-split-fix {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+/* Pane */
+.a-split-pane {
+  position: relative;
+  overflow: auto;
+  /* No transition on panes - it slows down dragging */
+}
+
+/* Hidden pane (collapsed) */
+.a-split-hidden {
+  flex-basis: 0 !important;
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
+  overflow: hidden !important;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Handlebar - Default */
+.a-split-handlebar {
+  position: relative;
+  flex-shrink: 0;
+  background-color: #e0e0e0;
+  z-index: 10;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Horizontal handlebar */
+.a-split-handlebar-horizontal {
+  width: 8px;
+  cursor: col-resize;
+  min-width: 8px;
+}
+
+.a-split-handlebar-horizontal:hover {
+  background-color: #d0d0d0;
+}
+
+.a-split-handlebar-horizontal:active {
+  background-color: #b0b0b0;
+}
+
+/* Vertical handlebar */
+.a-split-handlebar-vertical {
+  height: 8px;
+  cursor: row-resize;
+  min-height: 8px;
+}
+
+.a-split-handlebar-vertical:hover {
+  background-color: #d0d0d0;
+}
+
+.a-split-handlebar-vertical:active {
+  background-color: #b0b0b0;
+}
+
+/* Line bar style (minimal handlebar) */
+.a-split-handlebar-line {
+  background-color: transparent;
+  position: relative;
+}
+
+.a-split-handlebar-line::after {
+  content: '';
+  position: absolute;
+  background-color: #999;
+}
+
+.a-split-handlebar-line.a-split-handlebar-horizontal::after {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+.a-split-handlebar-line.a-split-handlebar-vertical::after {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.a-split-handlebar-line:hover::after {
+  background-color: #666;
+}
+
+.a-split-handlebar-line:active::after {
+  background-color: #333;
+}
+
+/* Disabled handlebar */
+.a-split-handlebar-disabled {
+  cursor: default !important;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Dragging state - applied to body to prevent text selection */
+.a-split-dragging {
+  cursor: col-resize !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+.a-split-dragging.a-split-vertical {
+  cursor: row-resize !important;
+}
+
+/* Prevent text selection during drag */
+.a-split-dragging * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+/* Animation for programmatic size changes */
+.a-split-pane.a-split-animating {
+  transition: flex-basis 0.3s ease;
+}
+
+/* Focus styles for accessibility */
+.a-split-handlebar:focus-visible {
+  outline: 2px solid #4285f4;
+  outline-offset: 2px;
+}
