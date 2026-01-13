@@ -24,7 +24,8 @@ import React, {
   useState,
   useCallback,
 } from 'react';
-import { SplitProps, SplitRef, SplitState, SplitAction } from '../types';
+// @ts-ignore - SplitSnapshot is used in function signature
+import type { SplitProps, SplitRef, SplitState, SplitAction, SplitSnapshot } from '../types';
 import { usePaneManager } from '../hooks/usePaneManager';
 import { useDragHandler } from '../hooks/useDragHandler';
 import { usePersistence } from '../hooks/usePersistence';
@@ -161,7 +162,7 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     }
   }, [initialSizes, minSizes, maxSizes, collapsed, children]);
 
-  // Pane management hook
+  // Pane management hook (Phase 4 Enhanced)
   const {
     panes,
     addPane,
@@ -169,6 +170,12 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     togglePane,
     setPaneSize,
     getPaneState,
+    // Phase 4: Enhanced operations
+    removePanes,
+    swapPanes,
+    collapsePane,
+    expandPane,
+    resizePane,
   } = usePaneManager(children, initialSizes, collapsed, minSizes, maxSizes);
 
   // Drag state for plugins
@@ -378,14 +385,70 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     },
   });
 
-  // Expose imperative API
-  useImperativeHandle(ref, () => ({
-    addPane,
-    removePane,
-    togglePane,
-    setPaneSize,
-    getPaneState,
-  }));
+  // Expose imperative API (Phase 4 Enhanced)
+  useImperativeHandle(
+    ref,
+    () => ({
+      // Basic operations
+      addPane,
+      removePane,
+      togglePane,
+      setPaneSize,
+      getPaneState,
+      // Phase 4: Advanced operations
+      removePanes,
+      swapPanes,
+      collapsePane,
+      expandPane,
+      resizePane,
+      getSnapshot: () => {
+        const container = containerRef.current;
+        const totalSize = container
+          ? mode === 'horizontal'
+            ? container.offsetWidth
+            : container.offsetHeight
+          : 0;
+
+        return {
+          panes: panes.map((p) => ({ ...p })),
+          totalSize,
+          mode,
+          timestamp: Date.now(),
+        };
+      },
+      restore: (snapshot) => {
+        if (snapshot.mode !== mode) {
+          console.warn(
+            `Cannot restore snapshot with different mode. Current: ${mode}, Snapshot: ${snapshot.mode}`
+          );
+          return;
+        }
+
+        snapshot.panes.forEach((pane, idx) => {
+          if (panes[idx]) {
+            setPaneSize(idx, pane.size);
+            if (pane.collapsed !== panes[idx].collapsed) {
+              togglePane(idx);
+            }
+          }
+        });
+      },
+    }),
+    [
+      addPane,
+      removePane,
+      togglePane,
+      setPaneSize,
+      getPaneState,
+      removePanes,
+      swapPanes,
+      collapsePane,
+      expandPane,
+      resizePane,
+      panes,
+      mode,
+    ]
+  );
 
   // Calculate container styles
   const containerStyles = useMemo(() => {

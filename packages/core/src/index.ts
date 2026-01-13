@@ -52,6 +52,11 @@ export type {
   PaneRemoveEvent,
   ResizeEvent,
   PluginConfig,
+  // Phase 4: Enhanced API types
+  SplitSnapshot,
+  SplitControllerState,
+  SplitControllerActions,
+  UseSplitControllerOptions,
 } from './types';
 
 // Hooks (for custom implementations)
@@ -59,6 +64,8 @@ export { useDragHandler } from './hooks/useDragHandler';
 export { usePaneManager } from './hooks/usePaneManager';
 export { usePersistence } from './hooks/usePersistence';
 export { usePluginContext } from './hooks/usePluginContext';
+// Phase 4: Hook-based API
+export { useSplitController } from './hooks/useSplitController';
 
 // Plugin System (Phase 3)
 export {

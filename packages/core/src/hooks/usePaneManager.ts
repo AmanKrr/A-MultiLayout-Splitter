@@ -168,6 +168,146 @@ export function usePaneManager(
    */
   const getPaneState = useCallback(() => panes, [panes]);
 
+  /**
+   * Remove multiple panes at once (Phase 4)
+   */
+  const removePanes = useCallback((indices: number[]) => {
+    setPanes((prevPanes) => {
+      // Sort indices in descending order to remove from end first
+      const sortedIndices = [...indices].sort((a, b) => b - a);
+      let newPanes = [...prevPanes];
+      let totalRemovedSize = 0;
+
+      // Remove all specified panes
+      sortedIndices.forEach((index) => {
+        if (index >= 0 && index < newPanes.length) {
+          const removed = newPanes.splice(index, 1)[0];
+          if (removed) {
+            totalRemovedSize += parseFloat(removed.size) || 0;
+          }
+        }
+      });
+
+      // Redistribute removed size to remaining panes
+      if (newPanes.length > 0 && totalRemovedSize > 0) {
+        const redistributeAmount = totalRemovedSize / newPanes.length;
+        newPanes = newPanes.map((pane) => ({
+          ...pane,
+          size: `${(parseFloat(pane.size) || 0) + redistributeAmount}%`,
+        }));
+      }
+
+      return newPanes;
+    });
+  }, []);
+
+  /**
+   * Swap two panes (Phase 4)
+   */
+  const swapPanes = useCallback((indexA: number, indexB: number) => {
+    setPanes((prevPanes) => {
+      if (
+        indexA < 0 ||
+        indexA >= prevPanes.length ||
+        indexB < 0 ||
+        indexB >= prevPanes.length ||
+        indexA === indexB
+      ) {
+        return prevPanes;
+      }
+
+      const newPanes = [...prevPanes];
+      const temp = newPanes[indexA];
+      newPanes[indexA] = newPanes[indexB]!;
+      newPanes[indexB] = temp!;
+
+      return newPanes;
+    });
+  }, []);
+
+  /**
+   * Collapse a pane (Phase 4)
+   */
+  const collapsePane = useCallback((index: number) => {
+    setPanes((prevPanes) => {
+      if (index < 0 || index >= prevPanes.length) return prevPanes;
+
+      const currentPane = prevPanes[index];
+      if (!currentPane || currentPane.collapsed) return prevPanes;
+
+      const newPanes = [...prevPanes];
+      newPanes[index] = { ...currentPane, collapsed: true };
+
+      // Update DOM
+      const element = document.querySelector(
+        `[data-pane-id="${currentPane.id}"]`
+      ) as HTMLElement;
+      if (element) {
+        element.classList.add('a-split-hidden');
+        element.style.flexGrow = '0';
+      }
+
+      return newPanes;
+    });
+  }, []);
+
+  /**
+   * Expand a pane (Phase 4)
+   */
+  const expandPane = useCallback((index: number) => {
+    setPanes((prevPanes) => {
+      if (index < 0 || index >= prevPanes.length) return prevPanes;
+
+      const currentPane = prevPanes[index];
+      if (!currentPane || !currentPane.collapsed) return prevPanes;
+
+      const newPanes = [...prevPanes];
+      newPanes[index] = { ...currentPane, collapsed: false };
+
+      // Update DOM
+      const element = document.querySelector(
+        `[data-pane-id="${currentPane.id}"]`
+      ) as HTMLElement;
+      if (element) {
+        element.classList.remove('a-split-hidden');
+        element.style.flexGrow = '';
+      }
+
+      return newPanes;
+    });
+  }, []);
+
+  /**
+   * Resize a pane by delta (Phase 4)
+   */
+  const resizePane = useCallback((index: number, delta: number) => {
+    setPanes((prevPanes) => {
+      if (index < 0 || index >= prevPanes.length) return prevPanes;
+
+      const currentPane = prevPanes[index];
+      if (!currentPane) return prevPanes;
+
+      const currentSize = parseFloat(currentPane.size) || 0;
+      const newSize = Math.max(
+        currentPane.minSize || 0,
+        Math.min(currentPane.maxSize || 100, currentSize + delta)
+      );
+
+      const newPanes = [...prevPanes];
+      newPanes[index] = { ...currentPane, size: `${newSize}%` };
+
+      // Update DOM
+      const element = document.querySelector(
+        `[data-pane-id="${currentPane.id}"]`
+      ) as HTMLElement;
+      if (element) {
+        element.style.flexBasis = `${newSize}%`;
+      }
+
+      return newPanes;
+    });
+  }, []);
+
   return {
     panes,
     addPane,
@@ -175,6 +315,12 @@ export function usePaneManager(
     togglePane,
     setPaneSize,
     getPaneState,
+    // Phase 4: Enhanced operations
+    removePanes,
+    swapPanes,
+    collapsePane,
+    expandPane,
+    resizePane,
   };
 }
 

@@ -146,14 +146,24 @@ export interface SplitProps {
 }
 
 /**
- * Imperative API exposed via ref
+ * Imperative API exposed via ref (Phase 4 Enhanced)
  */
 export interface SplitRef {
+  // Basic operations
   addPane: (config: AddPaneConfig) => void;
   removePane: (index: number) => void;
   togglePane: (index: number) => void;
   setPaneSize: (index: number, size: string, options?: AnimationOptions) => void;
   getPaneState: () => Pane[];
+
+  // Phase 4: Advanced operations
+  removePanes: (indices: number[]) => void;
+  swapPanes: (indexA: number, indexB: number) => void;
+  getSnapshot: () => SplitSnapshot;
+  restore: (snapshot: SplitSnapshot) => void;
+  collapsePane: (index: number) => void;
+  expandPane: (index: number) => void;
+  resizePane: (index: number, delta: number) => void;
 }
 
 /**
@@ -174,6 +184,54 @@ export interface AddPaneConfig {
 export interface AnimationOptions {
   animate?: boolean;
   duration?: number;
+}
+
+/**
+ * Split snapshot for save/restore operations (Phase 4)
+ */
+export interface SplitSnapshot {
+  panes: Pane[];
+  totalSize: number;
+  mode: SplitMode;
+  timestamp: number;
+}
+
+/**
+ * Controller state for useSplitController hook (Phase 4)
+ */
+export interface SplitControllerState {
+  panes: Pane[];
+  mode: SplitMode;
+  isDragging: boolean;
+}
+
+/**
+ * Controller actions for useSplitController hook (Phase 4)
+ */
+export interface SplitControllerActions {
+  addPane: (config: AddPaneConfig) => void;
+  removePane: (index: number) => void;
+  removePanes: (indices: number[]) => void;
+  togglePane: (index: number) => void;
+  collapsePane: (index: number) => void;
+  expandPane: (index: number) => void;
+  setPaneSize: (index: number, size: string, options?: AnimationOptions) => void;
+  swapPanes: (indexA: number, indexB: number) => void;
+  setPanes: (panes: Pane[]) => void;
+  getSnapshot: () => SplitSnapshot;
+  restore: (snapshot: SplitSnapshot) => void;
+}
+
+/**
+ * Options for useSplitController hook (Phase 4)
+ */
+export interface UseSplitControllerOptions {
+  mode?: SplitMode;
+  initialPanes?: Pane[];
+  initialSizes?: string[];
+  minSizes?: number[];
+  maxSizes?: number[];
+  onPaneChange?: (panes: Pane[]) => void;
 }
 
 /**
