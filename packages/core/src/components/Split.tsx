@@ -206,26 +206,19 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
 
   // ==================== REACTIVE PROPS SYSTEM ====================
   // Sync initialSizes prop to DOM when it changes
+  // NOTE: We deliberately exclude 'panes' from dependencies to avoid resetting
+  // sizes after drag operations. This effect should ONLY run when the parent
+  // changes the initialSizes prop, not when our internal panes state updates.
   useEffect(() => {
     if (!containerRef.current) return;
-    if (initialSizes.length === 0 || initialSizes.length !== panes.length) return;
+    if (initialSizes.length === 0) return;
 
-    // Check if any size has changed
-    let hasChanges = false;
+    // Apply initialSizes to all panes
     initialSizes.forEach((size, idx) => {
-      if (panes[idx] && panes[idx].size !== size) {
-        hasChanges = true;
-      }
+      setPaneSize(idx, size);
     });
-
-    if (hasChanges) {
-      initialSizes.forEach((size, idx) => {
-        if (panes[idx] && panes[idx].size !== size) {
-          setPaneSize(idx, size);
-        }
-      });
-    }
-  }, [initialSizes, panes, setPaneSize, children]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialSizes, children]);
 
   // Sync collapsed prop changes to DOM
   useEffect(() => {

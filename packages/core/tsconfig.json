@@ -30,5 +30,16 @@
     }
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.test.tsx"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "src/base",
+    "src/helper",
+    "src/DragHandle",
+    "src/utils/SplitUtils.ts",
+    "src/utils/SplitSessionStorage.ts",
+    "src/test"
+  ]
 }

@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { PaneProps } from '../types';
+import { PaneProps, Pane as PaneType } from '../types';
 import { calculateFlexBasis, calculateFlexValues } from '../utils/layoutCalculations';
 
 /**
@@ -27,7 +27,7 @@ import { calculateFlexBasis, calculateFlexValues } from '../utils/layoutCalculat
  */
 export const Pane: React.FC<PaneProps> = ({
   id,
-  size,
+  size: sizeProp,
   collapsed,
   minSize,
   maxSize,
@@ -36,8 +36,19 @@ export const Pane: React.FC<PaneProps> = ({
   mode: _mode,
   content,
 }) => {
+  // Ensure size is never undefined
+  const size = sizeProp || '100%';
+
   // Calculate flex values
-  const { flexGrow, flexShrink } = calculateFlexValues({ collapsed } as any, collapsed);
+  const paneConfig: PaneType = {
+    id,
+    size,
+    collapsed,
+    minSize,
+    maxSize,
+    content, // Include content to satisfy the Pane type
+  };
+  const { flexGrow, flexShrink } = calculateFlexValues(paneConfig, collapsed);
   const flexBasis = calculateFlexBasis(size, 0); // containerSize will be applied by CSS
 
   return (

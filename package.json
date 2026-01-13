@@ -1,11 +1,26 @@
 {
-  "name": "a-multilayout-splitter",
-  "description": "A React package designed to facilitate the division of your views into distinct sections, offering effortless resizing and support for intricate layouts.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "name": "a-multilayout-splitter-workspace",
+  "version": "6.0.0",
+  "private": true,
+  "description": "Monorepo for A-MultiLayout-Splitter v6 - A React package designed to facilitate the division of your views into distinct sections, offering effortless resizing and support for intricate layouts.",
   "author": "Aman Kumar",
-  "private": false,
-  "version": "5.2.1",
+  "license": "MIT",
+  "homepage": "https://amankrr.github.io/react-multilayout-split/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AmanKrr/A-MultiLayout-Splitter.git"
+  },
+  "scripts": {
+    "dev": "pnpm --filter basic-example dev",
+    "build": "pnpm -r build",
+    "build:core": "pnpm --filter @a-multilayout-splitter/core build",
+    "build:example": "pnpm --filter basic-example build",
+    "test": "pnpm -r test"
+  },
+  "engines": {
+    "node": ">=16",
+    "pnpm": ">=8"
+  },
   "keywords": [
     "splitter",
     "react",
@@ -19,76 +34,5 @@
     "UI components",
     "layout management",
     "react resizable splitter"
-  ],
-  "license": "MIT",
-  "homepage": "https://amankrr.github.io/react-multilayout-split/",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/AmanKrr/A-MultiLayout-Splitter.git"
-  },
-  "scripts": {
-    "clean": "rimraf dist/ ts-build/",
-    "copy-files": "copyfiles -u 1 src/**/*.css src/assets/**/* ts-build/",
-    "build": "npm run clean && tsc && npm run copy-files && node minifyBuild.js",
-    "semantic-release": "semantic-release"
-  },
-  "files": [
-    "dist"
-  ],
-  "dependencies": {
-    "lodash": "^4.17.21"
-  },
-  "peerDependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
-  "devDependencies": {
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/commit-analyzer": "^11.1.0",
-    "@semantic-release/git": "^10.0.1",
-    "@semantic-release/npm": "^11.0.2",
-    "@semantic-release/release-notes-generator": "^12.1.0",
-    "@types/lodash": "^4.14.202",
-    "@types/node": "20.11.6",
-    "@types/react": "^17.0.0",
-    "copyfiles": "^2.4.1",
-    "rimraf": "^5.0.5",
-    "semantic-release": "^23.0.0",
-    "typescript": "^4.0.0",
-    "uglify-js": "^3.17.4",
-    "uglifycss": "^0.0.29"
-  },
-  "release": {
-    "repositoryUrl": "https://github.com/AmanKrr/A-MultiLayout-Splitter.git",
-    "branches": [
-      "main",
-      {
-        "name": "beta-preview",
-        "prerelease": true
-      }
-    ],
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      "@semantic-release/changelog",
-      [
-        "@semantic-release/npm",
-        {
-          "npmPublish": false
-        }
-      ],
-      [
-        "@semantic-release/git",
-        {
-          "assets": [
-            "CHANGELOG.md",
-            "package.json",
-            "package.lock.json"
-          ]
-        }
-      ]
-    ],
-    "ci": false,
-    "dryRun": false
-  }
+  ]
 }

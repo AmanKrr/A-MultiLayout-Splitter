@@ -1,4 +1,4 @@
-import { useState, useCallback, ReactNode } from 'react';
+import React, { useState, useCallback, ReactNode } from 'react';
 import { Pane, AddPaneConfig, AnimationOptions } from '../types';
 
 /**
@@ -26,11 +26,7 @@ export function usePaneManager(
 ) {
   // Initialize panes from children
   const [panes, setPanes] = useState<Pane[]>(() => {
-    const childArray = Array.isArray(children)
-      ? children
-      : children
-      ? [children]
-      : [];
+    const childArray = React.Children.toArray(children);
 
     return childArray.map((child, index) => ({
       id: `pane-${index}`,

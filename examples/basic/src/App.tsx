@@ -5,7 +5,13 @@ import { SplitProvider } from '@a-multilayout-splitter/core';
 // Example component showing how to use context
 function PaneControls() {
   const { panes } = useSplitState();
-  const { togglePane, setPaneSize } = useSplitActions();
+  const actions = useSplitActions();
+
+  if (!actions) {
+    return <div>No actions available - not in SplitProvider</div>;
+  }
+
+  const { togglePane, setPaneSize } = actions;
 
   return (
     <div className="controls">

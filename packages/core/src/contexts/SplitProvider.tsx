@@ -189,27 +189,31 @@ export function useSplitState(): SplitState {
  * Access split actions
  * These are stable references, so subscribing won't cause re-renders
  */
-export function useSplitActions(): SplitActions {
+export function useSplitActions(): SplitActions | null {
   const context = useContext(ActionsContext);
-  if (!context) {
-    throw new Error('useSplitActions must be used within SplitProvider');
-  }
+  // Return null instead of throwing - Split component can work without provider
   return context;
 }
 
 /**
  * Access full split context (convenience hook)
  * Use specific hooks above for better performance
+ *
+ * Note: This hook requires SplitProvider. Use individual hooks if you need optional context support.
  */
 export function useSplit(): {
   config: SplitConfig;
   state: SplitState;
   actions: SplitActions;
 } {
+  const actions = useSplitActions();
+  if (!actions) {
+    throw new Error('useSplit must be used within SplitProvider');
+  }
   return {
     config: useSplitConfig(),
     state: useSplitState(),
-    actions: useSplitActions(),
+    actions,
   };
 }
 

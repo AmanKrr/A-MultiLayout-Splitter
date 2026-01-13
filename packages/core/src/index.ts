@@ -118,63 +118,10 @@ export {
 
 export { throttle, debounce } from './utils/native/throttle';
 
-// ==================== v5 Legacy API (Deprecated) ====================
-// These are kept for reference but will be removed in future versions
-// Users should migrate to v6 API
+// ==================== v5 Legacy API (Removed) ====================
+// v5 legacy code has been archived and is no longer available.
+// All users must migrate to the v6 API.
+// See archive/v5-legacy/README.md for migration guidance.
 
-// @ts-ignore - Legacy v5 code not updated for strict TypeScript
-import Split from './base/Split';
-// @ts-ignore - Legacy v5 code not updated for strict TypeScript
-import SplitUtils from './utils/SplitUtils';
-// @ts-ignore - Legacy v5 code not updated for strict TypeScript
-import SplitSessionStorage from './utils/SplitSessionStorage';
-// @ts-ignore - Legacy v5 code not updated for strict TypeScript
-import { SplitStateProvider } from './base/SplitProvider';
-
-// @ts-ignore - Legacy v5 code not updated for strict TypeScript
-const openSplitter = SplitUtils.openSplitter.bind(SplitUtils);
-// @ts-ignore - Legacy v5 code not updated for strict TypeScript
-const closeSplitter = SplitUtils.closeSplitter.bind(SplitUtils);
-// @ts-ignore - Legacy v5 code not updated for strict TypeScript
-const getSplitPaneInstance = SplitUtils.getSplitPaneInstance.bind(SplitUtils);
-// @ts-ignore - Legacy v5 code not updated for strict TypeScript
-const isSectionOpen = SplitUtils.isSectionOpen.bind(SplitUtils);
-// @ts-ignore - Legacy v5 code not updated for strict TypeScript
-const setPaneSize = SplitUtils.setPaneSize.bind(SplitUtils);
-// @ts-ignore - Legacy v5 code not updated for strict TypeScript
-const fixClass = SplitUtils.fixClass();
-// @ts-ignore - Legacy v5 code not updated for strict TypeScript
-const saveHorizontalPanelSizes = SplitUtils.saveHorizontalSizesToLocalStorage.bind(SplitUtils);
-// @ts-ignore - Legacy v5 code not updated for strict TypeScript
-const saveVerticalPanelSizes = SplitUtils.saveVerticalSizesToLocalStorage.bind(SplitUtils);
-
-/**
- * @deprecated Use the new Split component from './components/Split' instead
- */
-export const SplitV5 = Split;
-
-/**
- * @deprecated No longer needed in v6 - props are reactive by default
- */
-export { SplitStateProvider };
-
-/**
- * @deprecated Use imperative ref API instead
- */
-export {
-  openSplitter,
-  closeSplitter,
-  getSplitPaneInstance,
-  isSectionOpen,
-  fixClass,
-  setPaneSize,
-  SplitSessionStorage,
-  saveHorizontalPanelSizes,
-  saveVerticalPanelSizes,
-};
-
-// Default export for backward compatibility
-/**
- * @deprecated Import { Split } from '@a-multilayout-splitter/core' instead
- */
-export default Split;
+// Default export
+export { Split as default } from './components/Split';

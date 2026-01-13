@@ -16,6 +16,7 @@ import {
  * - Direct style manipulation (bypass React reconciliation)
  * - requestAnimationFrame synchronization
  * - Throttled updates at 16ms (60fps cap)
+ * - Min/max boundary checks (prevents unwanted resizing)
  *
  * @param containerRef - Reference to the split container
  * @param mode - Split orientation (horizontal/vertical)
@@ -30,6 +31,9 @@ export function useDragHandler(
 
   // Use ref to avoid re-renders during drag
   const dragState = useRef<DragState | null>(null);
+
+  // Track final sizes for onDragEnd callback
+  const finalSizes = useRef<{ prevSize: number; nextSize: number } | null>(null);
 
   /**
    * Initialize drag operation
@@ -55,6 +59,12 @@ export function useDragHandler(
 
       if (!prevElement || !nextElement) return;
 
+      // Check if either pane is collapsed - don't allow dragging
+      if (prevElement.classList.contains('a-split-hidden') ||
+          nextElement.classList.contains('a-split-hidden')) {
+        return;
+      }
+
       // PERFORMANCE: Cache everything needed during drag (avoid reflows)
       const clientX = 'touches' in e ? e.touches[0]?.clientX ?? 0 : e.clientX;
       const clientY = 'touches' in e ? e.touches[0]?.clientY ?? 0 : e.clientY;
@@ -77,6 +87,9 @@ export function useDragHandler(
         minNextSize: parseFloat(nextElement.getAttribute('data-min-size') || '0'),
         maxNextSize: parseFloat(nextElement.getAttribute('data-max-size') || '100'),
       };
+
+      // Reset final sizes
+      finalSizes.current = null;
 
       onDragStart?.({ paneIndex });
     },
@@ -116,35 +129,59 @@ export function useDragHandler(
         ? state.nextInitialWidth
         : state.nextInitialHeight;
 
-      // Calculate new sizes as percentages
-      let prevSize = ((prevInitialSize + delta) / containerSize) * 100;
-      let nextSize = ((nextInitialSize - delta) / containerSize) * 100;
+      // Calculate new sizes in pixels first
+      let prevSizePx = prevInitialSize + delta;
+      let nextSizePx = nextInitialSize - delta;
 
-      // Apply min/max constraints
-      prevSize = Math.max(state.minPrevSize, Math.min(state.maxPrevSize, prevSize));
-      nextSize = Math.max(state.minNextSize, Math.min(state.maxNextSize, nextSize));
+      // Prevent negative sizes
+      if (prevSizePx < 0) prevSizePx = 0;
+      if (nextSizePx < 0) nextSizePx = 0;
+
+      // Convert to percentages for boundary checks
+      let prevSize = (prevSizePx / containerSize) * 100;
+      let nextSize = (nextSizePx / containerSize) * 100;
+
+      // CRITICAL: Check boundaries before applying (v5 behavior)
+      // If boundary is hit, don't update anything - this prevents the third pane from resizing
+      const hitMinPrev = prevSize <= state.minPrevSize;
+      const hitMaxPrev = prevSize >= state.maxPrevSize;
+      const hitMinNext = nextSize <= state.minNextSize;
+      const hitMaxNext = nextSize >= state.maxNextSize;
+
+      if (hitMinPrev || hitMaxPrev || hitMinNext || hitMaxNext) {
+        // Boundary hit - don't update (v5 behavior: checkResizingBound returns 1)
+        return;
+      }
+
+      // Check for minimal displacement (avoid jitter)
+      const prevSizeChange = Math.abs(prevSizePx - prevInitialSize);
+      const nextSizeChange = Math.abs(nextSizePx - nextInitialSize);
+      if (prevSizeChange <= 1 || nextSizeChange <= 1) {
+        return;
+      }
+
+      // Store final sizes for onDragEnd
+      finalSizes.current = { prevSize, nextSize };
 
       // PERFORMANCE CRITICAL: Direct DOM manipulation via RAF
       // This bypasses React reconciliation for 60fps performance
       requestAnimationFrame(() => {
         if (!state.prevElement || !state.nextElement) return;
 
-        // Update flexBasis directly (preserves unit from initial setup)
+        // Preserve original unit from flexBasis (v5 behavior: setResizingLayout)
         const prevHasPercent = state.prevElement.style.flexBasis.includes('%');
         const nextHasPercent = state.nextElement.style.flexBasis.includes('%');
 
         if (prevHasPercent) {
           state.prevElement.style.flexBasis = `${prevSize}%`;
         } else {
-          const prevPx = (prevSize / 100) * containerSize;
-          state.prevElement.style.flexBasis = `${prevPx}px`;
+          state.prevElement.style.flexBasis = `${prevSizePx}px`;
         }
 
         if (nextHasPercent) {
           state.nextElement.style.flexBasis = `${nextSize}%`;
         } else {
-          const nextPx = (nextSize / 100) * containerSize;
-          state.nextElement.style.flexBasis = `${nextPx}px`;
+          state.nextElement.style.flexBasis = `${nextSizePx}px`;
         }
       });
 
@@ -158,14 +195,17 @@ export function useDragHandler(
    */
   const handleMouseUp = useCallback(() => {
     const state = dragState.current;
-    if (!state) return;
+    if (!state?.active) return;
 
+    // Use stored final sizes (v5 behavior: uses this.preSize and this.nextSize)
+    const sizes = finalSizes.current;
+    if (sizes) {
+      onDragEnd?.({ paneIndex: state.paneIndex, prevSize: sizes.prevSize, nextSize: sizes.nextSize });
+    }
+
+    // Clear state
     dragState.current = null;
-
-    const prevSize = parseFloat(state.prevElement.style.flexBasis);
-    const nextSize = parseFloat(state.nextElement.style.flexBasis);
-
-    onDragEnd?.({ paneIndex: state.paneIndex, prevSize, nextSize });
+    finalSizes.current = null;
   }, [onDragEnd]);
 
   /**
