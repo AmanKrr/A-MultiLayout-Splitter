@@ -106,6 +106,17 @@ export type {
   SplitProviderProps,
 } from './contexts/SplitProvider';
 
+// Phase 5: Nesting Context (for nested layout support)
+export {
+  NestingProvider,
+  useNestingLevel,
+  withNesting,
+} from './contexts/NestingContext';
+
+export type {
+  NestingProviderProps,
+} from './contexts/NestingContext';
+
 // Utilities (for advanced usage)
 export {
   percentageToPixel,

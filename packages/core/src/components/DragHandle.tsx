@@ -28,17 +28,31 @@ export const DragHandle: React.FC<DragHandleProps> = ({
   disabled,
   lineBar,
   onMouseDown,
+  onTouchStart,
+  onCollapse,
+  onExpand,
   renderCustom,
 }) => {
-  // Custom renderer provided
+  // Phase 5: Full HandleRenderProps passed to custom renderer
   if (renderCustom) {
+    const handleRenderProps = {
+      index,
+      mode,
+      disabled,
+      lineBar,
+      onMouseDown,
+      onTouchStart: onTouchStart || onMouseDown,
+      onCollapse,
+      onExpand,
+    };
+
     return (
       <div
         className="a-split-handlebar"
         onMouseDown={(e) => !disabled && onMouseDown(e)}
-        onTouchStart={(e) => !disabled && onMouseDown(e)}
+        onTouchStart={(e) => !disabled && (onTouchStart ? onTouchStart(e) : onMouseDown(e))}
       >
-        {renderCustom({ index, disabled }, index)}
+        {renderCustom(handleRenderProps, index)}
       </div>
     );
   }

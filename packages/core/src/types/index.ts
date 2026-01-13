@@ -105,8 +105,8 @@ export interface SplitProps {
   /** Line bar style for handlebars */
   lineBar?: boolean | number[];
 
-  /** Custom handlebar renderer */
-  renderBar?: (props: any, position: number) => JSX.Element;
+  /** Custom handlebar renderer with full props support (Phase 5) */
+  renderBar?: (props: HandleRenderProps, position: number) => JSX.Element;
 
   /** Plugins to extend functionality */
   plugins?: SplitPlugin[];
@@ -386,7 +386,10 @@ export interface DragHandleProps {
   disabled: boolean;
   lineBar: boolean;
   onMouseDown: (e: React.MouseEvent | React.TouchEvent) => void;
-  renderCustom?: (props: { index: number; disabled: boolean }, position: number) => JSX.Element;
+  onTouchStart?: (e: React.TouchEvent) => void;
+  onCollapse?: (direction: 'left' | 'right') => void;
+  onExpand?: (direction: 'left' | 'right') => void;
+  renderCustom?: (props: HandleRenderProps, position: number) => JSX.Element;
 }
 
 /**

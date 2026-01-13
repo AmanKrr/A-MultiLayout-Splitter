@@ -37,6 +37,7 @@ import {
   shouldShowHandlebar,
 } from '../utils/paneOperations';
 import { useSplitActions } from '../contexts/SplitProvider';
+import { useNestingLevel, NestingProvider } from '../contexts/NestingContext';
 import { DragHandle } from './DragHandle';
 import { Pane } from './Pane';
 import { PluginManager } from '../plugins/PluginManager';
@@ -91,6 +92,10 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
 
   // Plugin manager ref
   const pluginManagerRef = useRef<PluginManager | null>(null);
+
+  // Phase 5: Nesting level detection for automatic fixClass
+  const nestingLevel = useNestingLevel();
+  const autoFixClass = !fixClass && nestingLevel > 2; // Auto-apply fix for deep nesting
 
   // Props validation (development warnings)
   useEffect(() => {
@@ -339,6 +344,41 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     // This effect exists to ensure children updates trigger re-renders
   }, [children, panes.length]);
 
+  // Phase 5: Sync disable/visible/lineBar prop changes to handlebars
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const handlebars = containerRef.current.querySelectorAll('.a-split-handlebar');
+    handlebars.forEach((handlebar, idx) => {
+      const element = handlebar as HTMLElement;
+
+      // Sync disable state
+      const isDisabledArray = Array.isArray(disable);
+      const isDisabled = isDisabledArray ? disable[idx] : disable;
+      if (isDisabled) {
+        element.classList.add('a-split-handlebar-disabled');
+        element.style.cursor = 'default';
+      } else {
+        element.classList.remove('a-split-handlebar-disabled');
+        element.style.cursor = mode === 'horizontal' ? 'col-resize' : 'row-resize';
+      }
+
+      // Sync visible state
+      const isVisibleArray = Array.isArray(visible);
+      const isVisible = isVisibleArray ? visible[idx] : visible;
+      element.style.display = isVisible ? '' : 'none';
+
+      // Sync lineBar style
+      const isLineBarArray = Array.isArray(lineBar);
+      const isLinebar = isLineBarArray ? lineBar[idx] : lineBar;
+      if (isLinebar) {
+        element.classList.add('a-split-handlebar-line');
+      } else {
+        element.classList.remove('a-split-handlebar-line');
+      }
+    });
+  }, [disable, visible, lineBar, mode]);
+
   // Drag handler hook
   const { handleMouseDown } = useDragHandler(containerRef, mode, {
     onDragStart: (event) => {
@@ -384,6 +424,43 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
       }
     },
   });
+
+  // Phase 5: Collapse/Expand handlers for custom handlebars
+  const handleCollapse = useCallback(
+    (handlebarIndex: number, direction: 'left' | 'right') => {
+      const paneIndexToCollapse =
+        direction === 'left' ? handlebarIndex - 1 : handlebarIndex;
+
+      if (paneIndexToCollapse >= 0 && paneIndexToCollapse < panes.length) {
+        collapsePane(paneIndexToCollapse);
+
+        // Notify parent
+        const pane = panes[paneIndexToCollapse];
+        if (pane) {
+          onLayoutChange?.(paneIndexToCollapse, pane.id, 'close', null);
+        }
+      }
+    },
+    [panes, collapsePane, onLayoutChange]
+  );
+
+  const handleExpand = useCallback(
+    (handlebarIndex: number, direction: 'left' | 'right') => {
+      const paneIndexToExpand =
+        direction === 'left' ? handlebarIndex - 1 : handlebarIndex;
+
+      if (paneIndexToExpand >= 0 && paneIndexToExpand < panes.length) {
+        expandPane(paneIndexToExpand);
+
+        // Notify parent
+        const pane = panes[paneIndexToExpand];
+        if (pane) {
+          onLayoutChange?.(paneIndexToExpand, pane.id, 'open', null);
+        }
+      }
+    },
+    [panes, expandPane, onLayoutChange]
+  );
 
   // Expose imperative API (Phase 4 Enhanced)
   useImperativeHandle(
@@ -467,16 +544,24 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
   const containerClass = useMemo(() => {
     const classes = ['a-split-container'];
     if (mode === 'vertical') classes.push('a-split-vertical');
-    if (fixClass) classes.push('a-split-fix');
+    // Phase 5: Apply fixClass manually or automatically for deep nesting
+    if (fixClass || autoFixClass) classes.push('a-split-fix');
     if (className) classes.push(className);
     return classes.join(' ');
-  }, [mode, fixClass, className]);
+  }, [mode, fixClass, autoFixClass, className]);
 
   // Render panes and handlebars
   const renderContent = () => {
     const elements: JSX.Element[] = [];
 
     panes.forEach((pane, index) => {
+      // Phase 5: Wrap pane content with NestingProvider to increment level for nested Splits
+      const wrappedContent = (
+        <NestingProvider level={nestingLevel + 1}>
+          {pane.content}
+        </NestingProvider>
+      );
+
       // Render pane using Pane component
       elements.push(
         <Pane
@@ -487,7 +572,7 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
           minSize={pane.minSize}
           maxSize={pane.maxSize}
           mode={mode}
-          content={pane.content}
+          content={wrappedContent}
         />
       );
 
@@ -531,6 +616,8 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
                 disabled={isDisabled}
                 lineBar={isLinebar}
                 onMouseDown={(e) => handleMouseDown(handlebarIndex, e)}
+                onCollapse={(direction) => handleCollapse(handlebarIndex, direction)}
+                onExpand={(direction) => handleExpand(handlebarIndex, direction)}
                 renderCustom={renderBar}
               />
             );

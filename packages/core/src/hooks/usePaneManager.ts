@@ -1,5 +1,6 @@
 import React, { useState, useCallback, ReactNode } from 'react';
 import { Pane, AddPaneConfig, AnimationOptions } from '../types';
+import { animatePaneSize } from '../utils/paneOperations';
 
 /**
  * usePaneManager - Manages pane state and operations
@@ -141,20 +142,14 @@ export function usePaneManager(
         const newPanes = [...prevPanes];
         newPanes[index] = { ...currentPane, size };
 
-        // Update DOM directly
+        // Phase 5: Update DOM directly with animation support
         const element = document.querySelector(
           `[data-pane-id="${currentPane.id}"]`
         ) as HTMLElement;
 
         if (element) {
-          if (options?.animate) {
-            element.style.transition = `flex-basis ${options.duration || 300}ms ease`;
-            setTimeout(() => {
-              element.style.transition = '';
-            }, options.duration || 300);
-          }
-
-          element.style.flexBasis = size;
+          // Use animatePaneSize utility for consistent animation behavior
+          animatePaneSize(element, size, options || { animate: false });
         }
 
         return newPanes;
@@ -226,9 +221,9 @@ export function usePaneManager(
   }, []);
 
   /**
-   * Collapse a pane (Phase 4)
+   * Collapse a pane (Phase 4/5 Enhanced with animation)
    */
-  const collapsePane = useCallback((index: number) => {
+  const collapsePane = useCallback((index: number, options?: AnimationOptions) => {
     setPanes((prevPanes) => {
       if (index < 0 || index >= prevPanes.length) return prevPanes;
 
@@ -238,13 +233,22 @@ export function usePaneManager(
       const newPanes = [...prevPanes];
       newPanes[index] = { ...currentPane, collapsed: true };
 
-      // Update DOM
+      // Phase 5: Update DOM with animation support
       const element = document.querySelector(
         `[data-pane-id="${currentPane.id}"]`
       ) as HTMLElement;
+
       if (element) {
+        if (options?.animate) {
+          element.style.transition = `flex-basis ${options.duration || 300}ms ease`;
+          setTimeout(() => {
+            element.style.transition = '';
+          }, options.duration || 300);
+        }
+
         element.classList.add('a-split-hidden');
         element.style.flexGrow = '0';
+        element.style.flexBasis = '0';
       }
 
       return newPanes;
@@ -252,9 +256,9 @@ export function usePaneManager(
   }, []);
 
   /**
-   * Expand a pane (Phase 4)
+   * Expand a pane (Phase 4/5 Enhanced with animation)
    */
-  const expandPane = useCallback((index: number) => {
+  const expandPane = useCallback((index: number, options?: AnimationOptions) => {
     setPanes((prevPanes) => {
       if (index < 0 || index >= prevPanes.length) return prevPanes;
 
@@ -264,13 +268,22 @@ export function usePaneManager(
       const newPanes = [...prevPanes];
       newPanes[index] = { ...currentPane, collapsed: false };
 
-      // Update DOM
+      // Phase 5: Update DOM with animation support
       const element = document.querySelector(
         `[data-pane-id="${currentPane.id}"]`
       ) as HTMLElement;
+
       if (element) {
+        if (options?.animate) {
+          element.style.transition = `flex-basis ${options.duration || 300}ms ease`;
+          setTimeout(() => {
+            element.style.transition = '';
+          }, options.duration || 300);
+        }
+
         element.classList.remove('a-split-hidden');
         element.style.flexGrow = '';
+        element.style.flexBasis = currentPane.size;
       }
 
       return newPanes;
