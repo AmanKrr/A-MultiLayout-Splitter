@@ -108,6 +108,9 @@ export interface SplitProps {
   /** Custom handlebar renderer */
   renderBar?: (props: any, position: number) => JSX.Element;
 
+  /** Plugins to extend functionality */
+  plugins?: SplitPlugin[];
+
   /** Enable localStorage persistence */
   enableSessionStorage?: boolean;
 
@@ -174,23 +177,146 @@ export interface AnimationOptions {
 }
 
 /**
- * Plugin system types (for Phase 3)
+ * Plugin system types (Phase 3)
  */
-export interface SplitPlugin {
-  name: string;
-  version?: string;
-  onInit?: (context: PluginContext) => void;
-  onDestroy?: (context: PluginContext) => void;
-  onDragStart?: (event: DragStartEvent, context: PluginContext) => void;
-  onDragMove?: (event: DragMoveEvent, context: PluginContext) => boolean | void;
-  onDragEnd?: (event: DragEndEvent, context: PluginContext) => void;
+
+/**
+ * Dimensions for resize events
+ */
+export interface Dimensions {
+  width: number;
+  height: number;
 }
 
+/**
+ * Handle render props passed to custom handle renderers
+ */
+export interface HandleRenderProps {
+  index: number;
+  mode: SplitMode;
+  disabled: boolean;
+  lineBar: boolean;
+  onMouseDown: (e: React.MouseEvent | React.TouchEvent) => void;
+  onCollapse?: (direction: 'left' | 'right') => void;
+  onExpand?: (direction: 'left' | 'right') => void;
+}
+
+/**
+ * Split state for plugins
+ */
+export interface SplitState {
+  panes: Pane[];
+  mode: SplitMode;
+  dragState: DragState | null;
+}
+
+/**
+ * Split actions for plugins
+ */
+export type SplitAction =
+  | { type: 'ADD_PANE'; payload: AddPaneConfig }
+  | { type: 'REMOVE_PANE'; payload: number }
+  | { type: 'TOGGLE_PANE'; payload: number }
+  | { type: 'SET_PANE_SIZE'; payload: { index: number; size: string } }
+  | { type: 'RESTORE_STATE'; payload: SplitState }
+  | { type: 'ADJUST_PANE_SIZE'; payload: { direction: string; amount: number } };
+
+/**
+ * Context provided to plugins for interacting with Split component
+ */
 export interface PluginContext {
+  /** Unique identifier of the split instance */
   splitId: string;
-  getState: () => any;
-  dispatch: (action: any) => void;
+
+  /** Get current split state */
+  getState: () => SplitState;
+
+  /** Dispatch actions to modify split state */
+  dispatch: (action: SplitAction) => void;
+
+  /** Get the DOM element of the split container */
   getElement: () => HTMLElement | null;
+
+  /** Get all panes */
+  getPanes: () => Pane[];
+}
+
+/**
+ * Pane addition event
+ */
+export interface PaneAddEvent {
+  pane: Pane;
+  index: number;
+}
+
+/**
+ * Pane removal event
+ */
+export interface PaneRemoveEvent {
+  pane: Pane;
+  index: number;
+}
+
+/**
+ * Resize event
+ */
+export interface ResizeEvent {
+  dimensions: Dimensions;
+  mode: SplitMode;
+}
+
+/**
+ * Main plugin interface
+ */
+export interface SplitPlugin {
+  /** Unique plugin name */
+  name: string;
+
+  /** Plugin version (optional) */
+  version?: string;
+
+  // Lifecycle hooks
+  /** Called when plugin is initialized */
+  onInit?: (context: PluginContext) => void;
+
+  /** Called when pane is added */
+  onPaneAdd?: (event: PaneAddEvent, context: PluginContext) => void;
+
+  /** Called when pane is removed */
+  onPaneRemove?: (event: PaneRemoveEvent, context: PluginContext) => void;
+
+  /** Called when drag starts */
+  onDragStart?: (event: DragStartEvent, context: PluginContext) => void;
+
+  /** Called during drag move - return false to prevent default behavior */
+  onDragMove?: (event: DragMoveEvent, context: PluginContext) => boolean | void;
+
+  /** Called when drag ends */
+  onDragEnd?: (event: DragEndEvent, context: PluginContext) => void;
+
+  /** Called when container resizes */
+  onResize?: (event: ResizeEvent, context: PluginContext) => void;
+
+  // Component enhancement hooks
+  /** Custom handle renderer */
+  renderHandle?: (props: HandleRenderProps, context: PluginContext) => ReactNode;
+
+  /** Custom pane wrapper renderer */
+  renderPane?: (pane: Pane, context: PluginContext) => ReactNode;
+
+  /** Cleanup hook called when plugin is destroyed */
+  onDestroy?: (context: PluginContext) => void;
+}
+
+/**
+ * Plugin configuration options
+ */
+export interface PluginConfig {
+  /** Enable/disable the plugin */
+  enabled?: boolean;
+
+  /** Plugin-specific options */
+  options?: Record<string, any>;
 }
 
 /**

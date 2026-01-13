@@ -21,11 +21,14 @@ import React, {
   useRef,
   useEffect,
   useMemo,
+  useState,
+  useCallback,
 } from 'react';
-import { SplitProps, SplitRef } from '../types';
+import { SplitProps, SplitRef, SplitState, SplitAction } from '../types';
 import { usePaneManager } from '../hooks/usePaneManager';
 import { useDragHandler } from '../hooks/useDragHandler';
 import { usePersistence } from '../hooks/usePersistence';
+import { usePluginContext } from '../hooks/usePluginContext';
 import {
   isHandlebarDisabled,
   isHandlebarVisible,
@@ -35,6 +38,7 @@ import {
 import { useSplitActions } from '../contexts/SplitProvider';
 import { DragHandle } from './DragHandle';
 import { Pane } from './Pane';
+import { PluginManager } from '../plugins/PluginManager';
 import '../styles/split.css';
 
 /**
@@ -68,6 +72,7 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     visible = true,
     lineBar = false,
     renderBar,
+    plugins = [],
     enableSessionStorage = false,
     width = null,
     height = null,
@@ -82,6 +87,9 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
 
   // Container ref
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Plugin manager ref
+  const pluginManagerRef = useRef<PluginManager | null>(null);
 
   // Props validation (development warnings)
   useEffect(() => {
@@ -162,6 +170,66 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     setPaneSize,
     getPaneState,
   } = usePaneManager(children, initialSizes, collapsed, minSizes, maxSizes);
+
+  // Drag state for plugins
+  const [dragState, setDragState] = useState<any>(null);
+
+  // State getter for plugins
+  const getState = useCallback((): SplitState => {
+    return {
+      panes,
+      mode,
+      dragState,
+    };
+  }, [panes, mode, dragState]);
+
+  // Dispatcher for plugins
+  const dispatch = useCallback((action: SplitAction) => {
+    switch (action.type) {
+      case 'ADD_PANE':
+        addPane(action.payload);
+        break;
+      case 'REMOVE_PANE':
+        removePane(action.payload);
+        break;
+      case 'TOGGLE_PANE':
+        togglePane(action.payload);
+        break;
+      case 'SET_PANE_SIZE':
+        setPaneSize(action.payload.index, action.payload.size);
+        break;
+      case 'RESTORE_STATE':
+        // Handle state restoration
+        action.payload.panes.forEach((pane, idx) => {
+          setPaneSize(idx, pane.size);
+          if (pane.collapsed) {
+            togglePane(idx);
+          }
+        });
+        break;
+      case 'ADJUST_PANE_SIZE':
+        // Handle keyboard adjustments
+        // This would need more sophisticated logic
+        console.log('ADJUST_PANE_SIZE not fully implemented yet');
+        break;
+    }
+  }, [addPane, removePane, togglePane, setPaneSize]);
+
+  // Create plugin context
+  const pluginContext = usePluginContext(id, getState, dispatch, containerRef);
+
+  // Initialize plugin manager
+  useEffect(() => {
+    if (plugins.length > 0) {
+      pluginManagerRef.current = new PluginManager(pluginContext);
+      pluginManagerRef.current.registerPlugins(plugins);
+
+      return () => {
+        pluginManagerRef.current?.destroy();
+        pluginManagerRef.current = null;
+      };
+    }
+  }, [plugins, pluginContext]);
 
   // Persistence hook
   const persistence = usePersistence(
@@ -267,6 +335,12 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
   // Drag handler hook
   const { handleMouseDown } = useDragHandler(containerRef, mode, {
     onDragStart: (event) => {
+      // Update drag state
+      setDragState({ active: true, paneIndex: event.paneIndex });
+
+      // Notify plugins
+      pluginManagerRef.current?.onDragStart(event);
+
       // Notify parent
       const pane = panes[event.paneIndex];
       if (pane) {
@@ -274,13 +348,24 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
       }
     },
     onDragMove: (event) => {
-      // Call legacy callback
-      onDragging?.(event.prevSize, event.nextSize, event.paneIndex);
+      // Notify plugins (they can prevent default behavior)
+      const shouldContinue = pluginManagerRef.current?.onDragMove(event) ?? true;
+
+      if (shouldContinue) {
+        // Call legacy callback
+        onDragging?.(event.prevSize, event.nextSize, event.paneIndex);
+      }
     },
     onDragEnd: (event) => {
       // Update React state to match DOM
       setPaneSize(event.paneIndex - 1, `${event.prevSize}%`);
       setPaneSize(event.paneIndex, `${event.nextSize}%`);
+
+      // Clear drag state
+      setDragState(null);
+
+      // Notify plugins
+      pluginManagerRef.current?.onDragEnd(event);
 
       // Call legacy callback
       onDragEnd?.(event.prevSize, event.nextSize, event.paneIndex);
@@ -356,18 +441,37 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         const isLinebar = isLineBarStyle(handlebarIndex, lineBar);
 
         if (isVisible && showHandlebar) {
-          // Render handlebar using DragHandle component
-          elements.push(
-            <DragHandle
-              key={`handlebar-${handlebarIndex}`}
-              index={handlebarIndex}
-              mode={mode}
-              disabled={isDisabled}
-              lineBar={isLinebar}
-              onMouseDown={(e) => handleMouseDown(handlebarIndex, e)}
-              renderCustom={renderBar}
-            />
-          );
+          // Check if plugin provides custom handle
+          const customHandle = pluginManagerRef.current?.renderHandle({
+            index: handlebarIndex,
+            mode,
+            disabled: isDisabled,
+            lineBar: isLinebar,
+            onMouseDown: (e: React.MouseEvent | React.TouchEvent) =>
+              handleMouseDown(handlebarIndex, e),
+          });
+
+          if (customHandle) {
+            // Use plugin's custom handle
+            elements.push(
+              <React.Fragment key={`handlebar-${handlebarIndex}`}>
+                {customHandle}
+              </React.Fragment>
+            );
+          } else {
+            // Render default handlebar using DragHandle component
+            elements.push(
+              <DragHandle
+                key={`handlebar-${handlebarIndex}`}
+                index={handlebarIndex}
+                mode={mode}
+                disabled={isDisabled}
+                lineBar={isLinebar}
+                onMouseDown={(e) => handleMouseDown(handlebarIndex, e)}
+                renderCustom={renderBar}
+              />
+            );
+          }
         }
       }
     });

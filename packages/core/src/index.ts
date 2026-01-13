@@ -45,12 +45,38 @@ export type {
   PluginContext,
   DragHandleProps,
   PaneProps,
+  SplitAction,
+  Dimensions,
+  HandleRenderProps,
+  PaneAddEvent,
+  PaneRemoveEvent,
+  ResizeEvent,
+  PluginConfig,
 } from './types';
 
 // Hooks (for custom implementations)
 export { useDragHandler } from './hooks/useDragHandler';
 export { usePaneManager } from './hooks/usePaneManager';
 export { usePersistence } from './hooks/usePersistence';
+export { usePluginContext } from './hooks/usePluginContext';
+
+// Plugin System (Phase 3)
+export {
+  PluginManager,
+  createPlugin,
+  persistencePlugin,
+  clearPersistedState,
+  keyboardPlugin,
+  customHandlePlugin,
+  customHandleRenderPlugin,
+} from './plugins';
+
+export type {
+  PersistencePluginOptions,
+  StorageType,
+  KeyboardPluginOptions,
+  CustomHandleComponentProps,
+} from './plugins';
 
 // Context Provider (optional)
 export {
