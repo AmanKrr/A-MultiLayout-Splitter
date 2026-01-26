@@ -1,29 +1,12 @@
-import { useCallback } from 'react';
-import { debounce } from '../utils/native/throttle';
-import { Pane, SplitMode } from '../types';
+import { useCallback } from "react";
+import { debounce } from "../utils/native/throttle";
+import { Pane, SplitMode } from "../types";
 
 /**
- * usePersistence - Handles localStorage persistence
- *
- * This hook provides:
- * - Save pane state to localStorage
- * - Load pane state from localStorage
- * - Debounced saves to avoid performance issues
- * - Separate storage keys for horizontal/vertical modes
- *
- * @param enabled - Enable/disable persistence
- * @param storageKey - Base key for localStorage
- * @param mode - Split mode (affects storage key)
+ * usePersistence
+ * Manages saving and loading pane state to/from localStorage.
  */
-export function usePersistence(
-  enabled: boolean,
-  storageKey: string,
-  mode: SplitMode
-) {
-  /**
-   * Save pane state to localStorage
-   * Debounced at 300ms to avoid excessive writes during drag
-   */
+export function usePersistence(enabled: boolean, storageKey: string, mode: SplitMode) {
   const save = useCallback(
     debounce((panes: Pane[]) => {
       if (!enabled) return;
@@ -38,15 +21,12 @@ export function usePersistence(
 
         localStorage.setItem(key, JSON.stringify(data));
       } catch (error) {
-        console.warn('Failed to save split state to localStorage:', error);
+        console.warn("Failed to save split state:", error);
       }
     }, 300),
-    [enabled, storageKey, mode]
+    [enabled, storageKey, mode],
   );
 
-  /**
-   * Load pane state from localStorage
-   */
   const load = useCallback((): Array<{
     id: string;
     size: string;
@@ -57,19 +37,13 @@ export function usePersistence(
     try {
       const key = `${storageKey}-${mode}`;
       const stored = localStorage.getItem(key);
-
-      if (!stored) return null;
-
-      return JSON.parse(stored);
+      return stored ? JSON.parse(stored) : null;
     } catch (error) {
-      console.warn('Failed to load split state from localStorage:', error);
+      console.warn("Failed to load split state:", error);
       return null;
     }
   }, [enabled, storageKey, mode]);
 
-  /**
-   * Clear saved state
-   */
   const clear = useCallback(() => {
     if (!enabled) return;
 
@@ -77,13 +51,9 @@ export function usePersistence(
       const key = `${storageKey}-${mode}`;
       localStorage.removeItem(key);
     } catch (error) {
-      console.warn('Failed to clear split state from localStorage:', error);
+      console.warn("Failed to clear split state:", error);
     }
   }, [enabled, storageKey, mode]);
 
-  return {
-    save,
-    load,
-    clear,
-  };
+  return { save, load, clear };
 }

@@ -1,30 +1,12 @@
 /**
- * A-MultiLayout-Splitter v6.0.0
- *
- * High-performance split pane component for React with 60fps drag performance.
- *
- * Breaking Changes from v5:
- * - Functional components with hooks (no class-based API)
- * - Reactive props (no SplitStateProvider workaround needed)
- * - Clean TypeScript types
- * - ESM + CJS dual format
- * - Removed lodash dependency
- *
- * Migration Guide:
- * - Replace class-based Split with functional Split
- * - Use ref for imperative API instead of static methods
- * - Remove SplitStateProvider (no longer needed)
- * - Update imports to use named exports
+ * A-MultiLayout-Splitter
+ * High-performance split pane component for React.
  */
 
-// ==================== v6 API (Primary) ====================
-
-// Main component
-export { Split } from './components/Split';
-
-// Sub-components (for advanced usage)
-export { DragHandle } from './components/DragHandle';
-export { Pane as PaneComponent } from './components/Pane';
+// Primary API
+export { Split } from "./components/Split";
+export { DragHandle } from "./components/DragHandle";
+export { Pane as PaneComponent } from "./components/Pane";
 
 // Types
 export type {
@@ -52,22 +34,20 @@ export type {
   PaneRemoveEvent,
   ResizeEvent,
   PluginConfig,
-  // Phase 4: Enhanced API types
   SplitSnapshot,
   SplitControllerState,
   SplitControllerActions,
   UseSplitControllerOptions,
-} from './types';
+} from "./types";
 
-// Hooks (for custom implementations)
-export { useDragHandler } from './hooks/useDragHandler';
-export { usePaneManager } from './hooks/usePaneManager';
-export { usePersistence } from './hooks/usePersistence';
-export { usePluginContext } from './hooks/usePluginContext';
-// Phase 4: Hook-based API
-export { useSplitController } from './hooks/useSplitController';
+// Hooks
+export { useDragHandler } from "./hooks/useDragHandler";
+export { usePaneManager } from "./hooks/usePaneManager";
+export { usePersistence } from "./hooks/usePersistence";
+export { usePluginContext } from "./hooks/usePluginContext";
+export { useSplitController } from "./hooks/useSplitController";
 
-// Plugin System (Phase 3)
+// Plugins
 export {
   PluginManager,
   createPlugin,
@@ -76,16 +56,16 @@ export {
   keyboardPlugin,
   customHandlePlugin,
   customHandleRenderPlugin,
-} from './plugins';
+} from "./plugins";
 
 export type {
   PersistencePluginOptions,
   StorageType,
   KeyboardPluginOptions,
   CustomHandleComponentProps,
-} from './plugins';
+} from "./plugins";
 
-// Context Provider (optional)
+// Context Providers
 export {
   SplitProvider,
   useSplitConfig,
@@ -97,27 +77,19 @@ export {
   useIsDragging,
   useIsCollapsed,
   useVisiblePanes,
-} from './contexts/SplitProvider';
+} from "./contexts/SplitProvider";
 
 export type {
   SplitConfig,
   SplitState,
   SplitActions,
   SplitProviderProps,
-} from './contexts/SplitProvider';
+} from "./contexts/SplitProvider";
 
-// Phase 5: Nesting Context (for nested layout support)
-export {
-  NestingProvider,
-  useNestingLevel,
-  withNesting,
-} from './contexts/NestingContext';
+export { NestingProvider, useNestingLevel, withNesting } from "./contexts/NestingContext";
+export type { NestingProviderProps } from "./contexts/NestingContext";
 
-export type {
-  NestingProviderProps,
-} from './contexts/NestingContext';
-
-// Utilities (for advanced usage)
+// Utils
 export {
   percentageToPixel,
   pixelToPercentage,
@@ -125,20 +97,19 @@ export {
   parseSize,
   haveSameUnit,
   clampSize,
-} from './utils/sizeConversion';
+} from "./utils/sizeConversion";
 
 export {
   calculateTotalSize,
   validatePaneSizes,
   calculateFlexBasis,
   calculateFlexValues,
-  calculateHandlebarPosition,
   getContainerDimensions,
   normalizePaneSizes,
   canResize,
   getAxisProperty,
   getCoordinateProperty,
-} from './utils/layoutCalculations';
+} from "./utils/layoutCalculations";
 
 export {
   applyCollapseState,
@@ -158,14 +129,9 @@ export {
   isHandlebarDisabled,
   isHandlebarVisible,
   isLineBarStyle,
-} from './utils/paneOperations';
+} from "./utils/paneOperations";
 
-export { throttle, debounce } from './utils/native/throttle';
+export { throttle, debounce } from "./utils/native/throttle";
 
-// ==================== v5 Legacy API (Removed) ====================
-// v5 legacy code has been archived and is no longer available.
-// All users must migrate to the v6 API.
-// See archive/v5-legacy/README.md for migration guidance.
-
-// Default export
-export { Split as default } from './components/Split';
+// Default Export
+export { Split as default } from "./components/Split";
