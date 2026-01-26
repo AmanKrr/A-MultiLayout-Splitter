@@ -42,6 +42,7 @@ import { Pane } from './Pane';
 import { PluginManager } from '../plugins/PluginManager';
 import '../styles/split.css';
 
+
 /**
  * Split Component
  *

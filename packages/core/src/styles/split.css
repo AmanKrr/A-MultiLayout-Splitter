@@ -229,7 +229,7 @@
 .a-split-handlebar-horizontal .a-split-collapse-btn-left {
   order: 1;
   position: relative;
-  right: 4px !important;
+  right: 4px;
 }
 
 .a-split-handlebar-horizontal .a-split-grip-icon {
@@ -241,14 +241,14 @@
 .a-split-handlebar-horizontal .a-split-collapse-btn-right {
   order: 3;
   position: relative;
-  left: 4px !important;
+  left: 4px;
 }
 
 /* Vertical: position buttons closer to the bar */
 .a-split-handlebar-vertical .a-split-collapse-btn-top {
   order: 1;
   position: relative;
-  bottom: 4px !important;
+  bottom: 4px;
 }
 
 .a-split-handlebar-vertical .a-split-grip-icon {
@@ -260,7 +260,7 @@
 .a-split-handlebar-vertical .a-split-collapse-btn-bottom {
   order: 3;
   position: relative;
-  top: 4px !important;
+  top: 4px;
 }
 
 /* Show buttons on hover */
@@ -273,7 +273,7 @@
 /* Active/Drag State for Children (Requested Feature) */
 .a-split-handlebar:active .a-split-collapse-btn,
 .a-split-handlebar:active .a-split-grip-icon {
-  color: var(--split-primary-color) !important;
+  color: var(--split-primary-color);
 }
 
 /* Ensure buttons are visible when active even if not directly hovered (dragging) */
@@ -283,13 +283,13 @@
 }
 
 .a-split-collapse-btn:hover {
-  background-color: var(--split-btn-bg-hover) !important;
-  border-color: var(--split-primary-color) !important;
-  color: var(--split-primary-color) !important;
+  background-color: var(--split-btn-bg-hover);
+  border-color: var(--split-primary-color);
+  color: var(--split-primary-color);
 }
 
 .a-split-collapse-btn:active {
-  background-color: var(--split-btn-bg-active) !important;
+  background-color: var(--split-btn-bg-active);
 }
 
 

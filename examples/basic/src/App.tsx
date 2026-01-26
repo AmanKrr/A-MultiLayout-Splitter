@@ -8,7 +8,7 @@
 import ExamplesIndex from '../../../packages/core/examples/index';
 
 // Import the CSS directly from source during development
-import '../../../packages/core/src/styles/split.css';
+// import '../../../packages/core/src/styles/split.css';
 
 export default function App() {
   return <ExamplesIndex />;

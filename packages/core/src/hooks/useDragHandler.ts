@@ -37,6 +37,13 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
       e.preventDefault();
       e.stopPropagation(); // Prevent bubbling to parent Split components
 
+      // IGNORE MOUSE DOWN IF CLICKING ON BUTTONS
+      // The collapse buttons are inside the handlebar but should not trigger dragging
+      const target = e.target as HTMLElement;
+      if (target.closest('button') || target.tagName === 'BUTTON') {
+        return;
+      }
+
       const container = containerRef.current;
       if (!container) return;
 
