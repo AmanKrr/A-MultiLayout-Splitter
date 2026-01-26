@@ -61,7 +61,8 @@ export default defineConfig({
             { text: 'Props Playground', link: '/examples/props-playground' },
             { text: 'Nested Sidebar', link: '/examples/nested' },
             { text: 'Custom Handles', link: '/examples/custom-handles' },
-            { text: 'Interactive Controller', link: '/examples/controller' }
+            { text: 'Interactive Controller', link: '/examples/controller' },
+            { text: 'Nested Control', link: '/examples/nested-control' }
           ]
         }
       ]
