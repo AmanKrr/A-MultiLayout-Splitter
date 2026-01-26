@@ -1,14 +1,14 @@
-import React, { useState, useCallback, ReactNode } from 'react';
-import { Pane, AddPaneConfig, AnimationOptions } from '../types';
-import { animatePaneSize } from '../utils/paneOperations';
+import React, { useState, useCallback, useEffect, useRef, ReactNode } from "react";
+import { Pane, AddPaneConfig, AnimationOptions } from "../types";
+import { animatePaneSize } from "../utils/paneOperations";
 
 /**
  * usePaneManager
- * 
+ *
  * Internal hook responsible for managing the state and dynamic lifecycle of split panes.
- * It handles adding, removing, toggling, and resizing panes while maintaining 
+ * It handles adding, removing, toggling, and resizing panes while maintaining
  * proportional size redistribution.
- * 
+ *
  * @param children - React children elements to be managed as panes
  * @param initialSizes - Array of starting size strings (e.g. "50%", "100px")
  * @param collapsed - Array indicating initial collapse state for each pane
@@ -22,14 +22,14 @@ export function usePaneManager(
   collapsed: boolean[] = [],
   minSizes: number[] = [],
   maxSizes: number[] = [],
-  splitId: string = 'split'
+  splitId: string = "split",
 ) {
   const [panes, setPanes] = useState<Pane[]>(() => {
     const childArray = React.Children.toArray(children);
 
     return childArray.map((child, index) => ({
       id: `${splitId}-pane-${index}`,
-      size: initialSizes[index] || '100%',
+      size: initialSizes[index] || "100%",
       collapsed: collapsed[index] || false,
       minSize: minSizes[index] || 0,
       maxSize: maxSizes[index] || 100,
@@ -37,27 +37,64 @@ export function usePaneManager(
     }));
   });
 
+  // Track previous children to detect changes
+  const prevChildrenRef = useRef<ReactNode>(children);
+
+  /**
+   * Sync pane content when children change.
+   * This ensures nested components receive updated props.
+   */
+  useEffect(() => {
+    const childArray = React.Children.toArray(children);
+    const prevChildArray = React.Children.toArray(prevChildrenRef.current);
+
+    // Only update if children count matches (not adding/removing panes)
+    if (childArray.length === panes.length) {
+      setPanes((prevPanes) => {
+        let hasChanges = false;
+        const newPanes = prevPanes.map((pane, index) => {
+          const newChild = childArray[index];
+          const prevChild = prevChildArray[index];
+
+          // Check if this child has changed (by reference)
+          if (newChild !== prevChild) {
+            hasChanges = true;
+            return { ...pane, content: newChild };
+          }
+          return pane;
+        });
+
+        return hasChanges ? newPanes : prevPanes;
+      });
+    }
+
+    prevChildrenRef.current = children;
+  }, [children, panes.length]);
+
   /**
    * Adds a new pane at the specified position.
    */
-  const addPane = useCallback((config: AddPaneConfig) => {
-    setPanes((prevPanes) => {
-      const position = config.position ?? prevPanes.length;
-      const newPane: Pane = {
-        id: `${splitId}-pane-${Date.now()}`,
-        size: config.size,
-        collapsed: config.collapsed || false,
-        minSize: config.minSize || 0,
-        maxSize: config.maxSize || 100,
-        content: config.content,
-      };
+  const addPane = useCallback(
+    (config: AddPaneConfig) => {
+      setPanes((prevPanes) => {
+        const position = config.position ?? prevPanes.length;
+        const newPane: Pane = {
+          id: `${splitId}-pane-${Date.now()}`,
+          size: config.size,
+          collapsed: config.collapsed || false,
+          minSize: config.minSize || 0,
+          maxSize: config.maxSize || 100,
+          content: config.content,
+        };
 
-      const newPanes = [...prevPanes];
-      newPanes.splice(position, 0, newPane);
+        const newPanes = [...prevPanes];
+        newPanes.splice(position, 0, newPane);
 
-      return redistributeSizesOnAdd(newPanes, position, config.size);
-    });
-  }, [splitId]);
+        return redistributeSizesOnAdd(newPanes, position, config.size);
+      });
+    },
+    [splitId],
+  );
 
   /**
    * Removes a pane by its index and redistributes the freed space.
@@ -79,70 +116,60 @@ export function usePaneManager(
   /**
    * Toggles the visibility (collapse/expand) of a specific pane.
    */
-  const togglePane = useCallback(
-    (index: number) => {
-      setPanes((prevPanes) => {
-        if (index < 0 || index >= prevPanes.length) return prevPanes;
+  const togglePane = useCallback((index: number) => {
+    setPanes((prevPanes) => {
+      if (index < 0 || index >= prevPanes.length) return prevPanes;
 
-        const currentPane = prevPanes[index];
-        if (!currentPane) return prevPanes;
+      const currentPane = prevPanes[index];
+      if (!currentPane) return prevPanes;
 
-        const newPanes = [...prevPanes];
-        newPanes[index] = {
-          ...currentPane,
-          collapsed: !currentPane.collapsed,
-        };
+      const newPanes = [...prevPanes];
+      newPanes[index] = {
+        ...currentPane,
+        collapsed: !currentPane.collapsed,
+      };
 
-        const element = document.querySelector(
-          `[data-pane-id="${currentPane.id}"]`
-        ) as HTMLElement;
+      const element = document.querySelector(`[data-pane-id="${currentPane.id}"]`) as HTMLElement;
 
-        if (element) {
-          const updatedPane = newPanes[index];
-          const isCollapsed = updatedPane?.collapsed ?? false;
+      if (element) {
+        const updatedPane = newPanes[index];
+        const isCollapsed = updatedPane?.collapsed ?? false;
 
-          if (isCollapsed) {
-            element.classList.add('a-split-hidden');
-            element.style.flexGrow = '0';
-          } else {
-            element.classList.remove('a-split-hidden');
-            element.style.flexGrow = '';
-          }
+        if (isCollapsed) {
+          element.classList.add("a-split-hidden");
+          element.style.flexGrow = "0";
+        } else {
+          element.classList.remove("a-split-hidden");
+          element.style.flexGrow = "";
         }
+      }
 
-        return newPanes;
-      });
-    },
-    []
-  );
+      return newPanes;
+    });
+  }, []);
 
   /**
    * Sets a pane's size and optionally triggers a CSS transition.
    */
-  const setPaneSize = useCallback(
-    (index: number, size: string, options?: AnimationOptions) => {
-      setPanes((prevPanes) => {
-        if (index < 0 || index >= prevPanes.length) return prevPanes;
+  const setPaneSize = useCallback((index: number, size: string, options?: AnimationOptions) => {
+    setPanes((prevPanes) => {
+      if (index < 0 || index >= prevPanes.length) return prevPanes;
 
-        const currentPane = prevPanes[index];
-        if (!currentPane) return prevPanes;
+      const currentPane = prevPanes[index];
+      if (!currentPane) return prevPanes;
 
-        const newPanes = [...prevPanes];
-        newPanes[index] = { ...currentPane, size, flexGrow: undefined };
+      const newPanes = [...prevPanes];
+      newPanes[index] = { ...currentPane, size, flexGrow: undefined };
 
-        const element = document.querySelector(
-          `[data-pane-id="${currentPane.id}"]`
-        ) as HTMLElement;
+      const element = document.querySelector(`[data-pane-id="${currentPane.id}"]`) as HTMLElement;
 
-        if (element) {
-          animatePaneSize(element, size, options || { animate: false });
-        }
+      if (element) {
+        animatePaneSize(element, size, options || { animate: false });
+      }
 
-        return newPanes;
-      });
-    },
-    []
-  );
+      return newPanes;
+    });
+  }, []);
 
   /**
    * Helper to retrieve the current internal pane array.
@@ -184,13 +211,7 @@ export function usePaneManager(
    */
   const swapPanes = useCallback((indexA: number, indexB: number) => {
     setPanes((prevPanes) => {
-      if (
-        indexA < 0 ||
-        indexA >= prevPanes.length ||
-        indexB < 0 ||
-        indexB >= prevPanes.length ||
-        indexA === indexB
-      ) {
+      if (indexA < 0 || indexA >= prevPanes.length || indexB < 0 || indexB >= prevPanes.length || indexA === indexB) {
         return prevPanes;
       }
 
@@ -206,7 +227,7 @@ export function usePaneManager(
   /**
    * Direct collapse method that optionally handles neighboring growth.
    */
-  const collapsePane = useCallback((index: number, options?: AnimationOptions & { direction?: 'left' | 'right' }) => {
+  const collapsePane = useCallback((index: number, options?: AnimationOptions & { direction?: "left" | "right" }) => {
     setPanes((prevPanes) => {
       if (index < 0 || index >= prevPanes.length) return prevPanes;
 
@@ -216,9 +237,9 @@ export function usePaneManager(
       const direction = options?.direction;
       let adjacentIndex: number;
 
-      if (direction === 'left') {
+      if (direction === "left") {
         adjacentIndex = index + 1;
-      } else if (direction === 'right') {
+      } else if (direction === "right") {
         adjacentIndex = index - 1;
       } else {
         adjacentIndex = index < prevPanes.length - 1 ? index + 1 : index - 1;
@@ -236,13 +257,11 @@ export function usePaneManager(
       });
 
       if (options?.animate) {
-        const element = document.querySelector(
-          `[data-pane-id="${currentPane.id}"]`
-        ) as HTMLElement;
+        const element = document.querySelector(`[data-pane-id="${currentPane.id}"]`) as HTMLElement;
         if (element) {
           element.style.transition = `flex-basis ${options.duration || 300}ms ease`;
           setTimeout(() => {
-            element.style.transition = '';
+            element.style.transition = "";
           }, options.duration || 300);
         }
       }
@@ -254,21 +273,21 @@ export function usePaneManager(
   /**
    * Expands a previously collapsed pane back to its original size.
    */
-  const expandPane = useCallback((index: number, options?: AnimationOptions & { direction?: 'left' | 'right' }) => {
+  const expandPane = useCallback((index: number, options?: AnimationOptions & { direction?: "left" | "right" }) => {
     setPanes((prevPanes) => {
       if (index < 0 || index >= prevPanes.length) return prevPanes;
 
       const currentPane = prevPanes[index];
       if (!currentPane || !currentPane.collapsed) return prevPanes;
 
-      const openPaneCountAfter = prevPanes.filter(p => !p.collapsed).length + 1;
+      const openPaneCountAfter = prevPanes.filter((p) => !p.collapsed).length + 1;
       const totalPanes = prevPanes.length;
 
       let newPanes = [...prevPanes];
       newPanes[index] = { ...currentPane, collapsed: false, flexGrow: undefined };
 
       if (openPaneCountAfter === totalPanes) {
-        newPanes = newPanes.map(pane => ({
+        newPanes = newPanes.map((pane) => ({
           ...pane,
           flexGrow: undefined,
         }));
@@ -276,9 +295,9 @@ export function usePaneManager(
         const direction = options?.direction;
         let adjacentIndex: number;
 
-        if (direction === 'left') {
+        if (direction === "left") {
           adjacentIndex = index + 1;
-        } else if (direction === 'right') {
+        } else if (direction === "right") {
           adjacentIndex = index - 1;
         } else {
           adjacentIndex = index < prevPanes.length - 1 ? index + 1 : index - 1;
@@ -293,13 +312,11 @@ export function usePaneManager(
       }
 
       if (options?.animate) {
-        const element = document.querySelector(
-          `[data-pane-id="${currentPane.id}"]`
-        ) as HTMLElement;
+        const element = document.querySelector(`[data-pane-id="${currentPane.id}"]`) as HTMLElement;
         if (element) {
           element.style.transition = `flex-basis ${options.duration || 300}ms ease`;
           setTimeout(() => {
-            element.style.transition = '';
+            element.style.transition = "";
           }, options.duration || 300);
         }
       }
@@ -319,17 +336,12 @@ export function usePaneManager(
       if (!currentPane) return prevPanes;
 
       const currentSize = parseFloat(currentPane.size) || 0;
-      const newSize = Math.max(
-        currentPane.minSize || 0,
-        Math.min(currentPane.maxSize || 100, currentSize + delta)
-      );
+      const newSize = Math.max(currentPane.minSize || 0, Math.min(currentPane.maxSize || 100, currentSize + delta));
 
       const newPanes = [...prevPanes];
       newPanes[index] = { ...currentPane, size: `${newSize}%` };
 
-      const element = document.querySelector(
-        `[data-pane-id="${currentPane.id}"]`
-      ) as HTMLElement;
+      const element = document.querySelector(`[data-pane-id="${currentPane.id}"]`) as HTMLElement;
       if (element) {
         element.style.flexBasis = `${newSize}%`;
       }
@@ -360,13 +372,9 @@ export function usePaneManager(
  * @param addedSize The size of the newly added pane.
  * @returns A new array of panes with redistributed sizes.
  */
-function redistributeSizesOnAdd(
-  panes: Pane[],
-  addedIndex: number,
-  addedSize: string
-): Pane[] {
+function redistributeSizesOnAdd(panes: Pane[], addedIndex: number, addedSize: string): Pane[] {
   const addedValue = parseFloat(addedSize);
-  const isPercent = addedSize.includes('%');
+  const isPercent = addedSize.includes("%");
 
   if (!isPercent) {
     return panes;
@@ -387,7 +395,7 @@ function redistributeSizesOnAdd(
 
     return {
       ...pane,
-      size: pane.size.includes('%') ? `${newValue}%` : pane.size,
+      size: pane.size.includes("%") ? `${newValue}%` : pane.size,
     };
   });
 }
@@ -402,7 +410,7 @@ function redistributeSizesOnRemove(panes: Pane[], removedSize: string): Pane[] {
   if (panes.length === 0) return panes;
 
   const removedValue = parseFloat(removedSize);
-  const isPercent = removedSize.includes('%');
+  const isPercent = removedSize.includes("%");
 
   if (!isPercent) {
     return panes;
@@ -411,7 +419,7 @@ function redistributeSizesOnRemove(panes: Pane[], removedSize: string): Pane[] {
   const distributionAmount = removedValue / panes.length;
 
   return panes.map((pane) => {
-    if (!pane.size.includes('%')) return pane;
+    if (!pane.size.includes("%")) return pane;
 
     const currentValue = parseFloat(pane.size);
     const newValue = currentValue + distributionAmount;
@@ -426,14 +434,11 @@ function redistributeSizesOnRemove(panes: Pane[], removedSize: string): Pane[] {
 /**
  * Redistributes pane sizes proportionally based on their current sizes.
  */
-export function redistributeSizesProportional(
-  panes: Pane[],
-  removedSize: string
-): Pane[] {
+export function redistributeSizesProportional(panes: Pane[], removedSize: string): Pane[] {
   if (panes.length === 0) return panes;
 
   const removedValue = parseFloat(removedSize);
-  const isPercent = removedSize.includes('%');
+  const isPercent = removedSize.includes("%");
 
   if (!isPercent) return panes;
 
@@ -442,7 +447,7 @@ export function redistributeSizesProportional(
   }, 0);
 
   return panes.map((pane) => {
-    if (!pane.size.includes('%')) return pane;
+    if (!pane.size.includes("%")) return pane;
 
     const currentValue = parseFloat(pane.size);
     const proportion = currentValue / totalSize;

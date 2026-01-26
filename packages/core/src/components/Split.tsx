@@ -278,15 +278,37 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     persistence.save(panes);
   }, [panes, persistence]);
 
+  // Track whether this is the initial mount, previous children count, and previous initialSizes
+  const isInitialMountRef = useRef(true);
+  const prevChildCountRef = useRef(React.Children.count(children));
+  const prevInitialSizesRef = useRef<string[]>(initialSizes);
+
   useEffect(() => {
     if (!containerRef.current) return;
     if (initialSizes.length === 0) return;
 
-    initialSizes.forEach((size, idx) => {
-      setPaneSize(idx, size);
-    });
+    const currentChildCount = React.Children.count(children);
+    const childCountChanged = currentChildCount !== prevChildCountRef.current;
+
+    // Check if initialSizes values actually changed (not just reference)
+    const initialSizesChanged = initialSizes.length !== prevInitialSizesRef.current.length ||
+      initialSizes.some((size, idx) => size !== prevInitialSizesRef.current[idx]);
+
+    // Apply initialSizes on:
+    // 1. First mount
+    // 2. When children count changes (panes added/removed)
+    // 3. When initialSizes values actually change
+    // This preserves user's drag-resized values when other props change
+    if (isInitialMountRef.current || childCountChanged || initialSizesChanged) {
+      initialSizes.forEach((size, idx) => {
+        setPaneSize(idx, size);
+      });
+      isInitialMountRef.current = false;
+      prevChildCountRef.current = currentChildCount;
+      prevInitialSizesRef.current = initialSizes;
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialSizes, children]);
+  }, [children, initialSizes]);
 
   const collapsedRef = useRef(collapsed);
   useEffect(() => {
