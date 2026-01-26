@@ -35,11 +35,12 @@ export const Pane: React.FC<PaneProps> = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   mode: _mode,
   content,
+  flexGrow: flexGrowProp,
 }) => {
   // Ensure size is never undefined
   const size = sizeProp || '100%';
 
-  // Calculate flex values
+  // Calculate default flex values
   const paneConfig: PaneType = {
     id,
     size,
@@ -48,8 +49,13 @@ export const Pane: React.FC<PaneProps> = ({
     maxSize,
     content, // Include content to satisfy the Pane type
   };
-  const { flexGrow, flexShrink } = calculateFlexValues(paneConfig, collapsed);
-  const flexBasis = calculateFlexBasis(size, 0); // containerSize will be applied by CSS
+  const { flexGrow: defaultFlexGrow, flexShrink } = calculateFlexValues(paneConfig, collapsed);
+
+  // Use prop flexGrow if provided, otherwise use calculated default
+  const flexGrow = flexGrowProp !== undefined ? flexGrowProp : defaultFlexGrow;
+
+  // When collapsed, flexBasis should be 0, otherwise use the calculated size
+  const flexBasis = collapsed ? '0' : calculateFlexBasis(size, 0);
 
   return (
     <div
@@ -61,7 +67,7 @@ export const Pane: React.FC<PaneProps> = ({
         flexBasis,
         flexGrow,
         flexShrink,
-        overflow: 'auto',
+        overflow: collapsed ? 'hidden' : 'auto',
       }}
     >
       {content}

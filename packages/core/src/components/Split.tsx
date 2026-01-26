@@ -36,7 +36,6 @@ import {
   isLineBarStyle,
   shouldShowHandlebar,
 } from '../utils/paneOperations';
-import { useSplitActions } from '../contexts/SplitProvider';
 import { useNestingLevel, NestingProvider } from '../contexts/NestingContext';
 import { DragHandle } from './DragHandle';
 import { Pane } from './Pane';
@@ -64,7 +63,7 @@ import '../styles/split.css';
  */
 export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
   const {
-    id,
+    id: providedId,
     mode = 'horizontal',
     initialSizes = [],
     minSizes = [],
@@ -86,6 +85,10 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     onDragEnd,
     onLayoutChange,
   } = props;
+
+  // Generate stable ID if not provided
+  const generatedIdRef = useRef(`split-${Math.random().toString(36).slice(2, 11)}`);
+  const id = providedId || generatedIdRef.current;
 
   // Container ref
   const containerRef = useRef<HTMLDivElement>(null);
@@ -181,7 +184,7 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     collapsePane,
     expandPane,
     resizePane,
-  } = usePaneManager(children, initialSizes, collapsed, minSizes, maxSizes);
+  } = usePaneManager(children, initialSizes, collapsed, minSizes, maxSizes, id);
 
   // Drag state for plugins
   const [dragState, setDragState] = useState<any>(null);
@@ -220,12 +223,27 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         });
         break;
       case 'ADJUST_PANE_SIZE':
-        // Handle keyboard adjustments
-        // This would need more sophisticated logic
-        console.log('ADJUST_PANE_SIZE not fully implemented yet');
+        // Handle keyboard adjustments for accessibility
+        // This action is typically triggered by keyboard navigation plugins
+        // direction: 'grow' or 'shrink', amount: percentage to adjust
+        if (action.payload && dragState?.paneIndex != null) {
+          const paneIndex = dragState.paneIndex;
+          const currentPane = panes[paneIndex];
+          if (currentPane) {
+            const currentSize = parseFloat(currentPane.size);
+            const delta = action.payload.direction === 'grow'
+              ? action.payload.amount
+              : -action.payload.amount;
+            const newSize = Math.max(
+              currentPane.minSize || 0,
+              Math.min(currentPane.maxSize || 100, currentSize + delta)
+            );
+            setPaneSize(paneIndex, `${newSize}%`);
+          }
+        }
         break;
     }
-  }, [addPane, removePane, togglePane, setPaneSize]);
+  }, [addPane, removePane, togglePane, setPaneSize, panes, dragState]);
 
   // Create plugin context
   const pluginContext = usePluginContext(id, getState, dispatch, containerRef);
@@ -250,18 +268,8 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     mode
   );
 
-  // Context integration (optional - only if inside SplitProvider)
-  const contextActions = useSplitActions();
-
-  // Sync panes state to context when present
-  useEffect(() => {
-    if (contextActions) {
-      // Context is available - sync state
-      // This allows child components to access panes via context hooks
-      // Note: Context actions are already the same as our local actions
-      // so we don't need to override them
-    }
-  }, [panes, contextActions]);
+  // Context integration: useSplitActions() hook is available for child components
+  // to access split actions when wrapped in SplitProvider (optional)
 
   // Load saved state on mount
   useEffect(() => {
@@ -300,17 +308,36 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialSizes, children]);
 
-  // Sync collapsed prop changes to DOM
+  // Sync collapsed prop changes from parent
+  // Use collapsePane/expandPane instead of togglePane to properly handle flexGrow
+  // IMPORTANT: Only run when `collapsed` prop changes, NOT when internal panes change
+  // This prevents the sync effect from undoing internal collapse/expand actions
+  const collapsedRef = useRef(collapsed);
   useEffect(() => {
     if (!containerRef.current) return;
+
+    // Check if collapsed prop actually changed (not just panes state)
+    const collapsedChanged = collapsed.some((val, idx) => val !== collapsedRef.current[idx]);
+    if (!collapsedChanged && collapsedRef.current.length === collapsed.length) {
+      return; // No change in collapsed prop, skip sync
+    }
+
+    // Update ref to track current collapsed prop
+    collapsedRef.current = collapsed;
 
     collapsed.forEach((isCollapsed, idx) => {
       const pane = panes[idx];
       if (pane && pane.collapsed !== isCollapsed) {
-        togglePane(idx);
+        if (isCollapsed) {
+          // Parent wants this pane collapsed
+          collapsePane(idx);
+        } else {
+          // Parent wants this pane expanded
+          expandPane(idx);
+        }
       }
     });
-  }, [collapsed, panes, togglePane]);
+  }, [collapsed, panes, collapsePane, expandPane]);
 
   // Sync minSizes/maxSizes to data attributes
   useEffect(() => {
@@ -331,30 +358,22 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     });
   }, [minSizes, maxSizes, panes]);
 
-  // Sync mode changes (re-render with new flex direction)
-  useEffect(() => {
-    // Mode changes are handled by containerStyles recalculation
-    // No direct DOM manipulation needed - React will handle it
-  }, [mode]);
-
-  // Sync children prop changes
-  useEffect(() => {
-    // Note: Children changes are handled by usePaneManager
-    // which receives children as a dependency
-    // This effect exists to ensure children updates trigger re-renders
-  }, [children, panes.length]);
+  // Note: Mode changes are handled by containerStyles recalculation (React re-render)
+  // Note: Children changes are handled by usePaneManager hook
 
   // Phase 5: Sync disable/visible/lineBar prop changes to handlebars
+  // Uses the same helper functions as renderContent for consistency (1-based indexing)
   useEffect(() => {
     if (!containerRef.current) return;
 
     const handlebars = containerRef.current.querySelectorAll('.a-split-handlebar');
     handlebars.forEach((handlebar, idx) => {
       const element = handlebar as HTMLElement;
+      // Handlebar index is 1-based (matches renderContent)
+      const handlebarIndex = idx + 1;
 
-      // Sync disable state
-      const isDisabledArray = Array.isArray(disable);
-      const isDisabled = isDisabledArray ? disable[idx] : disable;
+      // Sync disable state using helper function (same as renderContent)
+      const isDisabled = isHandlebarDisabled(handlebarIndex, disable);
       if (isDisabled) {
         element.classList.add('a-split-handlebar-disabled');
         element.style.cursor = 'default';
@@ -363,14 +382,12 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         element.style.cursor = mode === 'horizontal' ? 'col-resize' : 'row-resize';
       }
 
-      // Sync visible state
-      const isVisibleArray = Array.isArray(visible);
-      const isVisible = isVisibleArray ? visible[idx] : visible;
+      // Sync visible state using helper function (same as renderContent)
+      const isVisible = isHandlebarVisible(handlebarIndex, visible);
       element.style.display = isVisible ? '' : 'none';
 
-      // Sync lineBar style
-      const isLineBarArray = Array.isArray(lineBar);
-      const isLinebar = isLineBarArray ? lineBar[idx] : lineBar;
+      // Sync lineBar style using helper function (same as renderContent)
+      const isLinebar = isLineBarStyle(handlebarIndex, lineBar);
       if (isLinebar) {
         element.classList.add('a-split-handlebar-line');
       } else {
@@ -432,12 +449,13 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         direction === 'left' ? handlebarIndex - 1 : handlebarIndex;
 
       if (paneIndexToCollapse >= 0 && paneIndexToCollapse < panes.length) {
-        collapsePane(paneIndexToCollapse);
+        // Pass direction to collapsePane so it knows which adjacent pane should grow
+        collapsePane(paneIndexToCollapse, { direction });
 
         // Notify parent
         const pane = panes[paneIndexToCollapse];
         if (pane) {
-          onLayoutChange?.(paneIndexToCollapse, pane.id, 'close', null);
+          onLayoutChange?.(paneIndexToCollapse, pane.id, 'close', direction);
         }
       }
     },
@@ -450,12 +468,13 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         direction === 'left' ? handlebarIndex - 1 : handlebarIndex;
 
       if (paneIndexToExpand >= 0 && paneIndexToExpand < panes.length) {
-        expandPane(paneIndexToExpand);
+        // Pass direction to expandPane so it knows which adjacent pane to adjust
+        expandPane(paneIndexToExpand, { direction });
 
         // Notify parent
         const pane = panes[paneIndexToExpand];
         if (pane) {
-          onLayoutChange?.(paneIndexToExpand, pane.id, 'open', null);
+          onLayoutChange?.(paneIndexToExpand, pane.id, 'open', direction);
         }
       }
     },
@@ -573,6 +592,7 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
           maxSize={pane.maxSize}
           mode={mode}
           content={wrappedContent}
+          flexGrow={pane.flexGrow}
         />
       );
 
@@ -584,9 +604,17 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
 
         // Check if handlebar should be shown
         const showHandlebar = shouldShowHandlebar(pane, nextPane);
-        const isDisabled = isHandlebarDisabled(handlebarIndex, disable);
         const isVisible = isHandlebarVisible(handlebarIndex, visible);
         const isLinebar = isLineBarStyle(handlebarIndex, lineBar);
+
+        // Collapsed states for left/top and right/bottom panes
+        const leftPaneCollapsed = pane.collapsed || false;
+        const rightPaneCollapsed = nextPane.collapsed || false;
+
+        // Check if explicitly disabled via disable prop (separate from collapse-based disable)
+        const explicitlyDisabled = isHandlebarDisabled(handlebarIndex, disable);
+        // Disable dragging if either pane is collapsed OR if explicitly disabled
+        const isDisabled = explicitlyDisabled || leftPaneCollapsed || rightPaneCollapsed;
 
         if (isVisible && showHandlebar) {
           // Check if plugin provides custom handle
@@ -615,10 +643,13 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
                 mode={mode}
                 disabled={isDisabled}
                 lineBar={isLinebar}
+                explicitlyDisabled={explicitlyDisabled}
                 onMouseDown={(e) => handleMouseDown(handlebarIndex, e)}
                 onCollapse={(direction) => handleCollapse(handlebarIndex, direction)}
                 onExpand={(direction) => handleExpand(handlebarIndex, direction)}
                 renderCustom={renderBar}
+                leftPaneCollapsed={leftPaneCollapsed}
+                rightPaneCollapsed={rightPaneCollapsed}
               />
             );
           }

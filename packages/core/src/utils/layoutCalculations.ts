@@ -94,7 +94,7 @@ export function validatePaneSizes(
 /**
  * Calculate flex-basis value for a pane
  *
- * @param size - Size string (e.g., "50%", "200px")
+ * @param size - Size string (e.g., "50%", "200px", "1fr")
  * @param _containerSize - Container size in pixels (reserved for future use)
  * @returns Flex basis value with unit
  */
@@ -110,6 +110,9 @@ export function calculateFlexBasis(size: string, _containerSize: number): string
       return `${(parsed.value / 100) * window.innerWidth}px`;
     case 'vh':
       return `${(parsed.value / 100) * window.innerHeight}px`;
+    case 'fr':
+      // For fr units, use 0 as flex-basis and let flexGrow handle the sizing
+      return '0';
     default:
       return `${parsed.value}px`; // Fallback to pixels
   }
@@ -135,6 +138,11 @@ export function calculateFlexValues(
   // Percentage-based panes can grow/shrink
   if (parsed.unit === '%') {
     return { flexGrow: 1, flexShrink: 1 };
+  }
+
+  // fr units should grow based on their fr value (e.g., 1fr = flexGrow: 1, 2fr = flexGrow: 2)
+  if (parsed.unit === 'fr') {
+    return { flexGrow: parsed.value, flexShrink: 1 };
   }
 
   // Fixed-size panes don't grow/shrink
@@ -176,21 +184,32 @@ export function calculateHandlebarPosition(
 }
 
 /**
+ * Handlebar total size (1px line + 5px margin on each side)
+ */
+export const HANDLEBAR_SIZE = 11;
+
+/**
  * Calculate container dimensions based on mode
  *
  * @param element - Container element
  * @param mode - Split orientation
+ * @param handlebarCount - Number of handlebars (optional, for accurate pane space calculation)
  * @returns Object with width and height
  */
 export function getContainerDimensions(
   element: HTMLElement,
-  mode: SplitMode
-): { width: number; height: number; primary: number } {
+  mode: SplitMode,
+  handlebarCount: number = 0
+): { width: number; height: number; primary: number; availableForPanes: number } {
   const width = element.offsetWidth;
   const height = element.offsetHeight;
   const primary = mode === 'horizontal' ? width : height;
 
-  return { width, height, primary };
+  // Calculate space available for panes (subtract handlebar space)
+  const handlebarSpace = handlebarCount * HANDLEBAR_SIZE;
+  const availableForPanes = primary - handlebarSpace;
+
+  return { width, height, primary, availableForPanes };
 }
 
 /**

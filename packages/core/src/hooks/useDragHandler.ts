@@ -1,10 +1,7 @@
-import { useCallback, useRef, useEffect, RefObject } from 'react';
-import { throttle } from '../utils/native/throttle';
-import {
-  DragState,
-  DragCallbacks,
-  SplitMode,
-} from '../types';
+import { useCallback, useRef, useEffect, RefObject } from "react";
+import { throttle } from "../utils/native/throttle";
+import { HANDLEBAR_SIZE } from "../utils/layoutCalculations";
+import { DragState, DragCallbacks, SplitMode } from "../types";
 
 /**
  * useDragHandler - Handles drag operations with 60fps performance
@@ -22,11 +19,7 @@ import {
  * @param mode - Split orientation (horizontal/vertical)
  * @param callbacks - Drag event callbacks
  */
-export function useDragHandler(
-  containerRef: RefObject<HTMLDivElement>,
-  mode: SplitMode,
-  callbacks: DragCallbacks = {}
-) {
+export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: SplitMode, callbacks: DragCallbacks = {}) {
   const { onDragStart, onDragMove, onDragEnd } = callbacks;
 
   // Use ref to avoid re-renders during drag
@@ -42,6 +35,7 @@ export function useDragHandler(
   const handleMouseDown = useCallback(
     (paneIndex: number, e: React.MouseEvent | React.TouchEvent) => {
       e.preventDefault();
+      e.stopPropagation(); // Prevent bubbling to parent Split components
 
       const container = containerRef.current;
       if (!container) return;
@@ -60,14 +54,19 @@ export function useDragHandler(
       if (!prevElement || !nextElement) return;
 
       // Check if either pane is collapsed - don't allow dragging
-      if (prevElement.classList.contains('a-split-hidden') ||
-          nextElement.classList.contains('a-split-hidden')) {
+      if (prevElement.classList.contains("a-split-hidden") || nextElement.classList.contains("a-split-hidden")) {
         return;
       }
 
       // PERFORMANCE: Cache everything needed during drag (avoid reflows)
-      const clientX = 'touches' in e ? e.touches[0]?.clientX ?? 0 : e.clientX;
-      const clientY = 'touches' in e ? e.touches[0]?.clientY ?? 0 : e.clientY;
+      const clientX = "touches" in e ? (e.touches[0]?.clientX ?? 0) : e.clientX;
+      const clientY = "touches" in e ? (e.touches[0]?.clientY ?? 0) : e.clientY;
+
+      // Count handlebars and calculate total handlebar space
+      // Handlebar dimensions: 1px width/height + 5px margin on each side = 11px total
+      const handlebars = container.querySelectorAll(".a-split-handlebar");
+      const handlebarCount = handlebars.length;
+      const totalHandlebarSpace = handlebarCount * HANDLEBAR_SIZE;
 
       dragState.current = {
         active: true,
@@ -80,12 +79,13 @@ export function useDragHandler(
         nextInitialWidth: nextElement.offsetWidth,
         prevInitialHeight: prevElement.offsetHeight,
         nextInitialHeight: nextElement.offsetHeight,
-        containerWidth: container.offsetWidth,
-        containerHeight: container.offsetHeight,
-        minPrevSize: parseFloat(prevElement.getAttribute('data-min-size') || '0'),
-        maxPrevSize: parseFloat(prevElement.getAttribute('data-max-size') || '100'),
-        minNextSize: parseFloat(nextElement.getAttribute('data-min-size') || '0'),
-        maxNextSize: parseFloat(nextElement.getAttribute('data-max-size') || '100'),
+        // Subtract handlebar space from container for accurate percentage calculations
+        containerWidth: container.offsetWidth - (mode === "horizontal" ? totalHandlebarSpace : 0),
+        containerHeight: container.offsetHeight - (mode === "vertical" ? totalHandlebarSpace : 0),
+        minPrevSize: parseFloat(prevElement.getAttribute("data-min-size") || "0"),
+        maxPrevSize: parseFloat(prevElement.getAttribute("data-max-size") || "100"),
+        minNextSize: parseFloat(nextElement.getAttribute("data-min-size") || "0"),
+        maxNextSize: parseFloat(nextElement.getAttribute("data-max-size") || "100"),
       };
 
       // Reset final sizes
@@ -93,7 +93,7 @@ export function useDragHandler(
 
       onDragStart?.({ paneIndex });
     },
-    [containerRef, onDragStart]
+    [containerRef, onDragStart],
   );
 
   /**
@@ -105,29 +105,21 @@ export function useDragHandler(
       const state = dragState.current;
       if (!state?.active) return;
 
-      const isHorizontal = mode === 'horizontal';
+      const isHorizontal = mode === "horizontal";
 
       // Extract client position
-      const clientX = 'touches' in e ? e.touches[0]?.clientX ?? 0 : e.clientX;
-      const clientY = 'touches' in e ? e.touches[0]?.clientY ?? 0 : e.clientY;
+      const clientX = "touches" in e ? (e.touches[0]?.clientX ?? 0) : e.clientX;
+      const clientY = "touches" in e ? (e.touches[0]?.clientY ?? 0) : e.clientY;
 
       // Calculate delta from start position
-      const delta = isHorizontal
-        ? clientX - state.startX
-        : clientY - state.startY;
+      const delta = isHorizontal ? clientX - state.startX : clientY - state.startY;
 
       // Calculate container size
-      const containerSize = isHorizontal
-        ? state.containerWidth
-        : state.containerHeight;
+      const containerSize = isHorizontal ? state.containerWidth : state.containerHeight;
 
-      const prevInitialSize = isHorizontal
-        ? state.prevInitialWidth
-        : state.prevInitialHeight;
+      const prevInitialSize = isHorizontal ? state.prevInitialWidth : state.prevInitialHeight;
 
-      const nextInitialSize = isHorizontal
-        ? state.nextInitialWidth
-        : state.nextInitialHeight;
+      const nextInitialSize = isHorizontal ? state.nextInitialWidth : state.nextInitialHeight;
 
       // Calculate new sizes in pixels first
       let prevSizePx = prevInitialSize + delta;
@@ -169,8 +161,8 @@ export function useDragHandler(
         if (!state.prevElement || !state.nextElement) return;
 
         // Preserve original unit from flexBasis (v5 behavior: setResizingLayout)
-        const prevHasPercent = state.prevElement.style.flexBasis.includes('%');
-        const nextHasPercent = state.nextElement.style.flexBasis.includes('%');
+        const prevHasPercent = state.prevElement.style.flexBasis.includes("%");
+        const nextHasPercent = state.nextElement.style.flexBasis.includes("%");
 
         if (prevHasPercent) {
           state.prevElement.style.flexBasis = `${prevSize}%`;
@@ -187,7 +179,7 @@ export function useDragHandler(
 
       onDragMove?.({ paneIndex: state.paneIndex, prevSize, nextSize });
     }, 16), // 60fps cap
-    [mode, onDragMove]
+    [mode, onDragMove],
   );
 
   /**
@@ -216,16 +208,16 @@ export function useDragHandler(
     const moveHandler = handleMouseMove as any;
     const upHandler = handleMouseUp;
 
-    window.addEventListener('mousemove', moveHandler);
-    window.addEventListener('mouseup', upHandler);
-    window.addEventListener('touchmove', moveHandler, { passive: false });
-    window.addEventListener('touchend', upHandler);
+    window.addEventListener("mousemove", moveHandler);
+    window.addEventListener("mouseup", upHandler);
+    window.addEventListener("touchmove", moveHandler, { passive: false });
+    window.addEventListener("touchend", upHandler);
 
     return () => {
-      window.removeEventListener('mousemove', moveHandler);
-      window.removeEventListener('mouseup', upHandler);
-      window.removeEventListener('touchmove', moveHandler);
-      window.removeEventListener('touchend', upHandler);
+      window.removeEventListener("mousemove", moveHandler);
+      window.removeEventListener("mouseup", upHandler);
+      window.removeEventListener("touchmove", moveHandler);
+      window.removeEventListener("touchend", upHandler);
     };
   }, [handleMouseMove, handleMouseUp]);
 

@@ -119,7 +119,7 @@ export function normalizeSize(
 /**
  * Parse size value and extract number + unit
  *
- * @param value - Size string (e.g., "50%", "200px")
+ * @param value - Size string (e.g., "50%", "200px", "1fr")
  * @returns Object with numeric value and unit
  */
 export function parseSize(value: string): { value: number; unit: string } {
@@ -139,6 +139,10 @@ export function parseSize(value: string): { value: number; unit: string } {
 
   if (value.includes('vh')) {
     return { value: numericValue, unit: 'vh' };
+  }
+
+  if (value.includes('fr')) {
+    return { value: numericValue, unit: 'fr' };
   }
 
   // Default to px

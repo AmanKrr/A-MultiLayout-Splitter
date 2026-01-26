@@ -34,5 +34,8 @@
     "UI components",
     "layout management",
     "react resizable splitter"
-  ]
+  ],
+  "devDependencies": {
+    "@playwright/test": "^1.57.0"
+  }
 }

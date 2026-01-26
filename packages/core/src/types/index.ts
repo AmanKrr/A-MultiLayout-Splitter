@@ -25,6 +25,8 @@ export interface Pane {
   minSize: number;
   maxSize: number;
   content: ReactNode;
+  /** Override flex-grow value (used when adjacent pane is collapsed) */
+  flexGrow?: number;
 }
 
 /**
@@ -78,8 +80,8 @@ export interface DragEndEvent {
  * Split component props (v6)
  */
 export interface SplitProps {
-  /** Unique identifier for this split instance */
-  id: string;
+  /** Unique identifier for this split instance (auto-generated if not provided) */
+  id?: string;
 
   /** Split orientation */
   mode?: SplitMode;
@@ -96,14 +98,14 @@ export interface SplitProps {
   /** Collapsed state for each pane */
   collapsed?: boolean[];
 
-  /** Enable/disable resize for specific handlebars */
-  disable?: boolean | number[];
+  /** Enable/disable resize for specific handlebars (boolean, array of booleans, or array of indices) */
+  disable?: boolean | boolean[] | number[];
 
-  /** Show/hide specific handlebars */
-  visible?: boolean | number[];
+  /** Show/hide specific handlebars (boolean, array of booleans, or array of indices) */
+  visible?: boolean | boolean[] | number[];
 
-  /** Line bar style for handlebars */
-  lineBar?: boolean | number[];
+  /** Line bar style for handlebars (boolean, array of booleans, or array of indices) */
+  lineBar?: boolean | boolean[] | number[];
 
   /** Custom handlebar renderer with full props support (Phase 5) */
   renderBar?: (props: HandleRenderProps, position: number) => JSX.Element;
@@ -403,4 +405,6 @@ export interface PaneProps {
   maxSize: number;
   mode: SplitMode;
   content: ReactNode;
+  /** Override flex-grow value (used when adjacent pane is collapsed) */
+  flexGrow?: number;
 }
