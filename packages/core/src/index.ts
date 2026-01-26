@@ -1,32 +1,16 @@
 /**
- * A-MultiLayout-Splitter v6.0.0
- *
- * High-performance split pane component for React with 60fps drag performance.
- *
- * Breaking Changes from v5:
- * - Functional components with hooks (no class-based API)
- * - Reactive props (no SplitStateProvider workaround needed)
- * - Clean TypeScript types
- * - ESM + CJS dual format
- * - Removed lodash dependency
- *
- * Migration Guide:
- * - Replace class-based Split with functional Split
- * - Use ref for imperative API instead of static methods
- * - Remove SplitStateProvider (no longer needed)
- * - Update imports to use named exports
+ * @a-multilayout-splitter/core
+ * 
+ * High-performance split pane component for React.
+ * Uses direct DOM manipulation to achieve 60fps drag performance.
  */
 
-// ==================== v6 API (Primary) ====================
-
-// Main component
+// --- Main Components ---
 export { Split } from './components/Split';
-
-// Sub-components (for advanced usage)
 export { DragHandle } from './components/DragHandle';
 export { Pane as PaneComponent } from './components/Pane';
 
-// Types
+// --- Type Definitions ---
 export type {
   SplitProps,
   SplitRef,
@@ -52,22 +36,20 @@ export type {
   PaneRemoveEvent,
   ResizeEvent,
   PluginConfig,
-  // Phase 4: Enhanced API types
   SplitSnapshot,
   SplitControllerState,
   SplitControllerActions,
   UseSplitControllerOptions,
 } from './types';
 
-// Hooks (for custom implementations)
+// --- Lifecycle Hooks ---
 export { useDragHandler } from './hooks/useDragHandler';
 export { usePaneManager } from './hooks/usePaneManager';
 export { usePersistence } from './hooks/usePersistence';
 export { usePluginContext } from './hooks/usePluginContext';
-// Phase 4: Hook-based API
 export { useSplitController } from './hooks/useSplitController';
 
-// Plugin System (Phase 3)
+// --- Plugin System ---
 export {
   PluginManager,
   createPlugin,
@@ -85,7 +67,7 @@ export type {
   CustomHandleComponentProps,
 } from './plugins';
 
-// Context Provider (optional)
+// --- Reactive Context Providers ---
 export {
   SplitProvider,
   useSplitConfig,
@@ -106,7 +88,7 @@ export type {
   SplitProviderProps,
 } from './contexts/SplitProvider';
 
-// Phase 5: Nesting Context (for nested layout support)
+// --- Nesting Support ---
 export {
   NestingProvider,
   useNestingLevel,
@@ -117,7 +99,7 @@ export type {
   NestingProviderProps,
 } from './contexts/NestingContext';
 
-// Utilities (for advanced usage)
+// --- Low-level Utilities ---
 export {
   percentageToPixel,
   pixelToPercentage,
@@ -162,10 +144,5 @@ export {
 
 export { throttle, debounce } from './utils/native/throttle';
 
-// ==================== v5 Legacy API (Removed) ====================
-// v5 legacy code has been archived and is no longer available.
-// All users must migrate to the v6 API.
-// See archive/v5-legacy/README.md for migration guidance.
-
-// Default export
+// --- Default Export ---
 export { Split as default } from './components/Split';

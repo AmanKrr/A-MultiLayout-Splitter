@@ -13,7 +13,10 @@ import {
 import { ReactNode } from 'react';
 
 /**
- * PluginManager handles plugin lifecycle and event dispatching
+ * PluginManager
+ * 
+ * Internal class that orchestrates the lifecycle and events of Split plugins.
+ * Acts as a bridge between the Split component and registered plugin instances.
  */
 export class PluginManager {
   private plugins: SplitPlugin[] = [];
@@ -24,7 +27,7 @@ export class PluginManager {
   }
 
   /**
-   * Register plugins and call their onInit hooks
+   * Registers a set of plugins and triggers their initialization.
    */
   registerPlugins(plugins: SplitPlugin[]): void {
     this.plugins = plugins;
@@ -36,7 +39,7 @@ export class PluginManager {
   }
 
   /**
-   * Unregister all plugins and call their onDestroy hooks
+   * Cleans up all plugins and triggers their destruction hooks.
    */
   destroy(): void {
     this.plugins.forEach(plugin => {
@@ -48,7 +51,7 @@ export class PluginManager {
   }
 
   /**
-   * Lifecycle: Pane added
+   * Notifies plugins when a pane is added.
    */
   onPaneAdd(event: PaneAddEvent): void {
     this.plugins.forEach(plugin => {
@@ -59,7 +62,7 @@ export class PluginManager {
   }
 
   /**
-   * Lifecycle: Pane removed
+   * Notifies plugins when a pane is removed.
    */
   onPaneRemove(event: PaneRemoveEvent): void {
     this.plugins.forEach(plugin => {
@@ -70,7 +73,7 @@ export class PluginManager {
   }
 
   /**
-   * Lifecycle: Drag start
+   * Notifies plugins when a drag operation begins.
    */
   onDragStart(event: DragStartEvent): void {
     this.plugins.forEach(plugin => {
@@ -81,8 +84,8 @@ export class PluginManager {
   }
 
   /**
-   * Lifecycle: Drag move
-   * Returns false if any plugin prevents default behavior
+   * Notifies plugins during drag movement.
+   * Plugins can return false to cancel the default drag behavior.
    */
   onDragMove(event: DragMoveEvent): boolean {
     let shouldContinue = true;
@@ -100,7 +103,7 @@ export class PluginManager {
   }
 
   /**
-   * Lifecycle: Drag end
+   * Notifies plugins when a drag operation ends.
    */
   onDragEnd(event: DragEndEvent): void {
     this.plugins.forEach(plugin => {
@@ -111,7 +114,7 @@ export class PluginManager {
   }
 
   /**
-   * Lifecycle: Container resize
+   * Notifies plugins when the split container is resized.
    */
   onResize(event: ResizeEvent): void {
     this.plugins.forEach(plugin => {
@@ -122,8 +125,8 @@ export class PluginManager {
   }
 
   /**
-   * Component enhancement: Custom handle renderer
-   * Returns the first custom renderer found
+   * Allows plugins to provide a custom handlebar renderer.
+   * Returns the first valid renderer found.
    */
   renderHandle(props: HandleRenderProps): ReactNode | null {
     for (const plugin of this.plugins) {
@@ -138,8 +141,8 @@ export class PluginManager {
   }
 
   /**
-   * Component enhancement: Custom pane wrapper renderer
-   * Returns the first custom renderer found
+   * Allows plugins to provide a custom pane wrapper.
+   * Returns the first valid renderer found.
    */
   renderPane(pane: Pane): ReactNode | null {
     for (const plugin of this.plugins) {
@@ -154,21 +157,21 @@ export class PluginManager {
   }
 
   /**
-   * Get all registered plugins
+   * Retrieves all registered plugins.
    */
   getPlugins(): SplitPlugin[] {
     return this.plugins;
   }
 
   /**
-   * Get plugin by name
+   * Retrieves a specific plugin by its unique name.
    */
   getPlugin(name: string): SplitPlugin | undefined {
     return this.plugins.find(plugin => plugin.name === name);
   }
 
   /**
-   * Check if plugin is registered
+   * Checks if a plugin with the given name is currently registered.
    */
   hasPlugin(name: string): boolean {
     return this.plugins.some(plugin => plugin.name === name);

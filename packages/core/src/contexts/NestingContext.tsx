@@ -1,43 +1,27 @@
-/**
- * Nesting Context - Phase 5
- *
- * Provides automatic nesting level detection for Split components.
- * Helps automatically apply fixClass for deeply nested layouts.
- */
-
 import React, { createContext, useContext, ReactNode } from 'react';
 
 /**
- * Nesting level context
+ * Internal context for tracking the nesting depth of Split components.
  */
 const NestingContext = createContext<number>(0);
 
 /**
- * Hook to get current nesting level
- *
- * @returns Current nesting depth (0 = top level, 1 = first nested, etc.)
- *
- * @example
- * ```tsx
- * const level = useNestingLevel();
- * const needsFix = level > 2; // Auto-apply fix for deep nesting
- * ```
+ * useNestingLevel
+ * 
+ * Hook to retrieve the current nesting depth.
+ * 0 indicates top-level, 1 indicates first nested level, etc.
  */
 export function useNestingLevel(): number {
   return useContext(NestingContext);
 }
 
 /**
- * Hook to check if fix class is needed based on nesting level
- *
- * @param threshold - Nesting level threshold (default: 2)
- * @returns True if current level exceeds threshold
- *
- * @example
- * ```tsx
- * const needsFix = useNeedsFixClass();
- * // Returns true if nesting level > 2
- * ```
+ * useNeedsFixClass
+ * 
+ * Determines if a CSS fix class is necessary based on nesting depth.
+ * Deeply nested layouts sometimes require specific CSS overrides to maintain correct flex distribution.
+ * 
+ * @param threshold - The nesting level at which the fix class is applied (default: 2)
  */
 export function useNeedsFixClass(threshold: number = 2): boolean {
   const level = useNestingLevel();
@@ -45,36 +29,19 @@ export function useNeedsFixClass(threshold: number = 2): boolean {
 }
 
 /**
- * Nesting provider props
+ * NestingProviderProps
  */
 export interface NestingProviderProps {
-  /** Current nesting level */
+  /** The specific nesting level to provide to children */
   level?: number;
-  /** Child elements */
+  /** React children */
   children: ReactNode;
 }
 
 /**
- * Nesting Provider Component
- *
- * Wraps Split components to provide nesting level information.
- * Automatically increments level for nested Splits.
- *
- * @example
- * ```tsx
- * <NestingProvider level={0}>
- *   <Split>
- *     <Pane>Content</Pane>
- *     <Pane>
- *       <NestingProvider level={1}>
- *         <Split>
- *           <Pane>Nested content</Pane>
- *         </Split>
- *       </NestingProvider>
- *     </Pane>
- *   </Split>
- * </NestingProvider>
- * ```
+ * NestingProvider
+ * 
+ * Provides nesting level information to descendant Split components.
  */
 export const NestingProvider: React.FC<NestingProviderProps> = ({
   level = 0,
@@ -90,16 +57,12 @@ export const NestingProvider: React.FC<NestingProviderProps> = ({
 NestingProvider.displayName = 'NestingProvider';
 
 /**
- * HOC to wrap a component with nesting detection
- *
- * @param Component - Component to wrap
- * @returns Wrapped component with automatic nesting level increment
- *
- * @example
- * ```tsx
- * const SplitWithNesting = withNesting(Split);
- * // Now automatically increments nesting level for children
- * ```
+ * withNesting
+ * 
+ * Higher-Order Component (HOC) that automatically increments the nesting level
+ * for any component it wraps.
+ * 
+ * @param Component - The component to be enhanced with nesting detection
  */
 export function withNesting<P extends object>(
   Component: React.ComponentType<P>

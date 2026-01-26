@@ -1,36 +1,26 @@
 import { createPlugin } from '../createPlugin';
 
 /**
- * Options for keyboard navigation plugin
+ * Options for the keyboard navigation plugin.
  */
 export interface KeyboardPluginOptions {
-  /** Enable arrow key navigation */
+  /** Enable arrow key resizing */
   enableArrowKeys?: boolean;
-  /** Enable number key navigation (1-9 to focus panes) */
+  /** Enable number key (1-9) to focus specific panes */
   enableNumberKeys?: boolean;
-  /** Step size for arrow key adjustments (in pixels) */
+  /** Relative step size for each arrow key press */
   stepSize?: number;
-  /** Enable Tab key to cycle through panes */
+  /** Enable Tab to cycle through panes */
   enableTabNavigation?: boolean;
 }
 
 /**
- * Creates a keyboard navigation plugin for accessibility
- *
- * Features:
- * - Arrow keys to resize panes
- * - Number keys to focus specific panes
- * - Tab navigation between panes
- *
- * @example
- * ```typescript
- * <Split
- *   id="my-split"
- *   plugins={[keyboardPlugin({ stepSize: 20 })]}
- * >
- *   ...
- * </Split>
- * ```
+ * keyboardPlugin
+ * 
+ * Provides accessibility enhancements by enabling keyboard navigation.
+ * Supports resizing via arrows, focusing via numbers, and Tab cycling.
+ * 
+ * @param options - Plugin configuration options
  */
 export function keyboardPlugin(options: KeyboardPluginOptions = {}) {
   const {
@@ -64,7 +54,6 @@ export function keyboardPlugin(options: KeyboardPluginOptions = {}) {
       const element = context.getElement();
       if (!element) return;
 
-      // Make container and panes focusable
       element.setAttribute('tabindex', '0');
       const panes = element.querySelectorAll('.a-split-control-pane');
       panes.forEach((pane, index) => {
@@ -75,7 +64,6 @@ export function keyboardPlugin(options: KeyboardPluginOptions = {}) {
         const state = context.getState();
         const panes = state.panes;
 
-        // Arrow key navigation
         if (enableArrowKeys) {
           if (
             e.key === 'ArrowLeft' ||
@@ -102,7 +90,6 @@ export function keyboardPlugin(options: KeyboardPluginOptions = {}) {
           }
         }
 
-        // Number key navigation (1-9)
         if (enableNumberKeys) {
           const num = parseInt(e.key, 10);
           if (!isNaN(num) && num >= 1 && num <= 9) {
@@ -113,7 +100,6 @@ export function keyboardPlugin(options: KeyboardPluginOptions = {}) {
           }
         }
 
-        // Tab navigation
         if (enableTabNavigation && e.key === 'Tab') {
           e.preventDefault();
 
@@ -121,7 +107,6 @@ export function keyboardPlugin(options: KeyboardPluginOptions = {}) {
             ? currentFocusedPaneIndex - 1
             : currentFocusedPaneIndex + 1;
 
-          // Wrap around
           if (nextIndex < 0) {
             nextIndex = panes.length - 1;
           } else if (nextIndex >= panes.length) {

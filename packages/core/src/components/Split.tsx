@@ -1,18 +1,8 @@
 /**
- * Split Component v6 - Functional Implementation
- *
- * PERFORMANCE CRITICAL: This component preserves the v5 performance characteristics:
- * - Direct DOM manipulation during drag (60fps with 10,000+ elements)
- * - Cached element references
- * - requestAnimationFrame synchronization
- * - CSS-based state persistence via flexBasis/flexGrow
- *
- * New in v6:
- * - Functional component with hooks
- * - Reactive props (no context workaround needed)
- * - Imperative API via ref
- * - Better TypeScript support
- * - Composable architecture
+ * Split
+ * 
+ * A high-performance, functional split pane component for React.
+ * Uses direct DOM manipulation for 60fps drag performance.
  */
 
 import React, {
@@ -46,21 +36,23 @@ import '../styles/split.css';
 /**
  * Split Component
  *
- * A high-performance split pane component with drag-to-resize functionality.
+ * Provides a resizable layout container with support for multiple panes,
+ * custom handlebars, and a plugin system.
  *
  * @example
  * ```tsx
  * <Split
- *   id="my-split"
+ *   id="main-layout"
  *   mode="horizontal"
- *   initialSizes={['50%', '50%']}
- *   minSizes={[10, 10]}
- *   maxSizes={[90, 90]}
+ *   initialSizes={['30%', '70%']}
  * >
- *   <div>Pane 1</div>
- *   <div>Pane 2</div>
+ *   <div id="sidebar">Sidebar Content</div>
+ *   <div id="content">Main Content</div>
  * </Split>
  * ```
+ * 
+ * @param props - Component properties
+ * @param ref - Imperative API reference
  */
 export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
   const {
@@ -87,26 +79,17 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     onLayoutChange,
   } = props;
 
-  // Generate stable ID if not provided
   const generatedIdRef = useRef(`split-${Math.random().toString(36).slice(2, 11)}`);
   const id = providedId || generatedIdRef.current;
 
-  // Container ref
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Plugin manager ref
   const pluginManagerRef = useRef<PluginManager | null>(null);
 
-  // Phase 5: Nesting level detection for automatic fixClass
   const nestingLevel = useNestingLevel();
-  const autoFixClass = !fixClass && nestingLevel > 2; // Auto-apply fix for deep nesting
+  const autoFixClass = !fixClass && nestingLevel > 2;
 
-
-
-  // Props validation (development warnings)
   useEffect(() => {
     if (process.env.NODE_ENV !== 'production') {
-      // Validate initialSizes
       if (initialSizes.length > 0) {
         const childArray = React.Children.toArray(children);
         if (initialSizes.length !== childArray.length) {
@@ -115,7 +98,6 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
           );
         }
 
-        // Check for invalid size formats
         initialSizes.forEach((size, idx) => {
           if (typeof size === 'string') {
             const parsed = parseFloat(size);
@@ -131,7 +113,6 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
           }
         });
 
-        // Check if total percentage exceeds 100%
         const totalPercent = initialSizes.reduce((sum, size) => {
           if (typeof size === 'string' && size.includes('%')) {
             return sum + parseFloat(size);
@@ -143,7 +124,6 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         }
       }
 
-      // Validate minSizes and maxSizes
       if (minSizes.length > 0 || maxSizes.length > 0) {
         minSizes.forEach((min, idx) => {
           const max = maxSizes[idx];
@@ -161,7 +141,6 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         });
       }
 
-      // Validate collapsed array length
       if (collapsed.length > 0) {
         const childArray = React.Children.toArray(children);
         if (collapsed.length !== childArray.length) {
@@ -173,7 +152,6 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     }
   }, [initialSizes, minSizes, maxSizes, collapsed, children]);
 
-  // Pane management hook (Phase 4 Enhanced)
   const {
     panes,
     addPane,
@@ -181,7 +159,6 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     togglePane,
     setPaneSize,
     getPaneState,
-    // Phase 4: Enhanced operations
     removePanes,
     swapPanes,
     collapsePane,
@@ -189,10 +166,8 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     resizePane,
   } = usePaneManager(children, initialSizes, collapsed, minSizes, maxSizes, id);
 
-  // Drag state for plugins
   const [dragState, setDragState] = useState<any>(null);
 
-  // Global Drag State Management (Moved here to access dragState)
   useEffect(() => {
     if (dragState && dragState.active) {
       document.body.classList.add('a-split-body-dragging');
@@ -208,7 +183,6 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     }
 
     return () => {
-      // Cleanup on unmount or drag end
       document.body.classList.remove('a-split-body-dragging');
       document.body.classList.remove('a-split-body-dragging-horizontal');
       document.body.classList.remove('a-split-body-dragging-vertical');
@@ -216,7 +190,6 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
   }, [dragState, mode]);
 
 
-  // State getter for plugins
   const getState = useCallback((): SplitState => {
     return {
       panes,
@@ -225,7 +198,6 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     };
   }, [panes, mode, dragState]);
 
-  // Dispatcher for plugins
   const dispatch = useCallback((action: SplitAction) => {
     switch (action.type) {
       case 'ADD_PANE':
@@ -241,7 +213,6 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         setPaneSize(action.payload.index, action.payload.size);
         break;
       case 'RESTORE_STATE':
-        // Handle state restoration
         action.payload.panes.forEach((pane, idx) => {
           setPaneSize(idx, pane.size);
           if (pane.collapsed) {
@@ -250,9 +221,6 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         });
         break;
       case 'ADJUST_PANE_SIZE':
-        // Handle keyboard adjustments for accessibility
-        // This action is typically triggered by keyboard navigation plugins
-        // direction: 'grow' or 'shrink', amount: percentage to adjust
         if (action.payload && dragState?.paneIndex != null) {
           const paneIndex = dragState.paneIndex;
           const currentPane = panes[paneIndex];
@@ -272,10 +240,8 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     }
   }, [addPane, removePane, togglePane, setPaneSize, panes, dragState]);
 
-  // Create plugin context
   const pluginContext = usePluginContext(id, getState, dispatch, containerRef);
 
-  // Initialize plugin manager
   useEffect(() => {
     if (plugins.length > 0) {
       pluginManagerRef.current = new PluginManager(pluginContext);
@@ -288,21 +254,15 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     }
   }, [plugins, pluginContext]);
 
-  // Persistence hook
   const persistence = usePersistence(
     enableSessionStorage,
     `split-state-${id}`,
     mode
   );
 
-  // Context integration: useSplitActions() hook is available for child components
-  // to access split actions when wrapped in SplitProvider (optional)
-
-  // Load saved state on mount
   useEffect(() => {
     const savedState = persistence.load();
     if (savedState && savedState.length === panes.length) {
-      // Restore saved sizes
       savedState.forEach((saved, index) => {
         if (panes[index] && saved.id === panes[index].id) {
           setPaneSize(index, saved.size);
@@ -312,61 +272,45 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         }
       });
     }
-  }, []); // Only on mount
+  }, []);
 
-  // Save state when panes change
   useEffect(() => {
     persistence.save(panes);
   }, [panes, persistence]);
 
-  // ==================== REACTIVE PROPS SYSTEM ====================
-  // Sync initialSizes prop to DOM when it changes
-  // NOTE: We deliberately exclude 'panes' from dependencies to avoid resetting
-  // sizes after drag operations. This effect should ONLY run when the parent
-  // changes the initialSizes prop, not when our internal panes state updates.
   useEffect(() => {
     if (!containerRef.current) return;
     if (initialSizes.length === 0) return;
 
-    // Apply initialSizes to all panes
     initialSizes.forEach((size, idx) => {
       setPaneSize(idx, size);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialSizes, children]);
 
-  // Sync collapsed prop changes from parent
-  // Use collapsePane/expandPane instead of togglePane to properly handle flexGrow
-  // IMPORTANT: Only run when `collapsed` prop changes, NOT when internal panes change
-  // This prevents the sync effect from undoing internal collapse/expand actions
   const collapsedRef = useRef(collapsed);
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Check if collapsed prop actually changed (not just panes state)
     const collapsedChanged = collapsed.some((val, idx) => val !== collapsedRef.current[idx]);
     if (!collapsedChanged && collapsedRef.current.length === collapsed.length) {
-      return; // No change in collapsed prop, skip sync
+      return;
     }
 
-    // Update ref to track current collapsed prop
     collapsedRef.current = collapsed;
 
     collapsed.forEach((isCollapsed, idx) => {
       const pane = panes[idx];
       if (pane && pane.collapsed !== isCollapsed) {
         if (isCollapsed) {
-          // Parent wants this pane collapsed
           collapsePane(idx);
         } else {
-          // Parent wants this pane expanded
           expandPane(idx);
         }
       }
     });
   }, [collapsed, panes, collapsePane, expandPane]);
 
-  // Sync minSizes/maxSizes to data attributes
   useEffect(() => {
     if (!containerRef.current) return;
 
@@ -385,21 +329,14 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     });
   }, [minSizes, maxSizes, panes]);
 
-  // Note: Mode changes are handled by containerStyles recalculation (React re-render)
-  // Note: Children changes are handled by usePaneManager hook
-
-  // Phase 5: Sync disable/visible/lineBar prop changes to handlebars
-  // Uses the same helper functions as renderContent for consistency (1-based indexing)
   useEffect(() => {
     if (!containerRef.current) return;
 
     const handlebars = containerRef.current.querySelectorAll('.a-split-handlebar');
     handlebars.forEach((handlebar, idx) => {
       const element = handlebar as HTMLElement;
-      // Handlebar index is 1-based (matches renderContent)
       const handlebarIndex = idx + 1;
 
-      // Sync disable state using helper function (same as renderContent)
       const isDisabled = isHandlebarDisabled(handlebarIndex, disable);
       if (isDisabled) {
         element.classList.add('a-split-handlebar-disabled');
@@ -409,11 +346,9 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         element.style.cursor = mode === 'horizontal' ? 'col-resize' : 'row-resize';
       }
 
-      // Sync visible state using helper function (same as renderContent)
       const isVisible = isHandlebarVisible(handlebarIndex, visible);
       element.style.display = isVisible ? '' : 'none';
 
-      // Sync lineBar style using helper function (same as renderContent)
       const isLinebar = isLineBarStyle(handlebarIndex, lineBar);
       if (isLinebar) {
         element.classList.add('a-split-handlebar-line');
@@ -423,45 +358,27 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     });
   }, [disable, visible, lineBar, mode]);
 
-  // Drag handler hook
   const { handleMouseDown } = useDragHandler(containerRef, mode, {
     onDragStart: (event) => {
-      // Update drag state
       setDragState({ active: true, paneIndex: event.paneIndex });
-
-      // Notify plugins
       pluginManagerRef.current?.onDragStart(event);
-
-      // Notify parent
       const pane = panes[event.paneIndex];
       if (pane) {
         onLayoutChange?.(event.paneIndex, pane.id, 'dragging', null);
       }
     },
     onDragMove: (event) => {
-      // Notify plugins (they can prevent default behavior)
       const shouldContinue = pluginManagerRef.current?.onDragMove(event) ?? true;
-
       if (shouldContinue) {
-        // Call legacy callback
         onDragging?.(event.prevSize, event.nextSize, event.paneIndex);
       }
     },
     onDragEnd: (event) => {
-      // Update React state to match DOM
       setPaneSize(event.paneIndex - 1, `${event.prevSize}%`);
       setPaneSize(event.paneIndex, `${event.nextSize}%`);
-
-      // Clear drag state
       setDragState(null);
-
-      // Notify plugins
       pluginManagerRef.current?.onDragEnd(event);
-
-      // Call legacy callback
       onDragEnd?.(event.prevSize, event.nextSize, event.paneIndex);
-
-      // Notify parent
       const pane = panes[event.paneIndex];
       if (pane) {
         onLayoutChange?.(event.paneIndex, pane.id, 'dragged', null);
@@ -469,17 +386,13 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     },
   });
 
-  // Phase 5: Collapse/Expand handlers for custom handlebars
   const handleCollapse = useCallback(
     (handlebarIndex: number, direction: 'left' | 'right') => {
       const paneIndexToCollapse =
         direction === 'left' ? handlebarIndex - 1 : handlebarIndex;
 
       if (paneIndexToCollapse >= 0 && paneIndexToCollapse < panes.length) {
-        // Pass direction to collapsePane so it knows which adjacent pane should grow
         collapsePane(paneIndexToCollapse, { direction });
-
-        // Notify parent
         const pane = panes[paneIndexToCollapse];
         if (pane) {
           onLayoutChange?.(paneIndexToCollapse, pane.id, 'close', direction);
@@ -495,10 +408,7 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         direction === 'left' ? handlebarIndex - 1 : handlebarIndex;
 
       if (paneIndexToExpand >= 0 && paneIndexToExpand < panes.length) {
-        // Pass direction to expandPane so it knows which adjacent pane to adjust
         expandPane(paneIndexToExpand, { direction });
-
-        // Notify parent
         const pane = panes[paneIndexToExpand];
         if (pane) {
           onLayoutChange?.(paneIndexToExpand, pane.id, 'open', direction);
@@ -508,17 +418,14 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     [panes, expandPane, onLayoutChange]
   );
 
-  // Expose imperative API (Phase 4 Enhanced)
   useImperativeHandle(
     ref,
     () => ({
-      // Basic operations
       addPane,
       removePane,
       togglePane,
       setPaneSize,
       getPaneState,
-      // Phase 4: Advanced operations
       removePanes,
       swapPanes,
       collapsePane,
@@ -573,7 +480,6 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     ]
   );
 
-  // Calculate container styles
   const containerStyles = useMemo(() => {
     const baseStyles: React.CSSProperties = {
       display: 'flex',
@@ -586,35 +492,29 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     return baseStyles;
   }, [mode, width, height, style]);
 
-  // Calculate container class
   const containerClass = useMemo(() => {
     const classes = ['a-split-container'];
     if (mode === 'vertical') classes.push('a-split-vertical');
-    // Phase 5: Apply fixClass manually or automatically for deep nesting
     if (fixClass || autoFixClass) classes.push('a-split-fix');
     
-    // Check if dragging is active (from local state or direct check)
     if (dragState?.active) {
       classes.push('a-split-dragging');
     }
     
     if (className) classes.push(className);
     return classes.join(' ');
-  }, [mode, fixClass, autoFixClass, className, dragState?.active]); // Add dragState dependency
+  }, [mode, fixClass, autoFixClass, className, dragState?.active]);
 
-  // Render panes and handlebars
   const renderContent = () => {
     const elements: JSX.Element[] = [];
 
     panes.forEach((pane, index) => {
-      // Phase 5: Wrap pane content with NestingProvider to increment level for nested Splits
       const wrappedContent = (
         <NestingProvider level={nestingLevel + 1}>
           {pane.content}
         </NestingProvider>
       );
 
-      // Render pane using Pane component
       elements.push(
         <Pane
           key={pane.id}
@@ -629,28 +529,22 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         />
       );
 
-      // Render handlebar (except after last pane)
       if (index < panes.length - 1) {
         const handlebarIndex = index + 1;
         const nextPane = panes[index + 1];
-        if (!nextPane) return; // Skip if next pane doesn't exist
+        if (!nextPane) return; 
 
-        // Check if handlebar should be shown
         const showHandlebar = shouldShowHandlebar(pane, nextPane);
         const isVisible = isHandlebarVisible(handlebarIndex, visible);
         const isLinebar = isLineBarStyle(handlebarIndex, lineBar);
 
-        // Collapsed states for left/top and right/bottom panes
         const leftPaneCollapsed = pane.collapsed || false;
         const rightPaneCollapsed = nextPane.collapsed || false;
 
-        // Check if explicitly disabled via disable prop (separate from collapse-based disable)
         const explicitlyDisabled = isHandlebarDisabled(handlebarIndex, disable);
-        // Disable dragging if either pane is collapsed OR if explicitly disabled
         const isDisabled = explicitlyDisabled || leftPaneCollapsed || rightPaneCollapsed;
 
         if (isVisible && showHandlebar) {
-          // Check if plugin provides custom handle
           const customHandle = pluginManagerRef.current?.renderHandle({
             index: handlebarIndex,
             mode,
@@ -661,14 +555,12 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
           });
 
           if (customHandle) {
-            // Use plugin's custom handle
             elements.push(
               <React.Fragment key={`handlebar-${handlebarIndex}`}>
                 {customHandle}
               </React.Fragment>
             );
           } else {
-            // Render default handlebar using DragHandle component
             elements.push(
               <DragHandle
                 key={`handlebar-${handlebarIndex}`}

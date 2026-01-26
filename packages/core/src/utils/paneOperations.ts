@@ -1,23 +1,10 @@
-/**
- * Pane Operation Utilities
- *
- * These functions handle pane-level operations:
- * - Open/close/toggle operations
- * - State management helpers
- * - DOM manipulation utilities
- * - Animation helpers
- *
- * Refactored from v5 SplitUtils for better testability and composition
- */
-
 import { Pane, AnimationOptions } from '../types';
 
 /**
- * Apply collapse state to a pane element
- * Uses direct DOM manipulation for immediate visual feedback
- *
- * @param element - Pane DOM element
- * @param collapsed - Target collapsed state
+ * Applies collapse state styles directly to a pane element.
+ * 
+ * @param element - The pane HTMLElement
+ * @param collapsed - Whether the pane should be hidden
  */
 export function applyCollapseState(element: HTMLElement, collapsed: boolean): void {
   if (collapsed) {
@@ -29,17 +16,15 @@ export function applyCollapseState(element: HTMLElement, collapsed: boolean): vo
     element.classList.remove('a-split-hidden');
     element.style.flexGrow = '';
     element.style.flexShrink = '';
-    // Note: flexBasis restored by pane manager based on saved size
   }
 }
 
 /**
- * Animate pane size change
- *
- * @param element - Pane DOM element
- * @param targetSize - Target size (e.g., "50%", "200px")
+ * Animates a pane's size change using CSS transitions.
+ * 
+ * @param element - The pane HTMLElement
+ * @param targetSize - The target size string (e.g., "50%")
  * @param options - Animation configuration
- * @returns Promise that resolves when animation completes
  */
 export function animatePaneSize(
   element: HTMLElement,
@@ -55,16 +40,10 @@ export function animatePaneSize(
       return;
     }
 
-    // Apply transition
     element.style.transition = `flex-basis ${duration}ms ease`;
-
-    // Trigger reflow to ensure transition applies
-    element.offsetHeight;
-
-    // Set target size
+    element.offsetHeight; // force reflow
     element.style.flexBasis = targetSize;
 
-    // Clean up after animation
     setTimeout(() => {
       element.style.transition = '';
       resolve();
@@ -73,10 +52,7 @@ export function animatePaneSize(
 }
 
 /**
- * Toggle pane collapse state
- *
- * @param pane - Pane to toggle
- * @returns New pane with toggled state
+ * Returns a new pane object with the collapsed state toggled.
  */
 export function togglePaneCollapse(pane: Pane): Pane {
   return {
@@ -86,65 +62,42 @@ export function togglePaneCollapse(pane: Pane): Pane {
 }
 
 /**
- * Find pane index by ID
- *
- * @param panes - Array of panes
- * @param id - Pane ID to find
- * @returns Index or -1 if not found
+ * Finds the index of a pane within an array by its ID.
  */
 export function findPaneIndex(panes: Pane[], id: string): number {
   return panes.findIndex((pane) => pane.id === id);
 }
 
 /**
- * Check if a pane is visible (not collapsed)
- *
- * @param pane - Pane to check
- * @returns True if visible
+ * Returns true if the pane is currently expanded.
  */
 export function isPaneVisible(pane: Pane): boolean {
   return !pane.collapsed;
 }
 
 /**
- * Get all visible panes
- *
- * @param panes - Array of panes
- * @returns Filtered array of visible panes
+ * Returns an array containing only the visible panes.
  */
 export function getVisiblePanes(panes: Pane[]): Pane[] {
   return panes.filter(isPaneVisible);
 }
 
 /**
- * Get pane element by ID
- *
- * @param id - Pane ID
- * @returns HTML element or null
+ * Retrieves a pane element from the DOM using its data attribute.
  */
 export function getPaneElement(id: string): HTMLElement | null {
   return document.querySelector(`[data-pane-id="${id}"]`);
 }
 
 /**
- * Apply size constraints to a value
- *
- * @param value - Size value to constrain
- * @param minSize - Minimum allowed size
- * @param maxSize - Maximum allowed size
- * @returns Constrained value
+ * Clamps a numeric size value between min and max bounds.
  */
 export function constrainSize(value: number, minSize: number, maxSize: number): number {
   return Math.max(minSize, Math.min(maxSize, value));
 }
 
 /**
- * Create a new pane with default values
- *
- * @param id - Pane ID
- * @param size - Initial size
- * @param content - React content
- * @returns New pane object
+ * Factory function to create a new pane object with default values.
  */
 export function createPane(
   id: string,
@@ -163,11 +116,7 @@ export function createPane(
 }
 
 /**
- * Update pane size
- *
- * @param pane - Pane to update
- * @param newSize - New size value
- * @returns Updated pane
+ * Returns a new pane object with an updated size.
  */
 export function updatePaneSize(pane: Pane, newSize: string): Pane {
   return {
@@ -177,11 +126,7 @@ export function updatePaneSize(pane: Pane, newSize: string): Pane {
 }
 
 /**
- * Batch update multiple panes
- *
- * @param panes - Array of panes
- * @param updates - Map of pane ID to updates
- * @returns Updated panes array
+ * Applies multiple updates to an array of panes based on their IDs.
  */
 export function batchUpdatePanes(
   panes: Pane[],
@@ -194,11 +139,7 @@ export function batchUpdatePanes(
 }
 
 /**
- * Restore pane from saved state
- *
- * @param pane - Current pane
- * @param savedState - Saved state from localStorage
- * @returns Pane with restored state
+ * Restores a pane's state from a saved persistence object.
  */
 export function restorePaneState(
   pane: Pane,
@@ -212,10 +153,7 @@ export function restorePaneState(
 }
 
 /**
- * Serialize pane state for persistence
- *
- * @param pane - Pane to serialize
- * @returns Serializable state object
+ * serializes a pane's state into a persistence-friendly object.
  */
 export function serializePaneState(pane: Pane): {
   id: string;
@@ -230,25 +168,14 @@ export function serializePaneState(pane: Pane): {
 }
 
 /**
- * Check if handlebar should be shown between panes
- *
- * @param prevPane - Previous pane
- * @param nextPane - Next pane
- * @returns True if handlebar should be visible
+ * Determines if a handlebar should be rendered between two panes.
  */
 export function shouldShowHandlebar(_prevPane: Pane, _nextPane: Pane): boolean {
-  // Always show handlebar - even when panes are collapsed
-  // The handlebar needs to remain visible so users can expand collapsed panes
-  // Drag functionality is disabled when panes are collapsed, but buttons still work
   return true;
 }
 
 /**
- * Calculate handlebar disable state
- *
- * @param index - Handlebar index (1-based)
- * @param disable - Disable configuration (boolean, array of booleans, or array of indices)
- * @returns True if this handlebar should be disabled
+ * Calculates whether a specific handlebar should be interaction-disabled.
  */
 export function isHandlebarDisabled(
   index: number,
@@ -258,24 +185,16 @@ export function isHandlebarDisabled(
     return disable;
   }
   if (Array.isArray(disable)) {
-    // Check if it's an array of booleans or array of indices
     if (disable.length > 0 && typeof disable[0] === 'boolean') {
-      // Array of booleans: disable[i] indicates if handlebar at index (i+1) is disabled
-      // Handlebar indices are 1-based, so disable[0] corresponds to handlebar 1
       return disable[index - 1] === true;
     }
-    // Array of indices: check if index is in the array
     return (disable as number[]).includes(index);
   }
   return false;
 }
 
 /**
- * Calculate handlebar visibility
- *
- * @param index - Handlebar index (1-based)
- * @param visible - Visibility configuration (boolean, array of booleans, or array of indices)
- * @returns True if this handlebar should be visible
+ * Calculates whether a specific handlebar should be visible in the DOM.
  */
 export function isHandlebarVisible(
   index: number,
@@ -285,23 +204,16 @@ export function isHandlebarVisible(
     return visible;
   }
   if (Array.isArray(visible)) {
-    // Check if it's an array of booleans or array of indices
     if (visible.length > 0 && typeof visible[0] === 'boolean') {
-      // Array of booleans: visible[i] indicates if handlebar at index (i+1) is visible
-      return visible[index - 1] !== false; // Default to visible if undefined
+      return visible[index - 1] !== false;
     }
-    // Array of indices: check if index is in the array
     return (visible as number[]).includes(index);
   }
-  return true; // Default to visible
+  return true;
 }
 
 /**
- * Check if handlebar should use line bar style
- *
- * @param index - Handlebar index (1-based)
- * @param lineBar - Line bar configuration (boolean, array of booleans, or array of indices)
- * @returns True if this handlebar should use line bar style
+ * Calculates whether a handlebar should use the simplified line style.
  */
 export function isLineBarStyle(
   index: number,
@@ -311,12 +223,9 @@ export function isLineBarStyle(
     return lineBar;
   }
   if (Array.isArray(lineBar)) {
-    // Check if it's an array of booleans or array of indices
     if (lineBar.length > 0 && typeof lineBar[0] === 'boolean') {
-      // Array of booleans: lineBar[i] indicates if handlebar at index (i+1) uses line bar style
       return lineBar[index - 1] === true;
     }
-    // Array of indices: check if index is in the array
     return (lineBar as number[]).includes(index);
   }
   return false;

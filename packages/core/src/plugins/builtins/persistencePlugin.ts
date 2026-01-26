@@ -2,34 +2,29 @@ import { createPlugin } from '../createPlugin';
 import { SplitState } from '../../types';
 
 /**
- * Storage type for persistence
+ * Storage backend type for persistence.
  */
 export type StorageType = 'localStorage' | 'sessionStorage';
 
 /**
- * Options for persistence plugin
+ * Options for the persistence plugin.
  */
 export interface PersistencePluginOptions {
-  /** Storage type to use */
+  /** Which storage backend to use */
   storage?: StorageType;
-  /** Custom storage key */
+  /** Custom key used for storage serialization */
   key?: string;
-  /** Debounce delay in ms */
+  /** Milliseconds to debounce save operations */
   debounceDelay?: number;
 }
 
 /**
- * Creates a persistence plugin that saves/restores split state
- *
- * @example
- * ```typescript
- * <Split
- *   id="my-split"
- *   plugins={[persistencePlugin()]}
- * >
- *   ...
- * </Split>
- * ```
+ * persistencePlugin
+ * 
+ * Automatically captures and restores the state of split panes across page reloads.
+ * Uses a debounced save mechanism to ensure performance during active resizing.
+ * 
+ * @param options - Plugin configuration options
  */
 export function persistencePlugin(options: PersistencePluginOptions = {}) {
   const {
@@ -100,7 +95,6 @@ export function persistencePlugin(options: PersistencePluginOptions = {}) {
     version: '1.0.0',
 
     onInit(context) {
-      // Try to restore saved state
       const saved = loadState(context.splitId);
       if (saved && saved.panes) {
         context.dispatch({
@@ -111,25 +105,21 @@ export function persistencePlugin(options: PersistencePluginOptions = {}) {
     },
 
     onDragEnd(_event, context) {
-      // Save state after drag
       const state = context.getState();
       debouncedSave(context.splitId, state);
     },
 
     onPaneAdd(_event, context) {
-      // Save state after pane added
       const state = context.getState();
       debouncedSave(context.splitId, state);
     },
 
     onPaneRemove(_event, context) {
-      // Save state after pane removed
       const state = context.getState();
       debouncedSave(context.splitId, state);
     },
 
     onDestroy() {
-      // Clear debounce timer on cleanup
       if (debounceTimer) {
         clearTimeout(debounceTimer);
         debounceTimer = null;
@@ -139,7 +129,10 @@ export function persistencePlugin(options: PersistencePluginOptions = {}) {
 }
 
 /**
- * Clear saved state for a specific split instance
+ * Utility to manually clear the persisted state for a specific split ID.
+ * 
+ * @param splitId - Unique ID of the split instance to clear
+ * @param storage - The storage backend that was used
  */
 export function clearPersistedState(
   splitId: string,

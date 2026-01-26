@@ -3,17 +3,15 @@ import { debounce } from '../utils/native/throttle';
 import { Pane, SplitMode } from '../types';
 
 /**
- * usePersistence - Handles localStorage persistence
- *
- * This hook provides:
- * - Save pane state to localStorage
- * - Load pane state from localStorage
- * - Debounced saves to avoid performance issues
- * - Separate storage keys for horizontal/vertical modes
- *
- * @param enabled - Enable/disable persistence
- * @param storageKey - Base key for localStorage
- * @param mode - Split mode (affects storage key)
+ * usePersistence
+ * 
+ * Manages the serialization and retrieval of pane dimensions to localStorage.
+ * Handles mode-specific keys to ensure horizontal and vertical layouts for the 
+ * same ID remain distinct.
+ * 
+ * @param enabled - Whether auto-persistence is toggled on
+ * @param storageKey - Base identifier for the storage entry
+ * @param mode - Current split orientation
  */
 export function usePersistence(
   enabled: boolean,
@@ -21,8 +19,9 @@ export function usePersistence(
   mode: SplitMode
 ) {
   /**
-   * Save pane state to localStorage
-   * Debounced at 300ms to avoid excessive writes during drag
+   * save
+   * 
+   * Debounced write operation to commit current pane states to localStorage.
    */
   const save = useCallback(
     debounce((panes: Pane[]) => {
@@ -45,7 +44,9 @@ export function usePersistence(
   );
 
   /**
-   * Load pane state from localStorage
+   * load
+   * 
+   * Retrieves and parses the saved layout state from localStorage.
    */
   const load = useCallback((): Array<{
     id: string;
@@ -68,7 +69,9 @@ export function usePersistence(
   }, [enabled, storageKey, mode]);
 
   /**
-   * Clear saved state
+   * clear
+   * 
+   * Formally removes the stored state for this specific instance and mode.
    */
   const clear = useCallback(() => {
     if (!enabled) return;

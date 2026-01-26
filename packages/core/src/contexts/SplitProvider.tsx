@@ -1,20 +1,3 @@
-/**
- * Split Context Provider v6
- *
- * Three-context architecture for granular subscriptions:
- * 1. ConfigContext - Static configuration (rarely changes)
- * 2. StateContext - Dynamic state (panes, sizes, collapsed)
- * 3. ActionsContext - Methods (stable references)
- *
- * This pattern prevents unnecessary re-renders:
- * - Components only subscribe to what they need
- * - Actions don't cause re-renders (stable references)
- * - Config changes are rare, isolated updates
- *
- * Optional: This provider is NOT required for basic usage.
- * Use it when you need to access split state/actions from child components.
- */
-
 import {
   createContext,
   useContext,
@@ -24,38 +7,57 @@ import {
 } from 'react';
 import { Pane, SplitMode, AddPaneConfig, AnimationOptions } from '../types';
 
-// ==================== Types ====================
-
+/**
+ * SplitConfig
+ */
 export interface SplitConfig {
+  /** Unique identifier for the split instance */
   id: string;
+  /** Current layout orientation */
   mode: SplitMode;
+  /** Whether session persistence is active */
   enableSessionStorage: boolean;
+  /** Key used for localStorage persistence */
   storageKey: string;
 }
 
+/**
+ * SplitState
+ */
 export interface SplitState {
+  /** Current list of pane configurations */
   panes: Pane[];
+  /** Whether a drag operation is currently active */
   isDragging: boolean;
+  /** Index of the handlebar currently being dragged */
   activeHandlebar: number | null;
 }
 
+/**
+ * SplitActions
+ */
 export interface SplitActions {
+  /** Programmatically add a new pane */
   addPane: (config: AddPaneConfig) => void;
+  /** Programmatically remove a pane by index */
   removePane: (index: number) => void;
+  /** Toggle the collapse state of a pane */
   togglePane: (index: number) => void;
+  /** Explicitly set the size of a pane */
   setPaneSize: (index: number, size: string, options?: AnimationOptions) => void;
+  /** Retrieve the current reactive pane state */
   getPaneState: () => Pane[];
+  /** Internal action to update drag state */
   setDragging: (dragging: boolean, handlebar?: number) => void;
 }
-
-// ==================== Contexts ====================
 
 const ConfigContext = createContext<SplitConfig | null>(null);
 const StateContext = createContext<SplitState | null>(null);
 const ActionsContext = createContext<SplitActions | null>(null);
 
-// ==================== Provider ====================
-
+/**
+ * SplitProviderProps
+ */
 export interface SplitProviderProps {
   id: string;
   mode?: SplitMode;
@@ -63,37 +65,28 @@ export interface SplitProviderProps {
   storageKey?: string;
   children: ReactNode;
 
-  // Internal: Injected by Split component
+  // Internal props injected by the Split component
+  /** @internal */
   _panes?: Pane[];
+  /** @internal */
   _addPane?: (config: AddPaneConfig) => void;
+  /** @internal */
   _removePane?: (index: number) => void;
+  /** @internal */
   _togglePane?: (index: number) => void;
+  /** @internal */
   _setPaneSize?: (index: number, size: string, options?: AnimationOptions) => void;
+  /** @internal */
   _getPaneState?: () => Pane[];
 }
 
 /**
  * SplitProvider
- *
- * Optional context provider for accessing split state/actions from child components.
- *
- * @example
- * ```tsx
- * // Wrap your Split component
- * <SplitProvider id="my-split" mode="horizontal">
- *   <Split>
- *     <ChildThatNeedsSplitAccess />
- *     <AnotherChild />
- *   </Split>
- * </SplitProvider>
- *
- * // Access from children
- * function ChildThatNeedsSplitAccess() {
- *   const { panes } = useSplitState();
- *   const { togglePane } = useSplitActions();
- *   // ...
- * }
- * ```
+ * 
+ * An optional context provider that exposes split state and actions to nested components.
+ * Useful for building custom toolbars or complex layouts that need to interact with the splitter.
+ * 
+ * @param props - Provider configuration
  */
 export function SplitProvider({
   id,
@@ -108,10 +101,8 @@ export function SplitProvider({
   _setPaneSize,
   _getPaneState,
 }: SplitProviderProps) {
-  // Track drag state
   const dragStateRef = useRef({ isDragging: false, activeHandlebar: null as number | null });
 
-  // Config (stable, rarely changes)
   const config = useMemo<SplitConfig>(
     () => ({
       id,
@@ -122,7 +113,6 @@ export function SplitProvider({
     [id, mode, enableSessionStorage, storageKey]
   );
 
-  // State (dynamic, changes frequently)
   const state = useMemo<SplitState>(
     () => ({
       panes: _panes,
@@ -132,7 +122,6 @@ export function SplitProvider({
     [_panes, dragStateRef.current.isDragging, dragStateRef.current.activeHandlebar]
   );
 
-  // Actions (stable references)
   const actions = useMemo<SplitActions>(
     () => ({
       addPane: _addPane || (() => console.warn('addPane not available')),
@@ -159,11 +148,10 @@ export function SplitProvider({
   );
 }
 
-// ==================== Hooks ====================
-
 /**
- * Access split configuration
- * This rarely changes, so components subscribing to this won't re-render often
+ * useSplitConfig
+ * 
+ * Hook to retrieve the static configuration of the current Split instance.
  */
 export function useSplitConfig(): SplitConfig {
   const context = useContext(ConfigContext);
@@ -174,8 +162,9 @@ export function useSplitConfig(): SplitConfig {
 }
 
 /**
- * Access split state
- * Subscribe to this for reactive updates to panes, drag state, etc.
+ * useSplitState
+ * 
+ * Hook to subscribe to the reactive state (panes, drag status) of the Split instance.
  */
 export function useSplitState(): SplitState {
   const context = useContext(StateContext);
@@ -186,20 +175,20 @@ export function useSplitState(): SplitState {
 }
 
 /**
- * Access split actions
- * These are stable references, so subscribing won't cause re-renders
+ * useSplitActions
+ * 
+ * Hook to access methods for controlling the Split instance.
+ * These methods are stable and do not trigger re-renders.
  */
 export function useSplitActions(): SplitActions | null {
   const context = useContext(ActionsContext);
-  // Return null instead of throwing - Split component can work without provider
   return context;
 }
 
 /**
- * Access full split context (convenience hook)
- * Use specific hooks above for better performance
- *
- * Note: This hook requires SplitProvider. Use individual hooks if you need optional context support.
+ * useSplit
+ * 
+ * Convenience hook that returns the full split context (config, state, and actions).
  */
 export function useSplit(): {
   config: SplitConfig;
@@ -217,11 +206,10 @@ export function useSplit(): {
   };
 }
 
-// ==================== Selector Hooks (for fine-grained subscriptions) ====================
-
 /**
- * Subscribe to a specific pane
- * Only re-renders when this pane changes
+ * usePane
+ * 
+ * Fine-grained hook to subscribe to state updates for a specific pane.
  */
 export function usePane(index: number): Pane | undefined {
   const { panes } = useSplitState();
@@ -229,8 +217,9 @@ export function usePane(index: number): Pane | undefined {
 }
 
 /**
- * Subscribe to pane count
- * Only re-renders when pane count changes (not on size/collapse changes)
+ * usePaneCount
+ * 
+ * Hook to retrieve and subscribe to the total number of panes.
  */
 export function usePaneCount(): number {
   const { panes } = useSplitState();
@@ -238,7 +227,9 @@ export function usePaneCount(): number {
 }
 
 /**
- * Subscribe to drag state only
+ * useIsDragging
+ * 
+ * Hook to subscribe specifically to the active dragging status.
  */
 export function useIsDragging(): boolean {
   const { isDragging } = useSplitState();
@@ -246,7 +237,9 @@ export function useIsDragging(): boolean {
 }
 
 /**
- * Check if a specific pane is collapsed
+ * useIsCollapsed
+ * 
+ * Hook to check and subscribe to the collapsed state of a specific pane.
  */
 export function useIsCollapsed(index: number): boolean {
   const pane = usePane(index);
@@ -254,7 +247,9 @@ export function useIsCollapsed(index: number): boolean {
 }
 
 /**
- * Get visible panes only
+ * useVisiblePanes
+ * 
+ * Hook to retrieve and subscribe to only the currently expanded panes.
  */
 export function useVisiblePanes(): Pane[] {
   const { panes } = useSplitState();

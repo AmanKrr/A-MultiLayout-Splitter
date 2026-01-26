@@ -1,29 +1,14 @@
-/**
- * Pane Component
- *
- * Individual pane component that encapsulates rendering logic.
- * Handles flex calculations and collapse state.
- */
-
 import React from 'react';
 import { PaneProps, Pane as PaneType } from '../types';
 import { calculateFlexBasis, calculateFlexValues } from '../utils/layoutCalculations';
 
 /**
- * Pane - Individual split pane with content
- *
- * @example
- * ```tsx
- * <Pane
- *   id="pane-0"
- *   size="50%"
- *   collapsed={false}
- *   minSize={10}
- *   maxSize={90}
- *   mode="horizontal"
- *   content={<div>Content</div>}
- * />
- * ```
+ * Pane
+ * 
+ * Individual split pane component.
+ * Responsible for rendering individual pane content and applying flex styles.
+ * 
+ * @param props - Component properties
  */
 export const Pane: React.FC<PaneProps> = ({
   id,
@@ -31,30 +16,25 @@ export const Pane: React.FC<PaneProps> = ({
   collapsed,
   minSize,
   maxSize,
-  // mode is not used in rendering but kept in props for future use
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   mode: _mode,
   content,
   flexGrow: flexGrowProp,
 }) => {
-  // Ensure size is never undefined
   const size = sizeProp || '100%';
 
-  // Calculate default flex values
   const paneConfig: PaneType = {
     id,
     size,
     collapsed,
     minSize,
     maxSize,
-    content, // Include content to satisfy the Pane type
+    content,
   };
   const { flexGrow: defaultFlexGrow, flexShrink } = calculateFlexValues(paneConfig, collapsed);
 
-  // Use prop flexGrow if provided, otherwise use calculated default
   const flexGrow = flexGrowProp !== undefined ? flexGrowProp : defaultFlexGrow;
 
-  // When collapsed, flexBasis should be 0, otherwise use the calculated size
   const flexBasis = collapsed ? '0' : calculateFlexBasis(size, 0);
 
   return (

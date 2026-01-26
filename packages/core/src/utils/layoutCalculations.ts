@@ -1,23 +1,11 @@
-/**
- * Layout Calculation Utilities
- *
- * These functions handle layout-related calculations:
- * - Container size validation
- * - Pane positioning
- * - Flex-based layout calculations
- * - Constraint validation
- *
- * Refactored from v5 SplitUtils for better testability
- */
-
 import { Pane, SplitMode } from '../types';
 import { parseSize } from './sizeConversion';
 
 /**
- * Calculate total size of all panes
- *
- * @param panes - Array of panes
- * @returns Total size in the unit of the first pane (or 0 if empty)
+ * Calculates the total size of an array of panes.
+ * 
+ * @param panes - Array of pane configurations
+ * @returns Total size and the unit of the first pane
  */
 export function calculateTotalSize(panes: Pane[]): { total: number; unit: string } {
   if (panes.length === 0) return { total: 0, unit: 'px' };
@@ -36,7 +24,7 @@ export function calculateTotalSize(panes: Pane[]): { total: number; unit: string
       console.warn(
         `Mixed units detected: ${firstParsed.unit} and ${parsed.unit}. Results may be inaccurate.`
       );
-      total += parsed.value; // Still add, but warn
+      total += parsed.value;
     }
   }
 
@@ -44,11 +32,11 @@ export function calculateTotalSize(panes: Pane[]): { total: number; unit: string
 }
 
 /**
- * Validate that pane sizes don't exceed container constraints
- *
+ * Validates pane size configurations against container constraints.
+ * 
  * @param panes - Array of panes
- * @param _containerSize - Container size in pixels (reserved for future use)
- * @returns Validation result with any errors
+ * @param _containerSize - Container size in pixels
+ * @returns Object indicating validity and a list of errors
  */
 export function validatePaneSizes(
   panes: Pane[],
@@ -56,13 +44,11 @@ export function validatePaneSizes(
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
 
-  // Check for empty panes
   if (panes.length === 0) {
     errors.push('No panes defined');
     return { valid: false, errors };
   }
 
-  // Calculate total percentage
   const percentagePanes = panes.filter((p) => p.size.includes('%'));
   if (percentagePanes.length > 0) {
     const totalPercent = percentagePanes.reduce((sum, pane) => {
@@ -70,12 +56,10 @@ export function validatePaneSizes(
     }, 0);
 
     if (totalPercent > 100.1) {
-      // Allow small floating point errors
       errors.push(`Total percentage (${totalPercent}%) exceeds 100%`);
     }
   }
 
-  // Validate min/max constraints
   panes.forEach((pane, index) => {
     if (pane.minSize < 0) {
       errors.push(`Pane ${index}: minSize cannot be negative`);
@@ -92,38 +76,36 @@ export function validatePaneSizes(
 }
 
 /**
- * Calculate flex-basis value for a pane
- *
- * @param size - Size string (e.g., "50%", "200px", "1fr")
- * @param _containerSize - Container size in pixels (reserved for future use)
- * @returns Flex basis value with unit
+ * Calculates the appropriate flex-basis value for CSS layout.
+ * 
+ * @param size - Original size string
+ * @param _containerSize - Container dimension in pixels
+ * @returns Formatted CSS flex-basis value
  */
 export function calculateFlexBasis(size: string, _containerSize: number): string {
   const parsed = parseSize(size);
 
   switch (parsed.unit) {
     case '%':
-      return size; // Use as-is for percentages
+      return size;
     case 'px':
-      return size; // Use as-is for pixels
+      return size;
     case 'vw':
       return `${(parsed.value / 100) * window.innerWidth}px`;
     case 'vh':
       return `${(parsed.value / 100) * window.innerHeight}px`;
     case 'fr':
-      // For fr units, use 0 as flex-basis and let flexGrow handle the sizing
       return '0';
     default:
-      return `${parsed.value}px`; // Fallback to pixels
+      return `${parsed.value}px`;
   }
 }
 
 /**
- * Determine flex grow/shrink values for a pane
- *
+ * Determines CSS flex-grow and flex-shrink values based on pane state.
+ * 
  * @param pane - Pane configuration
- * @param isCollapsed - Whether pane is collapsed
- * @returns Object with flexGrow and flexShrink values
+ * @param isCollapsed - Whether the pane is currently hidden
  */
 export function calculateFlexValues(
   pane: Pane,
@@ -135,27 +117,23 @@ export function calculateFlexValues(
 
   const parsed = parseSize(pane.size);
 
-  // Percentage-based panes can grow/shrink
   if (parsed.unit === '%') {
     return { flexGrow: 1, flexShrink: 1 };
   }
 
-  // fr units should grow based on their fr value (e.g., 1fr = flexGrow: 1, 2fr = flexGrow: 2)
   if (parsed.unit === 'fr') {
     return { flexGrow: parsed.value, flexShrink: 1 };
   }
 
-  // Fixed-size panes don't grow/shrink
   return { flexGrow: 0, flexShrink: 0 };
 }
 
 /**
- * Calculate handlebar position between two panes
- *
- * @param prevPaneSize - Size of previous pane
- * @param containerSize - Total container size
- * @param _mode - Split orientation (reserved for future use)
- * @returns Position in pixels
+ * Calculates the pixel position for a handlebar relative to its container.
+ * 
+ * @param prevPaneSize - Size of the pane preceding the handlebar
+ * @param containerSize - Total dimension of the container
+ * @param _mode - Layout orientation
  */
 export function calculateHandlebarPosition(
   prevPaneSize: string,
@@ -180,21 +158,20 @@ export function calculateHandlebarPosition(
     return (parsed.value / 100) * window.innerHeight;
   }
 
-  return parsed.value; // Fallback
+  return parsed.value;
 }
 
 /**
- * Handlebar total size (1px line + 5px margin on each side)
+ * Default size of the resize handlebar in pixels.
  */
 export const HANDLEBAR_SIZE = 11;
 
 /**
- * Calculate container dimensions based on mode
- *
- * @param element - Container element
- * @param mode - Split orientation
- * @param handlebarCount - Number of handlebars (optional, for accurate pane space calculation)
- * @returns Object with width and height
+ * Calculates the operational dimensions of the split container.
+ * 
+ * @param element - Container DOM element
+ * @param mode - Layout orientation
+ * @param handlebarCount - Number of resize bars
  */
 export function getContainerDimensions(
   element: HTMLElement,
@@ -205,7 +182,6 @@ export function getContainerDimensions(
   const height = element.offsetHeight;
   const primary = mode === 'horizontal' ? width : height;
 
-  // Calculate space available for panes (subtract handlebar space)
   const handlebarSpace = handlebarCount * HANDLEBAR_SIZE;
   const availableForPanes = primary - handlebarSpace;
 
@@ -213,29 +189,23 @@ export function getContainerDimensions(
 }
 
 /**
- * Adjust pane sizes to fit container exactly
- * Useful when total doesn't equal 100% due to rounding
- *
- * @param panes - Array of panes
- * @returns Adjusted panes with sizes that sum to 100%
+ * Normalizes pane percentages so they sum exactly to 100%.
  */
 export function normalizePaneSizes(panes: Pane[]): Pane[] {
   const percentagePanes = panes.filter((p) => p.size.includes('%'));
 
   if (percentagePanes.length === 0) {
-    return panes; // No percentage panes to normalize
+    return panes;
   }
 
   const totalPercent = percentagePanes.reduce((sum, pane) => {
     return sum + parseFloat(pane.size);
   }, 0);
 
-  // If already close to 100%, no adjustment needed
   if (Math.abs(totalPercent - 100) < 0.01) {
     return panes;
   }
 
-  // Calculate adjustment factor
   const adjustmentFactor = 100 / totalPercent;
 
   return panes.map((pane) => {
@@ -252,12 +222,7 @@ export function normalizePaneSizes(panes: Pane[]): Pane[] {
 }
 
 /**
- * Check if a pane can be resized
- *
- * @param pane - Pane to check
- * @param currentSize - Current size percentage
- * @param delta - Change amount (positive or negative)
- * @returns True if resize is allowed
+ * Checks if a pane resize operation stays within its min/max limits.
  */
 export function canResize(pane: Pane, currentSize: number, delta: number): boolean {
   const newSize = currentSize + delta;
@@ -269,20 +234,14 @@ export function canResize(pane: Pane, currentSize: number, delta: number): boole
 }
 
 /**
- * Get the axis property name for a given mode
- *
- * @param mode - Split orientation
- * @returns 'width' for horizontal, 'height' for vertical
+ * Retrieves the dimension property ('width' or 'height') associated with an orientation.
  */
 export function getAxisProperty(mode: SplitMode): 'width' | 'height' {
   return mode === 'horizontal' ? 'width' : 'height';
 }
 
 /**
- * Get the coordinate property for a given mode
- *
- * @param mode - Split orientation
- * @returns 'clientX' for horizontal, 'clientY' for vertical
+ * Retrieves the coordinate property ('clientX' or 'clientY') associated with an orientation.
  */
 export function getCoordinateProperty(mode: SplitMode): 'clientX' | 'clientY' {
   return mode === 'horizontal' ? 'clientX' : 'clientY';

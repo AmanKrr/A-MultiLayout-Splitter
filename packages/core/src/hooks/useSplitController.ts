@@ -1,41 +1,3 @@
-/**
- * useSplitController Hook (Phase 4)
- *
- * Provides a hook-based API for complete control over split pane state.
- * This is the most flexible API for advanced use cases where you need
- * full control over pane state outside of the Split component.
- *
- * @example
- * ```tsx
- * function App() {
- *   const {
- *     panes,
- *     addPane,
- *     removePane,
- *     togglePane,
- *     setPaneSize,
- *   } = useSplitController({
- *     mode: 'horizontal',
- *     initialPanes: [
- *       { id: '1', size: '50%', content: <div>Pane 1</div> },
- *       { id: '2', size: '50%', content: <div>Pane 2</div> },
- *     ],
- *   });
- *
- *   return (
- *     <>
- *       <Toolbar onAddPane={() => addPane({ size: '200px', content: <div>New</div> })} />
- *       <Split panes={panes} mode="horizontal">
- *         {panes.map(pane => (
- *           <PaneComponent key={pane.id} {...pane} />
- *         ))}
- *       </Split>
- *     </>
- *   );
- * }
- * ```
- */
-
 import { useState, useCallback, useMemo, useRef } from 'react';
 import {
   Pane,
@@ -48,7 +10,13 @@ import {
 } from '../types';
 
 /**
- * Hook for controlling split pane state
+ * useSplitController
+ * 
+ * Provides a React-friendly hook to manage the state of a Split layout externally.
+ * Ideal for building custom UIs where panes need to be synchronized or manipulated 
+ * from outside the actual Split component boundary.
+ * 
+ * @param options - Configuration for initializing the controller
  */
 export function useSplitController(
   options: UseSplitControllerOptions = {}
@@ -62,13 +30,11 @@ export function useSplitController(
     onPaneChange,
   } = options;
 
-  // Initialize panes from options
   const [panes, setPanesInternal] = useState<Pane[]>(() => {
     if (initialPanes.length > 0) {
       return initialPanes;
     }
 
-    // Create default panes from initialSizes
     return initialSizes.map((size, idx) => ({
       id: `pane-${idx}`,
       size,
@@ -79,19 +45,14 @@ export function useSplitController(
     }));
   });
 
-  // Track drag state
   const [isDragging] = useState(false);
-
-  // Internal ref to track if we're in a batch update
   const isBatchUpdateRef = useRef(false);
 
-  // Wrapper for setPanes that calls onPaneChange
   const setPanes = useCallback(
     (newPanes: Pane[] | ((prev: Pane[]) => Pane[])) => {
       setPanesInternal((prev) => {
         const updated = typeof newPanes === 'function' ? newPanes(prev) : newPanes;
 
-        // Call onPaneChange callback if not in batch update
         if (!isBatchUpdateRef.current && onPaneChange) {
           onPaneChange(updated);
         }
@@ -103,7 +64,7 @@ export function useSplitController(
   );
 
   /**
-   * Add a new pane
+   * Adds a new pane configuration to the controller state.
    */
   const addPane = useCallback(
     (config: AddPaneConfig) => {
@@ -128,7 +89,7 @@ export function useSplitController(
   );
 
   /**
-   * Remove a pane by index
+   * Removes a single pane by its index and redistributes sizes.
    */
   const removePane = useCallback(
     (index: number) => {
@@ -138,7 +99,6 @@ export function useSplitController(
         const newPanes = [...prevPanes];
         const removedPane = newPanes.splice(index, 1)[0];
 
-        // Redistribute removed pane's size
         if (removedPane && newPanes.length > 0) {
           const removedSize = parseFloat(removedPane.size) || 0;
           const redistributeAmount = removedSize / newPanes.length;
@@ -156,7 +116,7 @@ export function useSplitController(
   );
 
   /**
-   * Remove multiple panes
+   * Removes a batch of panes by their indices.
    */
   const removePanes = useCallback(
     (indices: number[]) => {
@@ -189,7 +149,7 @@ export function useSplitController(
   );
 
   /**
-   * Toggle pane collapse state
+   * Toggles the collapse state for a specific pane.
    */
   const togglePane = useCallback(
     (index: number) => {
@@ -212,7 +172,7 @@ export function useSplitController(
   );
 
   /**
-   * Collapse a pane
+   * Forces a pane into a collapsed state.
    */
   const collapsePane = useCallback(
     (index: number) => {
@@ -232,7 +192,7 @@ export function useSplitController(
   );
 
   /**
-   * Expand a pane
+   * Forces a pane into an expanded state.
    */
   const expandPane = useCallback(
     (index: number) => {
@@ -252,7 +212,7 @@ export function useSplitController(
   );
 
   /**
-   * Set pane size programmatically
+   * Explicitly sets the size string for a pane.
    */
   const setPaneSize = useCallback(
     (index: number, size: string, _options?: AnimationOptions) => {
@@ -272,7 +232,7 @@ export function useSplitController(
   );
 
   /**
-   * Swap two panes
+   * Swaps the ordering of two panes.
    */
   const swapPanes = useCallback(
     (indexA: number, indexB: number) => {
@@ -299,19 +259,19 @@ export function useSplitController(
   );
 
   /**
-   * Get a snapshot of the current state
+   * Returns a serializable snapshot of the current state.
    */
   const getSnapshot = useCallback((): SplitSnapshot => {
     return {
       panes: panes.map((p) => ({ ...p })),
-      totalSize: 0, // Will be calculated by the component
+      totalSize: 0,
       mode,
       timestamp: Date.now(),
     };
   }, [panes, mode]);
 
   /**
-   * Restore from a snapshot
+   * Restores the controller state from a snapshot.
    */
   const restore = useCallback(
     (snapshot: SplitSnapshot) => {
@@ -322,12 +282,10 @@ export function useSplitController(
         return;
       }
 
-      // Batch update to avoid multiple onPaneChange calls
       isBatchUpdateRef.current = true;
       setPanes(snapshot.panes.map((p) => ({ ...p })));
       isBatchUpdateRef.current = false;
 
-      // Call onPaneChange once after batch update
       if (onPaneChange) {
         onPaneChange(snapshot.panes);
       }
@@ -335,14 +293,11 @@ export function useSplitController(
     [mode, setPanes, onPaneChange]
   );
 
-  // Memoize the return value to avoid unnecessary re-renders
   return useMemo(
     () => ({
-      // State
       panes,
       mode,
       isDragging,
-      // Actions
       addPane,
       removePane,
       removePanes,

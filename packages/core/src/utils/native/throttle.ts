@@ -1,6 +1,11 @@
 /**
- * Throttle function - limits function execution to once per specified time period
- * Replaces lodash throttle to reduce bundle size
+ * throttle
+ * 
+ * Ensures a function is called at most once per specified time interval.
+ * Replaces heavier utility libraries to maintain a minimal bundle size.
+ * 
+ * @param func - The function to execute
+ * @param wait - Milliseconds to wait between executions
  */
 export function throttle<T extends (...args: any[]) => any>(
   func: T,
@@ -26,8 +31,12 @@ export function throttle<T extends (...args: any[]) => any>(
 }
 
 /**
- * Debounce function - delays function execution until after specified time has elapsed
- * since the last invocation. Replaces lodash debounce.
+ * debounce
+ * 
+ * Postpones function execution until after a specified silence period.
+ * 
+ * @param func - The function to execute
+ * @param wait - Milliseconds of silence to wait for
  */
 export function debounce<T extends (...args: any[]) => any>(
   func: T,

@@ -1,20 +1,8 @@
 /**
- * Size Conversion Utilities
- *
- * These pure functions handle conversion between different size units:
- * - Percentage to Pixel
- * - Pixel to Percentage
- * - Viewport units (vw, vh)
- *
- * Refactored from v5 SplitUtils for better testability and composition
- */
-
-/**
- * Convert percentage to pixels based on reference size
- *
- * @param percentage - Percentage value (0-100)
- * @param referenceWidth - Reference dimension (e.g., "1000px", "100vw", "50%")
- * @returns Pixel value
+ * Converts a percentage value to pixels based on a reference width.
+ * 
+ * @param percentage - Numeric percentage (0-100)
+ * @param referenceWidth - Container or viewport width string
  */
 export function percentageToPixel(
   percentage: number,
@@ -36,21 +24,18 @@ export function percentageToPixel(
   }
 
   if (referenceWidth.includes('%')) {
-    // Assume parent container width (would need actual measurement)
     console.warn('Percentage reference not fully supported, assuming viewport');
     return (percentage / 100) * window.innerWidth * (parseFloat(referenceWidth) / 100);
   }
 
-  // Fallback: treat as pixels
   return (percentage / 100) * parseFloat(referenceWidth);
 }
 
 /**
- * Convert pixels to percentage based on reference size
- *
- * @param pixelValue - Pixel value
- * @param referenceWidth - Reference dimension (e.g., "1000px", "100vw")
- * @returns Percentage value (0-100)
+ * Converts a pixel value to a percentage based on a reference width.
+ * 
+ * @param pixelValue - Size in pixels
+ * @param referenceWidth - Container or viewport width string
  */
 export function pixelToPercentage(
   pixelValue: number,
@@ -79,17 +64,15 @@ export function pixelToPercentage(
     return (pixelValue / containerPx) * 100;
   }
 
-  // Fallback: treat as pixels
   return (pixelValue / parseFloat(referenceWidth)) * 100;
 }
 
 /**
- * Normalize size to a specific unit
- *
- * @param value - Size value with unit (e.g., "50%", "200px")
- * @param containerSize - Container size in pixels
- * @param targetUnit - Target unit ('px' or '%')
- * @returns Normalized size string
+ * Normalizes a size string to a target unit (px or %).
+ * 
+ * @param value - Original size string
+ * @param containerSize - Current container dimension in pixels
+ * @param targetUnit - The unit to convert into
  */
 export function normalizeSize(
   value: string,
@@ -102,25 +85,23 @@ export function normalizeSize(
     if (targetUnit === 'px') {
       return `${(numericValue / 100) * containerSize}px`;
     }
-    return value; // Already in percentage
+    return value;
   }
 
   if (value.includes('px')) {
     if (targetUnit === '%') {
       return `${(numericValue / containerSize) * 100}%`;
     }
-    return value; // Already in pixels
+    return value;
   }
 
-  // Fallback: assume pixels
   return targetUnit === 'px' ? `${numericValue}px` : `${(numericValue / containerSize) * 100}%`;
 }
 
 /**
- * Parse size value and extract number + unit
- *
- * @param value - Size string (e.g., "50%", "200px", "1fr")
- * @returns Object with numeric value and unit
+ * Parses a size string and extracts the numeric value and unit.
+ * 
+ * @param value - The size string (e.g., "50%", "100px")
  */
 export function parseSize(value: string): { value: number; unit: string } {
   const numericValue = parseFloat(value);
@@ -145,16 +126,11 @@ export function parseSize(value: string): { value: number; unit: string } {
     return { value: numericValue, unit: 'fr' };
   }
 
-  // Default to px
   return { value: numericValue, unit: 'px' };
 }
 
 /**
- * Check if two sizes are in the same unit
- *
- * @param size1 - First size string
- * @param size2 - Second size string
- * @returns True if both use the same unit
+ * Checks if two size strings share the same measurement unit.
  */
 export function haveSameUnit(size1: string, size2: string): boolean {
   const parsed1 = parseSize(size1);
@@ -163,13 +139,12 @@ export function haveSameUnit(size1: string, size2: string): boolean {
 }
 
 /**
- * Clamp a size value within min/max bounds
- *
- * @param value - Size value
- * @param min - Minimum value
- * @param max - Maximum value
- * @param unit - Unit to append
- * @returns Clamped size string
+ * Clamps a size value and appends the appropriate unit.
+ * 
+ * @param value - Target size
+ * @param min - Minimum bound
+ * @param max - Maximum bound
+ * @param unit - CSS unit string
  */
 export function clampSize(
   value: number,

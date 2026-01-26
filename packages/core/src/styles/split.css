@@ -1,7 +1,12 @@
-/* ============================================
-   VARIABLES
-   ============================================ */
+/**
+ * A-MultiLayout-Splitter - Core Styles
+ * 
+ * Provides the essential visual structure and interactive feedback for split layouts.
+ * Optimized for performance with minimal reflow-triggering rules.
+ */
+
 :root {
+  /* Dynamic branding and state colors */
   --split-primary-color: #9c27b0;
   --split-bg-color: #e0e0e0;
   --split-bg-hover-color: #bbb;
@@ -9,17 +14,13 @@
   --split-icon-hover-color: #999;
   --split-border-color: #ccc;
   --split-handle-bg: rgba(255, 255, 255, 0.8);
-  /* Transparent white */
   --split-grip-bg: #fff;
-  /* Solid white to hide line */
   --split-btn-bg-hover: #f5f5f5;
   --split-btn-bg-active: #eee;
   --split-focus-ring: #4285f4;
 }
 
-/* ============================================
-   CONTAINER & PANES
-   ============================================ */
+/* --- Container & Layout --- */
 
 .a-split-container {
   position: relative;
@@ -32,6 +33,7 @@
 
 .a-split-container,
 .a-split-pane {
+  /* PERFORMANCE: Disable transitions during active drag via JS or explicit class */
   transition: none !important;
 }
 
@@ -46,6 +48,8 @@
   right: 0;
   bottom: 0;
 }
+
+/* --- Pane Styles --- */
 
 .a-split-pane {
   position: relative;
@@ -62,12 +66,11 @@
 }
 
 .a-split-pane.a-split-animating {
+  /* Visual smoothness for collapse/expand actions */
   transition: flex-basis 0.3s ease;
 }
 
-/* ============================================
-   HANDLEBAR - Syncfusion style
-   ============================================ */
+/* --- Handlebar Core --- */
 
 .a-split-handlebar {
   display: flex;
@@ -80,7 +83,8 @@
   z-index: 15;
 }
 
-/* Horizontal split bar (Vertical Line) */
+/* --- Handlebar Orientation: Horizontal (Vertical Line) --- */
+
 .a-split-handlebar-horizontal {
   flex-direction: row;
   width: 1px;
@@ -91,15 +95,12 @@
   background: linear-gradient(to bottom, var(--split-bg-color) 0%, var(--split-bg-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-bg-color) calc(50% + 14px), var(--split-bg-color) 100%);
 }
 
-.a-split-handlebar-horizontal:hover {
-  background: linear-gradient(to bottom, var(--split-primary-color) 0%, var(--split-primary-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-primary-color) calc(50% + 14px), var(--split-primary-color) 100%);
-}
-
+.a-split-handlebar-horizontal:hover,
 .a-split-handlebar-horizontal:active {
-  background: linear-gradient(to bottom, var(--split-primary-color) 0%, var(--split-primary-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-primary-color) calc(50% + 14px), var(--split-primary-color) 100%);
+  background: linear-gradient(to bottom, var(--split-primary-color) 0%, var(--split-primary-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-primary-color) calc(50% - 14px), var(--split-primary-color) 100%);
 }
 
-/* Hit area for easier grabbing */
+/* Hit area enhancement for easier grabbing */
 .a-split-handlebar-horizontal::after {
   content: '';
   position: absolute;
@@ -108,7 +109,8 @@
   z-index: 10;
 }
 
-/* Vertical split bar (Horizontal Line) */
+/* --- Handlebar Orientation: Vertical (Horizontal Line) --- */
+
 .a-split-handlebar-vertical {
   flex-direction: column;
   height: 1px;
@@ -119,15 +121,12 @@
   background: linear-gradient(to right, var(--split-bg-color) 0%, var(--split-bg-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-bg-color) calc(50% + 14px), var(--split-bg-color) 100%);
 }
 
-.a-split-handlebar-vertical:hover {
-  background: linear-gradient(to right, var(--split-primary-color) 0%, var(--split-primary-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-primary-color) calc(50% + 14px), var(--split-primary-color) 100%);
-}
-
+.a-split-handlebar-vertical:hover,
 .a-split-handlebar-vertical:active {
   background: linear-gradient(to right, var(--split-primary-color) 0%, var(--split-primary-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-primary-color) calc(50% + 14px), var(--split-primary-color) 100%);
 }
 
-/* Hit area for easier grabbing */
+/* Hit area enhancement for easier grabbing */
 .a-split-handlebar-vertical::after {
   content: '';
   position: absolute;
@@ -136,7 +135,8 @@
   z-index: 10;
 }
 
-/* Line bar style (no buttons) - fix gap */
+/* --- Alternative Handlebar Styles --- */
+
 .a-split-handlebar-horizontal.a-split-handlebar-line,
 .a-split-handlebar-vertical.a-split-handlebar-line {
   background: var(--split-bg-color);
@@ -144,7 +144,6 @@
 
 .a-split-handlebar-line {
   background: #d0d0d0;
-  /* Fallback/Base */
 }
 
 .a-split-handlebar-line:hover {
@@ -153,16 +152,13 @@
 
 .a-split-handlebar-line:active {
   background: var(--split-focus-ring);
-  /* Keep as blue focus ring color or use primary? kept as original #3b82f6 ~ focus ring */
 }
 
-/* Disabled handlebar - fix gap */
 .a-split-handlebar-horizontal.a-split-handlebar-disabled,
 .a-split-handlebar-vertical.a-split-handlebar-disabled {
   background: var(--split-bg-color);
 }
 
-/* Disabled handlebar */
 .a-split-handlebar-disabled {
   cursor: default !important;
 }
@@ -172,9 +168,7 @@
   cursor: pointer;
 }
 
-/* ============================================
-   DRAGGING STATE
-   ============================================ */
+/* --- Interactive States & Dragging --- */
 
 .a-split-dragging {
   cursor: col-resize !important;
@@ -192,14 +186,11 @@
   pointer-events: none !important;
 }
 
-/* Keep handlebar interactive during drag */
 .a-split-dragging .a-split-handlebar {
   pointer-events: auto !important;
 }
 
-/* ============================================
-   COLLAPSE BUTTONS - Syncfusion style
-   ============================================ */
+/* --- Collapse Buttons --- */
 
 .a-split-collapse-btn {
   border: 1px solid transparent;
@@ -219,13 +210,11 @@
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-/* Hidden button - invisible and no interaction, but keeps space */
 .a-split-collapse-btn.hidden {
   visibility: hidden;
   pointer-events: none;
 }
 
-/* Horizontal: position buttons closer to the bar */
 .a-split-handlebar-horizontal .a-split-collapse-btn-left {
   order: 1;
   position: relative;
@@ -244,7 +233,6 @@
   left: 4px;
 }
 
-/* Vertical: position buttons closer to the bar */
 .a-split-handlebar-vertical .a-split-collapse-btn-top {
   order: 1;
   position: relative;
@@ -263,20 +251,17 @@
   top: 4px;
 }
 
-/* Show buttons on hover */
 .a-split-handlebar:hover .a-split-collapse-btn {
   background-color: var(--split-handle-bg);
   border-color: var(--split-primary-color);
   color: var(--split-primary-color);
 }
 
-/* Active/Drag State for Children (Requested Feature) */
 .a-split-handlebar:active .a-split-collapse-btn,
 .a-split-handlebar:active .a-split-grip-icon {
   color: var(--split-primary-color);
 }
 
-/* Ensure buttons are visible when active even if not directly hovered (dragging) */
 .a-split-handlebar:active .a-split-collapse-btn {
   background-color: var(--split-handle-bg);
   border-color: var(--split-primary-color);
@@ -292,10 +277,7 @@
   background-color: var(--split-btn-bg-active);
 }
 
-
-/* ============================================
-   GRIP/RESIZE HANDLER
-   ============================================ */
+/* --- Grip Icon --- */
 
 .a-split-grip-icon {
   position: relative;
@@ -304,31 +286,23 @@
   justify-content: center;
   pointer-events: none;
   color: var(--split-icon-color);
-  /* Always visible */
   z-index: 20;
   flex-shrink: 0;
   transition: color 0.15s ease;
   overflow: visible;
-  /* background-color removed for transparency */
-  /* padding removed */
 }
 
-/* Adjust padding for vertical split (horizontal bar) */
 .a-split-handlebar-vertical .a-split-grip-icon {
   padding: 0 4px;
-  /* Horizontal padding for gap size */
 }
 
-/* ============================================
-   GLOBAL DRAG STATE (Body)
-   ============================================ */
+/* --- Global Drag States --- */
 
 body.a-split-body-dragging {
   user-select: none !important;
   -webkit-user-select: none !important;
 }
 
-/* Disable ALL pointer events on everything when dragging */
 body.a-split-body-dragging * {
   pointer-events: none !important;
 }
@@ -358,9 +332,7 @@ body.a-split-body-dragging-vertical {
   color: var(--split-primary-color);
 }
 
-/* ============================================
-   ACCESSIBILITY
-   ============================================ */
+/* --- Accessibility --- */
 
 .a-split-handlebar:focus-visible {
   outline: 2px solid var(--split-focus-ring);
