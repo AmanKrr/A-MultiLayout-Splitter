@@ -1,5 +1,8 @@
-/**/node_modules
-/.DS_Store
+**/node_modules
+.DS_Store
 /ts-build
-/**/*.md
-/**/dist
+**/dist
+
+# VitePress
+docs/.vitepress/dist
+docs/.vitepress/cache

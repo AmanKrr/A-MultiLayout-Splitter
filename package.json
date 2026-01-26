@@ -2,6 +2,7 @@
   "name": "a-multilayout-splitter-workspace",
   "version": "6.0.0",
   "private": true,
+  "type": "module",
   "description": "Monorepo for A-MultiLayout-Splitter v6 - A React package designed to facilitate the division of your views into distinct sections, offering effortless resizing and support for intricate layouts.",
   "author": "Aman Kumar",
   "license": "MIT",
@@ -15,7 +16,10 @@
     "build": "pnpm -r build",
     "build:core": "pnpm --filter @a-multilayout-splitter/core build",
     "build:example": "pnpm --filter basic-example build",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "engines": {
     "node": ">=16",
@@ -36,6 +40,13 @@
     "react resizable splitter"
   ],
   "devDependencies": {
-    "@playwright/test": "^1.57.0"
+    "@playwright/test": "^1.57.0",
+    "@types/react": "^18.3.27",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.27"
   }
 }

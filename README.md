@@ -1,110 +1,85 @@
 # A-MultiLayout-Splitter v6
 
-Powerful, performant, and flexible resizable split layouts for React. Built with a modern architecture that prioritizes 60fps performance even with complex, deeply nested layouts.
+**High-performance resizable split layouts for React.** Built for the modern web with a focus on speed, accessibility, and developer experience.
 
 [![npm version](https://img.shields.io/npm/v/@a-multilayout-splitter/core.svg?style=flat-square)](https://www.npmjs.com/package/@a-multilayout-splitter/core)
 [![license](https://img.shields.io/npm/l/@a-multilayout-splitter/core.svg?style=flat-square)](https://github.com/AmanKrr/A-MultiLayout-Splitter/blob/main/LICENSE)
+[![docs](https://img.shields.io/badge/docs-v6-blueviolet?style=flat-square)](https://amankrr.github.io/A-MultiLayout-Splitter/)
 
-## Why v6?
+## 🚀 Why A-MultiLayout-Splitter?
 
-Version 6 is a complete ground-up rewrite moving from legacy DOM-heavy logic to a modern "React-First" architecture.
+Most React splitters suffer from "jitter" because they trigger a full React render loop 60 times per second during a drag operation. A-MultiLayout-Splitter uses a **hybrid architecture** that bypasses React for resizing interaction while maintaining a perfect React-first state model.
 
-- **🚀 60fps Dragging**: Uses direct DOM manipulation during active resizing to bypass React's render loop.
-- **🏗️ Deep Nesting Support**: Built-in context to handle nested layouts with zero configuration.
-- **🔌 Plugin System**: Extend functionality with a robust lifecycle-based plugin API.
-- **🪝 Modern Hooks**: Full control over layout state with the `useSplitController` hook.
-- **📱 Touch Support**: Seamless resizing on mobile and tablet devices.
+### Key Features
+- ⚡️ **60fps Performance**: Direct DOM manipulation during interaction ensures zero-lag dragging.
+- 🌲 **Deep Nesting**: Effortlessly create complex IDE-grade layouts (Sidebars within Topbars within Views).
+- 🧩 **Plugin System**: Modular architecture for features like Keyboard Navigation, Persistence, and Custom UI.
+- 🪝 **First-Class Hooks**: Manage state externally with `useSplitController` for advanced programmatic Control.
+- 💾 **State Persistence**: Built-in support for remembering user layouts across page reloads.
+- 📦 **Zero Dependencies**: Lightweight, tree-shakable, and built with pure modern TypeScript.
 
-## Installation
+---
+
+## 📖 Documentation & Demos
+
+**[View Full Documentation Site](https://amankrr.github.io/A-MultiLayout-Splitter/)**
+
+Our documentation site contains:
+- **Interactive Demos**: Live examples of every feature.
+- **Guide**: Detailed explanation of the React-First architecture.
+- **Deep-Dives**: Learn how to build custom plugins and handle nested layouts.
+- **API Reference**: Comprehensive list of props, hooks, and types.
+
+---
+
+## 📦 Installation
 
 ```bash
 npm install @a-multilayout-splitter/core
 ```
 
-## Basic Usage
-
-The simplest way to create a split layout is to wrap your components in the `<Split>` component.
+## 🛠️ Basic Quick Start
 
 ```tsx
 import { Split } from '@a-multilayout-splitter/core';
-import '@a-multilayout-splitter/core/dist/style.css';
 
 function App() {
   return (
-    <div style={{ height: '500px' }}>
-      <Split mode="horizontal">
-        <div style={{ background: '#f0f0f0' }}>Left Pane</div>
-        <div style={{ background: '#e0e0e0' }}>Right Pane</div>
+    <div style={{ height: '100vh', width: '100vw' }}>
+      <Split mode="horizontal" initialSizes={['30%', '70%']}>
+        <div className="sidebar">Sidebar</div>
+        <div className="main">Main Content Area</div>
       </Split>
     </div>
   );
 }
 ```
 
-## Advanced Features
+---
 
-### Orientation & Initial Sizes
+## 🧩 Plugins
 
-Control layout direction and define starting widths using percentages or pixels.
+Extend the splitter with powerful built-in plugins:
 
 ```tsx
+import { Split, keyboardPlugin, persistencePlugin } from '@a-multilayout-splitter/core';
+
 <Split 
-  mode="vertical" 
-  initialSizes={['30%', '70%']}
-  minSizes={[100, 100]} // in pixels or percentage
+  plugins={[
+    keyboardPlugin(), // Arrows and numbers to resize/focus
+    persistencePlugin({ key: 'user-layout' }) // Auto-save state
+  ]}
 >
-  <div>Top</div>
-  <div>Bottom</div>
+  {/* Panes */}
 </Split>
 ```
 
-### Programmatic Control (Hooks)
+---
 
-For full control over pane state, use the `useSplitController` hook.
+## 🤝 Contributing
 
-```tsx
-import { Split, useSplitController } from '@a-multilayout-splitter/core';
+We welcome contributions! Please see our [Contributing Guide](https://github.com/AmanKrr/A-MultiLayout-Splitter/blob/v6/CONTRIBUTING.md) to get started.
 
-function Editor() {
-  const { panes, addPane, togglePane } = useSplitController({
-    initialSizes: ['250px', '1fr']
-  });
-
-  return (
-    <div>
-      <button onClick={() => togglePane(0)}>Toggle Sidebar</button>
-      <Split panes={panes} />
-    </div>
-  );
-}
-```
-
-### Persistence
-
-Enable layout saving across sessions with a single prop.
-
-```tsx
-<Split id="main-layout" enableSessionStorage>
-  <Pane 1>
-  <Pane 2>
-</Split>
-```
-
-## Component API
-
-### `<Split />` Props
-
-| Prop | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `mode` | `'horizontal' \| 'vertical'` | `'horizontal'` | Layout orientation |
-| `initialSizes` | `string[]` | `[]` | Initial sizes (e.g. `['30%', '70%']`) |
-| `minSizes` | `number[]` | `[]` | Minimum percentage for each pane |
-| `maxSizes` | `number[]` | `[]` | Maximum percentage for each pane |
-| `collapsed` | `boolean[]` | `[]` | Initial collapsed states |
-| `disable` | `boolean \| number[]` | `false` | Disable specific handlebars |
-| `enableSessionStorage` | `boolean` | `false` | Enable automatic state persistence |
-| `renderBar` | `Function` | `undefined` | Custom handlebar renderer |
-
-## License
+## 📄 License
 
 MIT © [Aman Kumar](https://github.com/AmanKrr)
