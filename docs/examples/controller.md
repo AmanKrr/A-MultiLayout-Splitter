@@ -4,32 +4,40 @@ import ControllerDemo from '../.vitepress/theme/demos/ControllerDemo'
 
 # Interactive Controller Demo
 
-Manage pane state externally via the `useSplitController` hook for maximum flexibility.
+The `Split` component allows for imperative control via a React `ref`. This is the recommended way to trigger layout changes from outside the component, such as header buttons or sidebar toggles.
 
 <ReactContainer :component="ControllerDemo" />
 
-```tsx
-import { useSplitController, Split } from '@a-multilayout-splitter/core';
+## Using the Ref API
 
-export default () => {
-  const { panes, togglePane, addPane } = useSplitController({
-    initialSizes: ['50%', '50%']
-  });
+To control the splitter programmatically, capture the `SplitRef` and call its built-in methods.
+
+```tsx
+import { useRef } from 'react';
+import { Split, type SplitRef } from '@a-multilayout-splitter/core';
+
+function MyView() {
+  const splitRef = useRef<SplitRef>(null);
 
   return (
-    <div>
-      <div className="flex gap-2 mb-4">
-        <button onClick={() => togglePane(0)}>Toggle Left</button>
-        <button onClick={() => addPane({ size: '30%', content: 'Added!' })}>Add Pane</button>
-      </div>
+    <>
+      <button onClick={() => splitRef.current?.togglePane(0)}>
+        Toggle Sidebar
+      </button>
 
-      <div style={{ height: '300px' }}>
-        <Split initialPanes={panes} />
-      </div>
-    </div>
+      <Split ref={splitRef}>
+        <div>Sidebar</div>
+        <div>Main Content</div>
+      </Split>
+    </>
   );
-};
+}
 ```
+
+## Why use the Ref API?
+- **Stability**: Methods on the ref have stable identities and don't trigger parent re-renders.
+- **Performance**: Operations like `collapsePane` or `addPane` happen instantly within the component.
+- **Simplicity**: No need to manage complex pane state arrays in your parent component.
 
 ## Why use this?
 - **Sync with UI**: Update buttons or nav items based on whether a pane is open.

@@ -58,6 +58,7 @@ export default defineConfig({
           text: 'Demos',
           items: [
             { text: 'Basic Layout', link: '/examples/basic' },
+            { text: 'Props Playground', link: '/examples/props-playground' },
             { text: 'Nested Sidebar', link: '/examples/nested' },
             { text: 'Custom Handles', link: '/examples/custom-handles' },
             { text: 'Interactive Controller', link: '/examples/controller' }
