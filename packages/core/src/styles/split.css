@@ -1,7 +1,21 @@
-/**
- * Split Component Styles v6
- * Based on Syncfusion splitter approach
- */
+/* ============================================
+   VARIABLES
+   ============================================ */
+:root {
+  --split-primary-color: #9c27b0;
+  --split-bg-color: #e0e0e0;
+  --split-bg-hover-color: #bbb;
+  --split-icon-color: #666;
+  --split-icon-hover-color: #999;
+  --split-border-color: #ccc;
+  --split-handle-bg: rgba(255, 255, 255, 0.8);
+  /* Transparent white */
+  --split-grip-bg: #fff;
+  /* Solid white to hide line */
+  --split-btn-bg-hover: #f5f5f5;
+  --split-btn-bg-active: #eee;
+  --split-focus-ring: #4285f4;
+}
 
 /* ============================================
    CONTAINER & PANES
@@ -66,7 +80,7 @@
   z-index: 15;
 }
 
-/* Horizontal split bar */
+/* Horizontal split bar (Vertical Line) */
 .a-split-handlebar-horizontal {
   flex-direction: row;
   width: 1px;
@@ -74,15 +88,15 @@
   height: inherit !important;
   margin-inline: 5px;
   cursor: col-resize;
-  background: #e0e0e0;
+  background: linear-gradient(to bottom, var(--split-bg-color) 0%, var(--split-bg-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-bg-color) calc(50% + 14px), var(--split-bg-color) 100%);
 }
 
 .a-split-handlebar-horizontal:hover {
-  background: #bbb;
+  background: linear-gradient(to bottom, var(--split-primary-color) 0%, var(--split-primary-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-primary-color) calc(50% + 14px), var(--split-primary-color) 100%);
 }
 
 .a-split-handlebar-horizontal:active {
-  background: #e91e63;
+  background: linear-gradient(to bottom, var(--split-primary-color) 0%, var(--split-primary-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-primary-color) calc(50% + 14px), var(--split-primary-color) 100%);
 }
 
 /* Hit area for easier grabbing */
@@ -94,7 +108,7 @@
   z-index: 10;
 }
 
-/* Vertical split bar */
+/* Vertical split bar (Horizontal Line) */
 .a-split-handlebar-vertical {
   flex-direction: column;
   height: 1px;
@@ -102,15 +116,15 @@
   width: inherit !important;
   margin-block: 5px;
   cursor: row-resize;
-  background: #e0e0e0;
+  background: linear-gradient(to right, var(--split-bg-color) 0%, var(--split-bg-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-bg-color) calc(50% + 14px), var(--split-bg-color) 100%);
 }
 
 .a-split-handlebar-vertical:hover {
-  background: #bbb;
+  background: linear-gradient(to right, var(--split-primary-color) 0%, var(--split-primary-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-primary-color) calc(50% + 14px), var(--split-primary-color) 100%);
 }
 
 .a-split-handlebar-vertical:active {
-  background: #e91e63;
+  background: linear-gradient(to right, var(--split-primary-color) 0%, var(--split-primary-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-primary-color) calc(50% + 14px), var(--split-primary-color) 100%);
 }
 
 /* Hit area for easier grabbing */
@@ -122,17 +136,30 @@
   z-index: 10;
 }
 
-/* Line bar style (no buttons) */
+/* Line bar style (no buttons) - fix gap */
+.a-split-handlebar-horizontal.a-split-handlebar-line,
+.a-split-handlebar-vertical.a-split-handlebar-line {
+  background: var(--split-bg-color);
+}
+
 .a-split-handlebar-line {
   background: #d0d0d0;
+  /* Fallback/Base */
 }
 
 .a-split-handlebar-line:hover {
-  background: #999;
+  background: var(--split-primary-color);
 }
 
 .a-split-handlebar-line:active {
-  background: #3b82f6;
+  background: var(--split-focus-ring);
+  /* Keep as blue focus ring color or use primary? kept as original #3b82f6 ~ focus ring */
+}
+
+/* Disabled handlebar - fix gap */
+.a-split-handlebar-horizontal.a-split-handlebar-disabled,
+.a-split-handlebar-vertical.a-split-handlebar-disabled {
+  background: var(--split-bg-color);
 }
 
 /* Disabled handlebar */
@@ -207,8 +234,8 @@
 
 .a-split-handlebar-horizontal .a-split-grip-icon {
   order: 2;
-  width: 4px;
-  min-width: 4px;
+  width: 8px;
+  min-width: 8px;
 }
 
 .a-split-handlebar-horizontal .a-split-collapse-btn-right {
@@ -226,8 +253,8 @@
 
 .a-split-handlebar-vertical .a-split-grip-icon {
   order: 2;
-  height: 4px;
-  min-height: 4px;
+  height: 8px;
+  min-height: 8px;
 }
 
 .a-split-handlebar-vertical .a-split-collapse-btn-bottom {
@@ -238,19 +265,31 @@
 
 /* Show buttons on hover */
 .a-split-handlebar:hover .a-split-collapse-btn {
-  background-color: #fff;
-  border-color: #e0e0e0;
-  color: #666;
+  background-color: var(--split-handle-bg);
+  border-color: var(--split-primary-color);
+  color: var(--split-primary-color);
+}
+
+/* Active/Drag State for Children (Requested Feature) */
+.a-split-handlebar:active .a-split-collapse-btn,
+.a-split-handlebar:active .a-split-grip-icon {
+  color: var(--split-primary-color) !important;
+}
+
+/* Ensure buttons are visible when active even if not directly hovered (dragging) */
+.a-split-handlebar:active .a-split-collapse-btn {
+  background-color: var(--split-handle-bg);
+  border-color: var(--split-primary-color);
 }
 
 .a-split-collapse-btn:hover {
-  background-color: #f5f5f5 !important;
-  border-color: #ccc !important;
-  color: #333 !important;
+  background-color: var(--split-btn-bg-hover) !important;
+  border-color: var(--split-primary-color) !important;
+  color: var(--split-primary-color) !important;
 }
 
 .a-split-collapse-btn:active {
-  background-color: #eee !important;
+  background-color: var(--split-btn-bg-active) !important;
 }
 
 
@@ -264,11 +303,46 @@
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  color: transparent;
+  color: var(--split-icon-color);
+  /* Always visible */
   z-index: 20;
   flex-shrink: 0;
   transition: color 0.15s ease;
   overflow: visible;
+  /* background-color removed for transparency */
+  /* padding removed */
+}
+
+/* Adjust padding for vertical split (horizontal bar) */
+.a-split-handlebar-vertical .a-split-grip-icon {
+  padding: 0 4px;
+  /* Horizontal padding for gap size */
+}
+
+/* ============================================
+   GLOBAL DRAG STATE (Body)
+   ============================================ */
+
+body.a-split-body-dragging {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+/* Disable ALL pointer events on everything when dragging */
+body.a-split-body-dragging * {
+  pointer-events: none !important;
+}
+
+body.a-split-body-dragging iframe {
+  pointer-events: none !important;
+}
+
+body.a-split-body-dragging-horizontal {
+  cursor: col-resize !important;
+}
+
+body.a-split-body-dragging-vertical {
+  cursor: row-resize !important;
 }
 
 .a-split-grip-icon svg {
@@ -281,7 +355,7 @@
 }
 
 .a-split-handlebar:hover .a-split-grip-icon {
-  color: #999;
+  color: var(--split-primary-color);
 }
 
 /* ============================================
@@ -289,6 +363,6 @@
    ============================================ */
 
 .a-split-handlebar:focus-visible {
-  outline: 2px solid #4285f4;
+  outline: 2px solid var(--split-focus-ring);
   outline-offset: 2px;
 }

@@ -100,6 +100,8 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
   const nestingLevel = useNestingLevel();
   const autoFixClass = !fixClass && nestingLevel > 2; // Auto-apply fix for deep nesting
 
+
+
   // Props validation (development warnings)
   useEffect(() => {
     if (process.env.NODE_ENV !== 'production') {
@@ -188,6 +190,30 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
 
   // Drag state for plugins
   const [dragState, setDragState] = useState<any>(null);
+
+  // Global Drag State Management (Moved here to access dragState)
+  useEffect(() => {
+    if (dragState && dragState.active) {
+      document.body.classList.add('a-split-body-dragging');
+      document.body.classList.add(
+        mode === 'horizontal'
+          ? 'a-split-body-dragging-horizontal'
+          : 'a-split-body-dragging-vertical'
+      );
+    } else {
+      document.body.classList.remove('a-split-body-dragging');
+      document.body.classList.remove('a-split-body-dragging-horizontal');
+      document.body.classList.remove('a-split-body-dragging-vertical');
+    }
+
+    return () => {
+      // Cleanup on unmount or drag end
+      document.body.classList.remove('a-split-body-dragging');
+      document.body.classList.remove('a-split-body-dragging-horizontal');
+      document.body.classList.remove('a-split-body-dragging-vertical');
+    };
+  }, [dragState, mode]);
+
 
   // State getter for plugins
   const getState = useCallback((): SplitState => {
@@ -565,9 +591,15 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     if (mode === 'vertical') classes.push('a-split-vertical');
     // Phase 5: Apply fixClass manually or automatically for deep nesting
     if (fixClass || autoFixClass) classes.push('a-split-fix');
+    
+    // Check if dragging is active (from local state or direct check)
+    if (dragState?.active) {
+      classes.push('a-split-dragging');
+    }
+    
     if (className) classes.push(className);
     return classes.join(' ');
-  }, [mode, fixClass, autoFixClass, className]);
+  }, [mode, fixClass, autoFixClass, className, dragState?.active]); // Add dragState dependency
 
   // Render panes and handlebars
   const renderContent = () => {

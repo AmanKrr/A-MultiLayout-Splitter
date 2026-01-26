@@ -132,16 +132,16 @@ export const DragHandle: React.FC<DragHandleProps & {
           {/* Grip Icon - hidden when any pane is collapsed */}
           <div className={`a-split-grip-icon${hideGrip ? ' hidden' : ''}`} aria-hidden="true">
             {isHorizontal ? (
-              <svg width="4" height="14" viewBox="0 0 4 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="2" cy="2" r="1.5" fill="currentColor" />
-                <circle cx="2" cy="7" r="1.5" fill="currentColor" />
-                <circle cx="2" cy="12" r="1.5" fill="currentColor" />
+              <svg width="8" height="24" viewBox="0 0 8 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="4" cy="4" r="2.5" fill="currentColor" />
+                <circle cx="4" cy="12" r="2.5" fill="currentColor" />
+                <circle cx="4" cy="20" r="2.5" fill="currentColor" />
               </svg>
             ) : (
-              <svg width="14" height="4" viewBox="0 0 14 4" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="2" cy="2" r="1.5" fill="currentColor" />
-                <circle cx="7" cy="2" r="1.5" fill="currentColor" />
-                <circle cx="12" cy="2" r="1.5" fill="currentColor" />
+              <svg width="24" height="8" viewBox="0 0 24 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="4" cy="4" r="2.5" fill="currentColor" />
+                <circle cx="12" cy="4" r="2.5" fill="currentColor" />
+                <circle cx="20" cy="4" r="2.5" fill="currentColor" />
               </svg>
             )}
           </div>

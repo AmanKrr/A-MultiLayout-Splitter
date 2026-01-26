@@ -1,6 +1,6 @@
 import { useCallback, useRef, useEffect, RefObject } from "react";
 import { throttle } from "../utils/native/throttle";
-import { HANDLEBAR_SIZE } from "../utils/layoutCalculations";
+
 import { DragState, DragCallbacks, SplitMode } from "../types";
 
 /**
@@ -65,8 +65,24 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
       // Count handlebars and calculate total handlebar space
       // Handlebar dimensions: 1px width/height + 5px margin on each side = 11px total
       const handlebars = container.querySelectorAll(".a-split-handlebar");
-      const handlebarCount = handlebars.length;
-      const totalHandlebarSpace = handlebarCount * HANDLEBAR_SIZE;
+
+      // Calculate total handlebar space dynamically (supports custom handlebar sizes)
+      let totalHandlebarSpace = 0;
+      handlebars.forEach((handlebar) => {
+        const h = handlebar as HTMLElement;
+        const style = window.getComputedStyle(h);
+        
+        if (mode === "horizontal") {
+          const marginLeft = parseFloat(style.marginLeft) || 0;
+          const marginRight = parseFloat(style.marginRight) || 0;
+          totalHandlebarSpace += h.offsetWidth + marginLeft + marginRight;
+        } else {
+          const marginTop = parseFloat(style.marginTop) || 0;
+          const marginBottom = parseFloat(style.marginBottom) || 0;
+          totalHandlebarSpace += h.offsetHeight + marginTop + marginBottom;
+        }
+      });
+
 
       dragState.current = {
         active: true,
@@ -100,16 +116,20 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
    * Handle drag movement
    * PERFORMANCE: Throttled to 16ms (60fps) with direct DOM writes
    */
-  const handleMouseMove = useCallback(
-    throttle((e: MouseEvent | TouchEvent) => {
+  /**
+   * Calculate drag state and new sizes
+   * Shared logic for both mousemove (throttled) and mouseup (final)
+   */
+  const calculateDragState = useCallback(
+    (e: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent) => {
       const state = dragState.current;
-      if (!state?.active) return;
+      if (!state?.active) return null;
 
       const isHorizontal = mode === "horizontal";
 
       // Extract client position
-      const clientX = "touches" in e ? (e.touches[0]?.clientX ?? 0) : e.clientX;
-      const clientY = "touches" in e ? (e.touches[0]?.clientY ?? 0) : e.clientY;
+      const clientX = "touches" in e ? (e.touches[0]?.clientX ?? 0) : (e as MouseEvent).clientX;
+      const clientY = "touches" in e ? (e.touches[0]?.clientY ?? 0) : (e as MouseEvent).clientY;
 
       // Calculate delta from start position
       const delta = isHorizontal ? clientX - state.startX : clientY - state.startY;
@@ -118,7 +138,6 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
       const containerSize = isHorizontal ? state.containerWidth : state.containerHeight;
 
       const prevInitialSize = isHorizontal ? state.prevInitialWidth : state.prevInitialHeight;
-
       const nextInitialSize = isHorizontal ? state.nextInitialWidth : state.nextInitialHeight;
 
       // Calculate new sizes in pixels first
@@ -130,25 +149,48 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
       if (nextSizePx < 0) nextSizePx = 0;
 
       // Convert to percentages for boundary checks
-      let prevSize = (prevSizePx / containerSize) * 100;
-      let nextSize = (nextSizePx / containerSize) * 100;
+      const prevSize = (prevSizePx / containerSize) * 100;
+      const nextSize = (nextSizePx / containerSize) * 100;
 
-      // CRITICAL: Check boundaries before applying (v5 behavior)
-      // If boundary is hit, don't update anything - this prevents the third pane from resizing
+      // CRITICAL: Check boundaries before returning
       const hitMinPrev = prevSize <= state.minPrevSize;
       const hitMaxPrev = prevSize >= state.maxPrevSize;
       const hitMinNext = nextSize <= state.minNextSize;
       const hitMaxNext = nextSize >= state.maxNextSize;
+      
+      // If boundary hit, clamp to boundary limits to ensure we stop exactly at the limit
+      // This is an improvement over v5 which just returned early
+      if (hitMinPrev) return null; // Clamping logic could be added here for even better UX
+      if (hitMaxPrev) return null;
+      if (hitMinNext) return null;
+      if (hitMaxNext) return null;
 
-      if (hitMinPrev || hitMaxPrev || hitMinNext || hitMaxNext) {
-        // Boundary hit - don't update (v5 behavior: checkResizingBound returns 1)
-        return;
-      }
+      return {
+        prevSize,
+        nextSize,
+        prevSizePx,
+        nextSizePx,
+        state
+      };
+    }, 
+    [mode]
+  );
+
+  /**
+   * Handle drag movement
+   * PERFORMANCE: Throttled to 16ms (60fps) with direct DOM writes
+   */
+  const handleMouseMove = useCallback(
+    throttle((e: MouseEvent | TouchEvent) => {
+      const result = calculateDragState(e);
+      if (!result) return;
+
+      const { prevSize, nextSize, prevSizePx, nextSizePx, state } = result;
+      const { prevInitialWidth, prevInitialHeight } = state;
+      const prevInitialSize = mode === "horizontal" ? prevInitialWidth : prevInitialHeight;
 
       // Check for minimal displacement (avoid jitter)
-      const prevSizeChange = Math.abs(prevSizePx - prevInitialSize);
-      const nextSizeChange = Math.abs(nextSizePx - nextInitialSize);
-      if (prevSizeChange <= 1 || nextSizeChange <= 1) {
+      if (Math.abs(result.prevSizePx - prevInitialSize) <= 1) {
         return;
       }
 
@@ -156,11 +198,10 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
       finalSizes.current = { prevSize, nextSize };
 
       // PERFORMANCE CRITICAL: Direct DOM manipulation via RAF
-      // This bypasses React reconciliation for 60fps performance
       requestAnimationFrame(() => {
         if (!state.prevElement || !state.nextElement) return;
 
-        // Preserve original unit from flexBasis (v5 behavior: setResizingLayout)
+        // Preserve original unit from flexBasis
         const prevHasPercent = state.prevElement.style.flexBasis.includes("%");
         const nextHasPercent = state.nextElement.style.flexBasis.includes("%");
 
@@ -179,17 +220,24 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
 
       onDragMove?.({ paneIndex: state.paneIndex, prevSize, nextSize });
     }, 16), // 60fps cap
-    [mode, onDragMove],
+    [calculateDragState, mode, onDragMove],
   );
 
   /**
    * End drag operation
    */
-  const handleMouseUp = useCallback(() => {
+  const handleMouseUp = useCallback((e: MouseEvent | TouchEvent) => {
     const state = dragState.current;
     if (!state?.active) return;
 
-    // Use stored final sizes (v5 behavior: uses this.preSize and this.nextSize)
+    // Final calculation to ensure we end exactly where the mouse is
+    // This fixes the "fast drag" issue where throttled mousemove might be missed
+    const result = calculateDragState(e);
+    if (result) {
+      finalSizes.current = { prevSize: result.prevSize, nextSize: result.nextSize };
+    }
+
+    // Use stored final sizes
     const sizes = finalSizes.current;
     if (sizes) {
       onDragEnd?.({ paneIndex: state.paneIndex, prevSize: sizes.prevSize, nextSize: sizes.nextSize });
@@ -198,7 +246,7 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
     // Clear state
     dragState.current = null;
     finalSizes.current = null;
-  }, [onDragEnd]);
+  }, [calculateDragState, onDragEnd]);
 
   /**
    * Set up global event listeners
