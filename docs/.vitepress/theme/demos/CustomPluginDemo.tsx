@@ -1,25 +1,26 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Split, createPlugin } from '@a-multilayout-splitter/core';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { Split, createPlugin, SplitPlugin } from '@a-multilayout-splitter/core';
 
 // Custom analytics plugin that tracks drag events
-function analyticsPlugin(onEvent: (event: string, data: any) => void) {
+// Uses a callback ref pattern to avoid recreating the plugin on every render
+function createAnalyticsPlugin(onEventRef: React.MutableRefObject<(event: string, data: any) => void>): SplitPlugin {
   return createPlugin({
     name: 'analytics',
     version: '1.0.0',
 
     onInit(context) {
-      onEvent('init', { splitId: context.splitId });
+      onEventRef.current('init', { splitId: context.splitId });
     },
 
     onDragStart(event, context) {
-      onEvent('drag_start', {
+      onEventRef.current('drag_start', {
         paneIndex: event.paneIndex,
         splitId: context.splitId,
       });
     },
 
     onDragEnd(event, context) {
-      onEvent('drag_end', {
+      onEventRef.current('drag_end', {
         paneIndex: event.paneIndex,
         prevSize: event.prevSize.toFixed(1),
         nextSize: event.nextSize.toFixed(1),
@@ -28,13 +29,13 @@ function analyticsPlugin(onEvent: (event: string, data: any) => void) {
     },
 
     onDestroy(context) {
-      onEvent('destroy', { splitId: context.splitId });
+      onEventRef.current('destroy', { splitId: context.splitId });
     },
   });
 }
 
 // Custom resize limiter plugin that prevents resizing beyond certain thresholds
-function resizeLimiterPlugin(minTotal: number = 50) {
+function createResizeLimiterPlugin(minTotal: number = 50): SplitPlugin {
   return createPlugin({
     name: 'resize-limiter',
     version: '1.0.0',
@@ -62,7 +63,8 @@ export default function CustomPluginDemo() {
   const logIdRef = useRef(0);
   const logsContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleEvent = (event: string, data: any) => {
+  // Use a ref for the callback to avoid recreating plugins on every render
+  const handleEventRef = useRef((event: string, data: any) => {
     const newLog: LogEntry = {
       id: logIdRef.current++,
       timestamp: new Date().toLocaleTimeString(),
@@ -70,7 +72,14 @@ export default function CustomPluginDemo() {
       data,
     };
     setLogs(prev => [...prev.slice(-9), newLog]); // Keep last 10 logs
-  };
+  });
+
+  // Memoize plugins to prevent infinite re-renders
+  // Plugins are only created once and use refs internally for callbacks
+  const plugins = useMemo(() => [
+    createAnalyticsPlugin(handleEventRef),
+    createResizeLimiterPlugin(60),
+  ], []);
 
   useEffect(() => {
     if (logsContainerRef.current) {
@@ -144,10 +153,7 @@ export default function CustomPluginDemo() {
               mode="horizontal"
               initialSizes={['50%', '50%']}
               minSizes={[20, 20]}
-              plugins={[
-                analyticsPlugin(handleEvent),
-                resizeLimiterPlugin(60),
-              ]}
+              plugins={plugins}
             >
               <div style={{ ...paneStyle, background: 'var(--vp-c-bg)' }}>
                 Panel A

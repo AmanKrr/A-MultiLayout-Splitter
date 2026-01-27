@@ -53,7 +53,7 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     lineBar = false,
     renderBar,
     plugins = [],
-    enableSessionStorage = false,
+    enablePersistence = false,
     width = null,
     height = null,
     className = "",
@@ -228,7 +228,7 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     }
   }, [plugins, pluginContext]);
 
-  const persistence = usePersistence(enableSessionStorage, `split-state-${id}`, mode);
+  const persistence = usePersistence(enablePersistence, `split-state-${id}`, mode);
 
   useEffect(() => {
     const savedState = persistence.load();
@@ -385,6 +385,7 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         collapsePane(paneIndexToCollapse, { direction });
         const pane = panes[paneIndexToCollapse];
         if (pane) {
+          pluginManagerRef.current?.onPaneCollapse({ pane, index: paneIndexToCollapse, direction });
           onLayoutChange?.(paneIndexToCollapse, pane.id, "close", direction);
         }
       }
@@ -400,6 +401,7 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         expandPane(paneIndexToExpand, { direction });
         const pane = panes[paneIndexToExpand];
         if (pane) {
+          pluginManagerRef.current?.onPaneExpand({ pane, index: paneIndexToExpand, direction });
           onLayoutChange?.(paneIndexToExpand, pane.id, "open", direction);
         }
       }

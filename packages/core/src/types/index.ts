@@ -108,6 +108,24 @@ export interface PaneRemoveEvent {
 }
 
 /**
+ * PaneCollapseEvent
+ */
+export interface PaneCollapseEvent {
+  pane: Pane;
+  index: number;
+  direction?: 'left' | 'right';
+}
+
+/**
+ * PaneExpandEvent
+ */
+export interface PaneExpandEvent {
+  pane: Pane;
+  index: number;
+  direction?: 'left' | 'right';
+}
+
+/**
  * AddPaneConfig
  * Parameters for dynamically injecting a new pane.
  */
@@ -263,6 +281,10 @@ export interface SplitPlugin {
   onPaneAdd?: (event: PaneAddEvent, context: PluginContext) => void;
   /** Called when a pane is removed from the layout */
   onPaneRemove?: (event: PaneRemoveEvent, context: PluginContext) => void;
+  /** Called when a pane is collapsed */
+  onPaneCollapse?: (event: PaneCollapseEvent, context: PluginContext) => void;
+  /** Called when a pane is expanded */
+  onPaneExpand?: (event: PaneExpandEvent, context: PluginContext) => void;
   /** Called when a resize operation begins */
   onDragStart?: (event: DragStartEvent, context: PluginContext) => void;
   /** Called during pointer move. Return false to prevent movement. */
@@ -359,8 +381,8 @@ export interface SplitProps {
   renderBar?: (props: any) => ReactNode;
   /** Active plugins for feature extension */
   plugins?: SplitPlugin[];
-  /** Enable automatic session-based persistence */
-  enableSessionStorage?: boolean;
+  /** Enable automatic localStorage persistence of pane sizes and collapsed state */
+  enablePersistence?: boolean;
   /** Container CSS override */
   className?: string;
   /** Container inline styles */

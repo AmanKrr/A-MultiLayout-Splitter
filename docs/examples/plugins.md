@@ -15,7 +15,7 @@ The plugin system allows you to extend the core functionality of **A-MultiLayout
 
 ### `persistencePlugin`
 
-Automatically saves and restores the layout to localStorage or sessionStorage. This is the plugin version of the simpler `enableSessionStorage` prop, but with more control.
+Automatically saves and restores the layout to localStorage or sessionStorage. This is the plugin version of the simpler `enablePersistence` prop, but with more control.
 
 <ReactContainer :component="PersistencePluginDemo" />
 

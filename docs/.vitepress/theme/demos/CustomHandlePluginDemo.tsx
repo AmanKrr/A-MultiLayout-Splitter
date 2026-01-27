@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Split, customHandlePlugin, customHandleRenderPlugin, type HandleRenderProps } from '@a-multilayout-splitter/core';
 
 // Custom handle component
@@ -66,32 +66,36 @@ const GradientHandle = (props: HandleRenderProps) => {
 
 type HandleType = 'default' | 'grip' | 'gradient' | 'minimal';
 
+// Minimal handle render function (defined outside component to be stable)
+const MinimalHandle = (props: HandleRenderProps) => (
+  <div
+    style={{
+      width: props.mode === 'horizontal' ? '2px' : '100%',
+      height: props.mode === 'horizontal' ? '100%' : '2px',
+      background: 'var(--vp-c-brand)',
+      cursor: props.disabled ? 'default' : props.mode === 'horizontal' ? 'col-resize' : 'row-resize',
+    }}
+    onMouseDown={props.disabled ? undefined : props.onMouseDown}
+    onTouchStart={props.disabled ? undefined : props.onMouseDown}
+  />
+);
+
 export default function CustomHandlePluginDemo() {
   const [handleType, setHandleType] = useState<HandleType>('grip');
 
-  const getPlugins = () => {
+  // Memoize plugins based on handleType to prevent unnecessary recreations
+  const plugins = useMemo(() => {
     switch (handleType) {
       case 'grip':
         return [customHandlePlugin(GripHandle)];
       case 'gradient':
         return [customHandleRenderPlugin(GradientHandle)];
       case 'minimal':
-        return [customHandleRenderPlugin((props) => (
-          <div
-            style={{
-              width: props.mode === 'horizontal' ? '2px' : '100%',
-              height: props.mode === 'horizontal' ? '100%' : '2px',
-              background: 'var(--vp-c-brand)',
-              cursor: props.disabled ? 'default' : props.mode === 'horizontal' ? 'col-resize' : 'row-resize',
-            }}
-            onMouseDown={props.disabled ? undefined : props.onMouseDown}
-            onTouchStart={props.disabled ? undefined : props.onMouseDown}
-          />
-        ))];
+        return [customHandleRenderPlugin(MinimalHandle)];
       default:
         return [];
     }
-  };
+  }, [handleType]);
 
   const buttonStyle = (active: boolean) => ({
     padding: '6px 12px',
@@ -152,7 +156,7 @@ export default function CustomHandlePluginDemo() {
           mode="horizontal"
           initialSizes={['33%', '34%', '33%']}
           minSizes={[15, 15, 15]}
-          plugins={getPlugins()}
+          plugins={plugins}
         >
           <div style={{ ...paneStyle, background: 'var(--vp-c-bg)' }}>
             Panel A

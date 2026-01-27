@@ -96,27 +96,65 @@ export function persistencePlugin(options: PersistencePluginOptions = {}) {
 
     onInit(context) {
       const saved = loadState(context.splitId);
-      if (saved && saved.panes) {
-        context.dispatch({
-          type: 'RESTORE_STATE',
-          payload: { panes: saved.panes },
-        });
+      const savedPanes = saved?.panes;
+
+      if (savedPanes && savedPanes.length > 0) {
+        // Use setTimeout to restore state AFTER React has completed initial render
+        // and applied initialSizes. This ensures persistence overrides initialSizes.
+        setTimeout(() => {
+          const currentState = context.getState();
+          // Only restore if pane count matches (layout structure unchanged)
+          if (currentState.panes.length === savedPanes.length) {
+            context.dispatch({
+              type: 'RESTORE_STATE',
+              payload: { panes: savedPanes as { size: string; collapsed: boolean; id: string }[] },
+            });
+          }
+        }, 0);
+      } else {
+        // No saved state - save the initial state after render completes
+        setTimeout(() => {
+          const state = context.getState();
+          saveState(context.splitId, state);
+        }, 0);
       }
     },
 
     onDragEnd(_event, context) {
-      const state = context.getState();
-      debouncedSave(context.splitId, state);
+      // Use setTimeout to ensure state is updated after React's state batch
+      // The drag handler calls setPaneSize before onDragEnd, but React batches state updates
+      setTimeout(() => {
+        const state = context.getState();
+        debouncedSave(context.splitId, state);
+      }, 0);
     },
 
     onPaneAdd(_event, context) {
-      const state = context.getState();
-      debouncedSave(context.splitId, state);
+      setTimeout(() => {
+        const state = context.getState();
+        debouncedSave(context.splitId, state);
+      }, 0);
     },
 
     onPaneRemove(_event, context) {
-      const state = context.getState();
-      debouncedSave(context.splitId, state);
+      setTimeout(() => {
+        const state = context.getState();
+        debouncedSave(context.splitId, state);
+      }, 0);
+    },
+
+    onPaneCollapse(_event, context) {
+      setTimeout(() => {
+        const state = context.getState();
+        debouncedSave(context.splitId, state);
+      }, 0);
+    },
+
+    onPaneExpand(_event, context) {
+      setTimeout(() => {
+        const state = context.getState();
+        debouncedSave(context.splitId, state);
+      }, 0);
     },
 
     onDestroy() {

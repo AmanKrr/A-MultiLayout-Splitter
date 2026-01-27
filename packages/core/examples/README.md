@@ -128,7 +128,7 @@ function App() {
   collapsed={[false, false]}
   lineBar={false}
   disable={false}
-  enableSessionStorage={true}
+  enablePersistence={true}
   onDragEnd={(prevSize, nextSize, index) => {
     console.log('Resized:', prevSize, nextSize);
   }}

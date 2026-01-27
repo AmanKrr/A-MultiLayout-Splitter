@@ -6,6 +6,8 @@ import {
   DragEndEvent,
   PaneAddEvent,
   PaneRemoveEvent,
+  PaneCollapseEvent,
+  PaneExpandEvent,
   ResizeEvent,
   HandleRenderProps,
   Pane,
@@ -68,6 +70,28 @@ export class PluginManager {
     this.plugins.forEach(plugin => {
       if (plugin.onPaneRemove) {
         plugin.onPaneRemove(event, this.context);
+      }
+    });
+  }
+
+  /**
+   * Notifies plugins when a pane is collapsed.
+   */
+  onPaneCollapse(event: PaneCollapseEvent): void {
+    this.plugins.forEach(plugin => {
+      if (plugin.onPaneCollapse) {
+        plugin.onPaneCollapse(event, this.context);
+      }
+    });
+  }
+
+  /**
+   * Notifies plugins when a pane is expanded.
+   */
+  onPaneExpand(event: PaneExpandEvent): void {
+    this.plugins.forEach(plugin => {
+      if (plugin.onPaneExpand) {
+        plugin.onPaneExpand(event, this.context);
       }
     });
   }

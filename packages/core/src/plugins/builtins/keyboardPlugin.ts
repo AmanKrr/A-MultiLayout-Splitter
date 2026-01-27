@@ -8,7 +8,7 @@ export interface KeyboardPluginOptions {
   enableArrowKeys?: boolean;
   /** Enable number key (1-9) to focus specific panes */
   enableNumberKeys?: boolean;
-  /** Relative step size for each arrow key press */
+  /** Relative step size for each arrow key press (percentage) */
   stepSize?: number;
   /** Enable Tab to cycle through panes */
   enableTabNavigation?: boolean;
@@ -16,17 +16,17 @@ export interface KeyboardPluginOptions {
 
 /**
  * keyboardPlugin
- * 
+ *
  * Provides accessibility enhancements by enabling keyboard navigation.
  * Supports resizing via arrows, focusing via numbers, and Tab cycling.
- * 
+ *
  * @param options - Plugin configuration options
  */
 export function keyboardPlugin(options: KeyboardPluginOptions = {}) {
   const {
     enableArrowKeys = true,
     enableNumberKeys = true,
-    stepSize = 10,
+    stepSize = 5,
     enableTabNavigation = true,
   } = options;
 
@@ -36,7 +36,7 @@ export function keyboardPlugin(options: KeyboardPluginOptions = {}) {
   const focusPane = (element: HTMLElement | null, index: number) => {
     if (!element) return;
 
-    const panes = element.querySelectorAll('.a-split-control-pane');
+    const panes = element.querySelectorAll('.a-split-pane');
     const pane = panes[index] as HTMLElement;
 
     if (pane) {
@@ -55,14 +55,14 @@ export function keyboardPlugin(options: KeyboardPluginOptions = {}) {
       if (!element) return;
 
       element.setAttribute('tabindex', '0');
-      const panes = element.querySelectorAll('.a-split-control-pane');
+      const panes = element.querySelectorAll('.a-split-pane');
       panes.forEach((pane, index) => {
         (pane as HTMLElement).setAttribute('tabindex', index === 0 ? '0' : '-1');
       });
 
       keydownHandler = (e: KeyboardEvent) => {
         const state = context.getState();
-        const panes = state.panes;
+        const panesState = state.panes;
 
         if (enableArrowKeys) {
           if (
@@ -78,14 +78,51 @@ export function keyboardPlugin(options: KeyboardPluginOptions = {}) {
               (isHorizontal && e.key === 'ArrowRight') ||
               (!isHorizontal && e.key === 'ArrowDown');
 
-            const direction = isIncrease ? 'grow' : 'shrink';
+            // Use currentFocusedPaneIndex to determine which pane to resize
+            // Resize the focused pane and the next pane (or previous if last pane)
+            const paneIndex = currentFocusedPaneIndex;
+            const currentPane = panesState[paneIndex];
+            const neighborIndex = paneIndex < panesState.length - 1 ? paneIndex + 1 : paneIndex - 1;
+            const neighborPane = panesState[neighborIndex];
 
+            if (!currentPane || !neighborPane) return;
+
+            const currentSize = parseFloat(currentPane.size);
+            const neighborSize = parseFloat(neighborPane.size);
+
+            // Calculate new sizes
+            const delta = isIncrease ? stepSize : -stepSize;
+            let newCurrentSize = currentSize + delta;
+            let newNeighborSize = neighborSize - delta;
+
+            // Apply min/max constraints
+            const minCurrent = currentPane.minSize || 0;
+            const maxCurrent = currentPane.maxSize || 100;
+            const minNeighbor = neighborPane.minSize || 0;
+            const maxNeighbor = neighborPane.maxSize || 100;
+
+            newCurrentSize = Math.max(minCurrent, Math.min(maxCurrent, newCurrentSize));
+            newNeighborSize = Math.max(minNeighbor, Math.min(maxNeighbor, newNeighborSize));
+
+            // Ensure total remains consistent
+            const total = currentSize + neighborSize;
+            if (newCurrentSize + newNeighborSize !== total) {
+              // Adjust if constraints prevented full resize
+              if (newCurrentSize === minCurrent || newCurrentSize === maxCurrent) {
+                newNeighborSize = total - newCurrentSize;
+              } else {
+                newCurrentSize = total - newNeighborSize;
+              }
+            }
+
+            // Apply sizes via dispatch
             context.dispatch({
-              type: 'ADJUST_PANE_SIZE',
-              payload: {
-                direction,
-                amount: stepSize,
-              },
+              type: 'SET_PANE_SIZE',
+              payload: { index: paneIndex, size: `${newCurrentSize}%` },
+            });
+            context.dispatch({
+              type: 'SET_PANE_SIZE',
+              payload: { index: neighborIndex, size: `${newNeighborSize}%` },
             });
           }
         }
@@ -94,7 +131,7 @@ export function keyboardPlugin(options: KeyboardPluginOptions = {}) {
           const num = parseInt(e.key, 10);
           if (!isNaN(num) && num >= 1 && num <= 9) {
             const paneIndex = num - 1;
-            if (paneIndex < panes.length) {
+            if (paneIndex < panesState.length) {
               focusPane(element, paneIndex);
             }
           }
@@ -108,8 +145,8 @@ export function keyboardPlugin(options: KeyboardPluginOptions = {}) {
             : currentFocusedPaneIndex + 1;
 
           if (nextIndex < 0) {
-            nextIndex = panes.length - 1;
-          } else if (nextIndex >= panes.length) {
+            nextIndex = panesState.length - 1;
+          } else if (nextIndex >= panesState.length) {
             nextIndex = 0;
           }
 

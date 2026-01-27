@@ -1,12 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Split, persistencePlugin, clearPersistedState } from '@a-multilayout-splitter/core';
+
+const SPLIT_ID = 'persistence-demo';
 
 export default function PersistencePluginDemo() {
   const [key, setKey] = useState(0);
-  const splitId = 'persistence-demo';
+
+  // Memoize the plugin to prevent recreation on every render
+  const plugins = useMemo(() => [
+    persistencePlugin({
+      storage: 'localStorage',
+      key: `demo-${SPLIT_ID}`,
+      debounceDelay: 300,
+    })
+  ], []);
 
   const handleClearAndReset = () => {
-    clearPersistedState(splitId, 'localStorage');
+    clearPersistedState(SPLIT_ID, 'localStorage');
     setKey(prev => prev + 1);
   };
 
@@ -74,17 +84,11 @@ export default function PersistencePluginDemo() {
       }}>
         <Split
           key={key}
-          id={splitId}
+          id={SPLIT_ID}
           mode="horizontal"
           initialSizes={['30%', '40%', '30%']}
           minSizes={[15, 20, 15]}
-          plugins={[
-            persistencePlugin({
-              storage: 'localStorage',
-              key: `demo-${splitId}`,
-              debounceDelay: 300,
-            })
-          ]}
+          plugins={plugins}
         >
           <div style={{ ...paneStyle, background: 'var(--vp-c-bg)' }}>
             <strong>Panel A</strong>

@@ -8,7 +8,6 @@ export default function PropsPlayground() {
   const [visible, setVisible] = useState(true);
   const [paneCount, setPaneCount] = useState(3);
   const [minSize, setMinSize] = useState(10);
-  const [enableSessionStorage, setEnableSessionStorage] = useState(false);
 
   const panes = Array.from({ length: paneCount }).map((_, i) => (
     <div key={i} style={{ 

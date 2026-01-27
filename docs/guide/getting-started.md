@@ -46,7 +46,7 @@ Always ensure the parent container of the `Split` component has a defined height
 - **`mode`**: Choose between `'horizontal'` or `'vertical'`.
 - **`initialSizes`**: Define starting dimensions as an array of strings (e.g., `['300px', '1fr']` or `['40%', '60%']`).
 - **`minSizes` / `maxSizes`**: Constraint percentages for individual panes.
-- **`enableSessionStorage`**: Enable simple auto-saving of the layout.
+- **`enablePersistence`**: Enable simple auto-saving of the layout to localStorage.
 
 ## Next Steps
 

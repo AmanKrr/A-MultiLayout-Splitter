@@ -1,13 +1,16 @@
-import { useRef, RefObject } from 'react';
+import { useRef, RefObject, useMemo } from 'react';
 import { PluginContext, SplitState, SplitAction } from '../types';
 
 /**
  * usePluginContext
- * 
- * Internal hook to initialize and provide a stable reference context for plugins. 
- * This context allows plugins to interact with the Split component's state and 
+ *
+ * Internal hook to initialize and provide a stable reference context for plugins.
+ * This context allows plugins to interact with the Split component's state and
  * lifecycle without triggering redundant renders.
- * 
+ *
+ * The context object itself is stable (same reference), but internally it always
+ * uses the latest getState/dispatch callbacks through refs.
+ *
  * @param splitId - Unique identifier of the split instance
  * @param getState - Callback to retrieve current reactive state
  * @param dispatch - Callback to trigger state modifications
@@ -17,19 +20,24 @@ export function usePluginContext(
   splitId: string,
   getState: () => SplitState,
   dispatch: (action: SplitAction) => void,
-  containerRef: RefObject<HTMLDivElement>
+  containerRef: RefObject<HTMLDivElement | null>
 ): PluginContext {
-  const contextRef = useRef<PluginContext | null>(null);
+  // Store latest callbacks in refs so context methods always use current values
+  const getStateRef = useRef(getState);
+  const dispatchRef = useRef(dispatch);
 
-  if (!contextRef.current) {
-    contextRef.current = {
-      splitId,
-      getState,
-      dispatch,
-      getElement: () => containerRef.current,
-      getPanes: () => getState().panes,
-    };
-  }
+  // Update refs on each render
+  getStateRef.current = getState;
+  dispatchRef.current = dispatch;
 
-  return contextRef.current;
+  // Create stable context object once per splitId
+  const context = useMemo<PluginContext>(() => ({
+    splitId,
+    getState: () => getStateRef.current(),
+    dispatch: (action: SplitAction) => dispatchRef.current(action),
+    getElement: () => containerRef.current,
+    getPanes: () => getStateRef.current().panes,
+  }), [splitId, containerRef]);
+
+  return context;
 }

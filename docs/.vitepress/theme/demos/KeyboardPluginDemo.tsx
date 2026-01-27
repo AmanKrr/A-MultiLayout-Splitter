@@ -1,10 +1,20 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { Split, type SplitRef, keyboardPlugin } from '@a-multilayout-splitter/core';
 
 export default function KeyboardPluginDemo() {
   const splitRef = useRef<SplitRef>(null);
   const [focusedPane, setFocusedPane] = useState<number | null>(null);
   const [lastAction, setLastAction] = useState<string>('Click on the split area to focus');
+
+  // Memoize the plugin to prevent recreation on every render
+  const plugins = useMemo(() => [
+    keyboardPlugin({
+      enableArrowKeys: true,
+      enableNumberKeys: true,
+      enableTabNavigation: true,
+      stepSize: 5,
+    })
+  ], []);
 
   const handleFocus = () => {
     setLastAction('Split focused - use keyboard now!');
@@ -69,14 +79,7 @@ export default function KeyboardPluginDemo() {
           mode="horizontal"
           initialSizes={['33%', '34%', '33%']}
           minSizes={[15, 15, 15]}
-          plugins={[
-            keyboardPlugin({
-              enableArrowKeys: true,
-              enableNumberKeys: true,
-              enableTabNavigation: true,
-              stepSize: 5,
-            })
-          ]}
+          plugins={plugins}
         >
           <div
             style={{

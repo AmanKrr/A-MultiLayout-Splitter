@@ -34,6 +34,8 @@ export type {
   HandleRenderProps,
   PaneAddEvent,
   PaneRemoveEvent,
+  PaneCollapseEvent,
+  PaneExpandEvent,
   ResizeEvent,
   PluginConfig,
   SplitSnapshot,

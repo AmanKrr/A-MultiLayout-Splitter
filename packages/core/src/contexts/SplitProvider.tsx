@@ -15,8 +15,8 @@ export interface SplitConfig {
   id: string;
   /** Current layout orientation */
   mode: SplitMode;
-  /** Whether session persistence is active */
-  enableSessionStorage: boolean;
+  /** Whether localStorage persistence is active */
+  enablePersistence: boolean;
   /** Key used for localStorage persistence */
   storageKey: string;
 }
@@ -61,7 +61,7 @@ const ActionsContext = createContext<SplitActions | null>(null);
 export interface SplitProviderProps {
   id: string;
   mode?: SplitMode;
-  enableSessionStorage?: boolean;
+  enablePersistence?: boolean;
   storageKey?: string;
   children: ReactNode;
 
@@ -91,7 +91,7 @@ export interface SplitProviderProps {
 export function SplitProvider({
   id,
   mode = 'horizontal',
-  enableSessionStorage = false,
+  enablePersistence = false,
   storageKey = `split-state-${id}`,
   children,
   _panes = [],
@@ -107,10 +107,10 @@ export function SplitProvider({
     () => ({
       id,
       mode,
-      enableSessionStorage,
+      enablePersistence,
       storageKey,
     }),
-    [id, mode, enableSessionStorage, storageKey]
+    [id, mode, enablePersistence, storageKey]
   );
 
   const state = useMemo<SplitState>(

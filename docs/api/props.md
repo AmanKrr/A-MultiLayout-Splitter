@@ -29,7 +29,7 @@ Detailed reference for all configuration properties available on the `Split` com
 | Prop | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | `plugins` | `SplitPlugin[]` | `[]` | Array of plugins to extend the component's functionality. |
-| `enableSessionStorage` | `boolean` | `false` | Enable automatic auto-save/restore to `sessionStorage`. |
+| `enablePersistence` | `boolean` | `false` | Enable automatic auto-save/restore to `localStorage`. |
 | `fixClass` | `boolean` | `false` | Force-apply a legacy CSS fix for specific deep-nesting bugs. |
 
 ## Event Callbacks

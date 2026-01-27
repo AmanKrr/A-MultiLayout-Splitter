@@ -8,10 +8,10 @@ Persistence in **A-MultiLayout-Splitter** is handled by the `persistencePlugin`.
 
 ## Simple Usage
 
-The easiest way to enable persistence is via the `enableSessionStorage` shorthand prop:
+The easiest way to enable persistence is via the `enablePersistence` shorthand prop:
 
 ```tsx
-<Split id="main-editor" enableSessionStorage>
+<Split id="main-editor" enablePersistence>
   <div>Pane 1</div>
   <div>Pane 2</div>
 </Split>
