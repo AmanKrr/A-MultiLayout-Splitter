@@ -1,7 +1,7 @@
 {
   "name": "@a-multilayout-splitter/core",
   "version": "6.0.0-alpha.1",
-  "description": "A React component for creating resizable split panes - Modern v6 architecture",
+  "description": "A modern React component for building resizable, multi-pane layouts with flexible split views and complex layout support.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

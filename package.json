@@ -3,7 +3,7 @@
   "version": "6.0.0",
   "private": true,
   "type": "module",
-  "description": "Monorepo for A-MultiLayout-Splitter v6 - A React package designed to facilitate the division of your views into distinct sections, offering effortless resizing and support for intricate layouts.",
+  "description": "A modern React component for building resizable, multi-pane layouts with flexible split views and complex layout support.",
   "author": "Aman Kumar",
   "license": "MIT",
   "homepage": "https://amankrr.github.io/react-multilayout-split/",
@@ -12,6 +12,7 @@
     "url": "git+https://github.com/AmanKrr/A-MultiLayout-Splitter.git"
   },
   "scripts": {
+    "release": "semantic-release",
     "dev": "pnpm --filter basic-example dev",
     "build": "pnpm -r build",
     "build:core": "pnpm --filter @a-multilayout-splitter/core build",
@@ -47,6 +48,12 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "vitepress": "^1.6.4",
-    "vue": "^3.5.27"
+    "vue": "^3.5.27",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "^11.1.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/npm": "^11.0.2",
+    "@semantic-release/release-notes-generator": "^12.1.0",
+    "semantic-release": "^23.0.0"
   }
 }
