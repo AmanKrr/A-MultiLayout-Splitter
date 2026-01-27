@@ -24,4 +24,6 @@ export default {
       },
     ],
   ],
+  ci: false,
+  dryRun: false,
 };
