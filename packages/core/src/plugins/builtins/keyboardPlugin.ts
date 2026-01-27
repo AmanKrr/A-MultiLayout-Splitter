@@ -78,7 +78,7 @@ export function keyboardPlugin(options: KeyboardPluginOptions = {}) {
               (isHorizontal && e.key === 'ArrowRight') ||
               (!isHorizontal && e.key === 'ArrowDown');
 
-            const direction = isIncrease ? 'increase' : 'decrease';
+            const direction = isIncrease ? 'grow' : 'shrink';
 
             context.dispatch({
               type: 'ADJUST_PANE_SIZE',

@@ -99,7 +99,7 @@ export function persistencePlugin(options: PersistencePluginOptions = {}) {
       if (saved && saved.panes) {
         context.dispatch({
           type: 'RESTORE_STATE',
-          payload: saved as SplitState,
+          payload: { panes: saved.panes },
         });
       }
     },

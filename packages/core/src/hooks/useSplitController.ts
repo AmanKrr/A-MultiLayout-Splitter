@@ -283,11 +283,29 @@ export function useSplitController(
       }
 
       isBatchUpdateRef.current = true;
-      setPanes(snapshot.panes.map((p) => ({ ...p })));
+      setPanes((prevPanes) => 
+        snapshot.panes.map((snapshotPane, index) => {
+          // Try to find matching pane by id, or use index as fallback
+          const existingPane = prevPanes.find(p => p.id === snapshotPane.id) || prevPanes[index];
+          
+          return {
+            id: snapshotPane.id,
+            size: snapshotPane.size,
+            collapsed: snapshotPane.collapsed,
+            // Preserve existing values, or use defaults if no matching pane found
+            minSize: existingPane?.minSize ?? 0,
+            maxSize: existingPane?.maxSize ?? 100,
+            content: existingPane?.content ?? null,
+          };
+        })
+      );
       isBatchUpdateRef.current = false;
 
       if (onPaneChange) {
-        onPaneChange(snapshot.panes);
+        setPanesInternal((currentPanes) => {
+          onPaneChange(currentPanes);
+          return currentPanes;
+        });
       }
     },
     [mode, setPanes, onPaneChange]

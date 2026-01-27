@@ -10,11 +10,7 @@ import { DragHandleProps } from '../types';
  * 
  * @param props - Component properties including drag and collapse handlers
  */
-export const DragHandle: React.FC<DragHandleProps & {
-  leftPaneCollapsed?: boolean;
-  rightPaneCollapsed?: boolean;
-  explicitlyDisabled?: boolean;
-}> = ({
+export const DragHandle: React.FC<DragHandleProps> = ({
   index,
   mode,
   disabled,

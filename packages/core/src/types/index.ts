@@ -1,10 +1,68 @@
-import { CSSProperties, ReactNode } from 'react';
+import React, { CSSProperties, ReactNode } from 'react';
 
 /**
  * SplitMode
  * Choice of layout orientation.
  */
 export type SplitMode = 'horizontal' | 'vertical';
+
+/**
+ * Dimensions
+ */
+export interface Dimensions {
+  width: number;
+  height: number;
+}
+
+/**
+ * ResizeEvent
+ */
+export interface ResizeEvent {
+  dimensions: Dimensions;
+  mode: SplitMode;
+}
+
+/**
+ * PluginConfig
+ */
+export interface PluginConfig {
+  /** Whether the plugin should be active */
+  enabled?: boolean;
+  /** Configuration variables for the specific plugin */
+  options?: Record<string, any>;
+}
+
+/**
+ * DragStartEvent
+ */
+export interface DragStartEvent {
+  /** Index of the pane being resized */
+  paneIndex: number;
+}
+
+/**
+ * DragMoveEvent
+ */
+export interface DragMoveEvent {
+  /** Index of the pane being resized */
+  paneIndex: number;
+  /** Calculated percentage size for the previous pane */
+  prevSize: number;
+  /** Calculated percentage size for the next pane */
+  nextSize: number;
+}
+
+/**
+ * DragEndEvent
+ */
+export interface DragEndEvent {
+  /** Index of the pane that was resized */
+  paneIndex: number;
+  /** Final percentage size for the previous pane */
+  prevSize: number;
+  /** Final percentage size for the next pane */
+  nextSize: number;
+}
 
 /**
  * PaneStatus
@@ -31,6 +89,22 @@ export interface Pane {
   maxSize: number;
   /** Internal flex distribution override */
   flexGrow?: number;
+}
+
+/**
+ * PaneAddEvent
+ */
+export interface PaneAddEvent {
+  pane: Pane;
+  index: number;
+}
+
+/**
+ * PaneRemoveEvent
+ */
+export interface PaneRemoveEvent {
+  pane: Pane;
+  index: number;
 }
 
 /**
@@ -89,6 +163,78 @@ export interface DragCallbacks {
 }
 
 /**
+ * HandleRenderProps
+ */
+export interface HandleRenderProps {
+  /** Unique handlebar index */
+  index: number;
+  /** Parent orientation */
+  mode: SplitMode;
+  /** Whether interaction is currently disabled */
+  disabled: boolean;
+  /** Whether line styling should be applied */
+  lineBar: boolean;
+  /** Event handler to trigger dragging */
+  onMouseDown: (e: React.MouseEvent | React.TouchEvent) => void;
+  /** Event handler for programmatic collapse */
+  onCollapse?: (direction: 'left' | 'right') => void;
+  /** Event handler for programmatic expansion */
+  onExpand?: (direction: 'left' | 'right') => void;
+}
+
+/**
+ * DragHandleProps
+ */
+export interface DragHandleProps {
+  /** Index of the handlebar */
+  index: number;
+  /** Current mode of splitting */
+  mode: SplitMode;
+  /** Whether interaction with the handle is disabled */
+  disabled: boolean;
+  /** Whether to use a minimal line style */
+  lineBar: boolean;
+  /** Internal tracking for user-level disabling */
+  explicitlyDisabled?: boolean;
+  /** Mouse/Touch trigger to begin resizing */
+  onMouseDown: (e: React.MouseEvent | React.TouchEvent) => void;
+  /** Touch trigger for mobile resizing */
+  onTouchStart?: (e: React.TouchEvent) => void;
+  /** Event to collapse the adjacent pane */
+  onCollapse?: (direction: 'left' | 'right') => void;
+  /** Event to expand the adjacent pane */
+  onExpand?: (direction: 'left' | 'right') => void;
+  /** Reference for external custom render functions */
+  renderCustom?: (props: HandleRenderProps, position: number) => ReactNode;
+  /** State of the pane on the left (or top) of the handlebar */
+  leftPaneCollapsed?: boolean;
+  /** State of the pane on the right (or bottom) of the handlebar */
+  rightPaneCollapsed?: boolean;
+}
+
+/**
+ * PaneProps
+ */
+export interface PaneProps {
+  /** Unique pane ID */
+  id: string;
+  /** Current size string */
+  size: string;
+  /** Current collapse status */
+  collapsed: boolean;
+  /** Lower bound percentage */
+  minSize: number;
+  /** Upper bound percentage */
+  maxSize: number;
+  /** Split layout direction */
+  mode: SplitMode;
+  /** React children for the pane */
+  content: ReactNode;
+  /** Internal flex-grow value */
+  flexGrow?: number;
+}
+
+/**
  * PluginContext
  * The API surface exposed to plugins to interact with the Split component.
  */
@@ -102,19 +248,35 @@ export interface PluginContext {
 
 /**
  * SplitPlugin
- * Lifecycle hooks that allow external logic to intercept and extend the component.
+ * 
+ * Defines the structure for custom plugins to tap into Split life-cycles.
  */
 export interface SplitPlugin {
+  /** Unique name for identifying the plugin */
   name: string;
+  /** Semantic versioning support */
+  version?: string;
+
+  /** Called when the plugin is registered */
   onInit?: (context: PluginContext) => void;
-  onPaneAdd?: (pane: Pane, context: PluginContext) => void;
-  onPaneRemove?: (pane: Pane, context: PluginContext) => void;
-  onDragStart?: (event: { paneIndex: number }, context: PluginContext) => void;
-  onDragMove?: (event: { paneIndex: number; prevSize: number; nextSize: number }, context: PluginContext) => boolean | void;
-  onDragEnd?: (event: { paneIndex: number; prevSize: number; nextSize: number }, context: PluginContext) => void;
-  onResize?: (context: PluginContext) => void;
-  renderHandle?: (props: any, context: PluginContext) => ReactNode;
-  renderPane?: (pane: Pane, content: ReactNode, context: PluginContext) => ReactNode;
+  /** Called when a new pane is added to the layout */
+  onPaneAdd?: (event: PaneAddEvent, context: PluginContext) => void;
+  /** Called when a pane is removed from the layout */
+  onPaneRemove?: (event: PaneRemoveEvent, context: PluginContext) => void;
+  /** Called when a resize operation begins */
+  onDragStart?: (event: DragStartEvent, context: PluginContext) => void;
+  /** Called during pointer move. Return false to prevent movement. */
+  onDragMove?: (event: DragMoveEvent, context: PluginContext) => boolean | void;
+  /** Called when dragging finishes */
+  onDragEnd?: (event: DragEndEvent, context: PluginContext) => void;
+  /** Called when the container HTMLElement changes dimensions */
+  onResize?: (event: ResizeEvent, context: PluginContext) => void;
+
+  /** Implement this to provide a custom handlebar React component */
+  renderHandle?: (props: HandleRenderProps, context: PluginContext) => ReactNode;
+  /** Implement this to wrap the default pane content */
+  renderPane?: (pane: Pane, context: PluginContext) => ReactNode;
+  /** Called when the split component unmounts */
   onDestroy?: (context: PluginContext) => void;
 }
 
