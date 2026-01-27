@@ -56,7 +56,9 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
       const clientX = "touches" in e ? (e.touches[0]?.clientX ?? 0) : e.clientX;
       const clientY = "touches" in e ? (e.touches[0]?.clientY ?? 0) : e.clientY;
 
-      const handlebars = container.querySelectorAll(".a-split-handlebar");
+      const handlebars = Array.from(container.querySelectorAll(".a-split-handlebar")).filter(
+        (h) => h.parentElement === container
+      );
 
       let totalHandlebarSpace = 0;
       handlebars.forEach((handlebar) => {
