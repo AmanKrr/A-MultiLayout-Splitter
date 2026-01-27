@@ -63,7 +63,8 @@ export default defineConfig({
             { text: 'Nested Sidebar', link: '/examples/nested' },
             { text: 'Custom Handles', link: '/examples/custom-handles' },
             { text: 'Interactive Controller', link: '/examples/controller' },
-            { text: 'Nested Control', link: '/examples/nested-control' }
+            { text: 'Nested Control', link: '/examples/nested-control' },
+            { text: 'Plugins', link: '/examples/plugins' }
           ]
         }
       ]
