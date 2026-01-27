@@ -75,7 +75,11 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
   const autoFixClass = !fixClass && nestingLevel > 2;
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== "production") {
+    // Development-only validation warnings - use globalThis to avoid TypeScript errors
+    const isDevelopment = typeof globalThis !== "undefined" &&
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (globalThis as any).process?.env?.NODE_ENV !== "production";
+    if (isDevelopment) {
       if (initialSizes.length > 0) {
         const childArray = React.Children.toArray(children);
         if (initialSizes.length !== childArray.length) {

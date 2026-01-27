@@ -15,6 +15,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "emitDeclarationOnly": true,
+    "declarationDir": "./dist",
     "jsx": "react-jsx",
     "composite": true,
     /* Linting - Strict mode enabled in Phase 2 */

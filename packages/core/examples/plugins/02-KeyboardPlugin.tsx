@@ -10,8 +10,9 @@ import { Split, keyboardPlugin } from '../../src';
 
 // Configure keyboard plugin
 const myKeyboardPlugin = keyboardPlugin({
-  resizeStep: 5,  // Resize by 5% per keystroke
-  enableFocusIndicator: true,
+  stepSize: 5,  // Resize by 5% per keystroke
+  enableArrowKeys: true,
+  enableTabNavigation: true,
 });
 
 export default function KeyboardPluginExample() {

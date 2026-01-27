@@ -6,7 +6,7 @@
  */
 
 import React, { useState } from 'react';
-import { Split, createPlugin, PluginContext } from '../../src';
+import { Split, createPlugin, PluginContext, DragStartEvent, DragMoveEvent, DragEndEvent, PaneAddEvent, PaneRemoveEvent } from '../../src';
 
 // Custom Analytics Plugin
 const analyticsPlugin = createPlugin({
@@ -17,14 +17,14 @@ const analyticsPlugin = createPlugin({
     console.log('✅ Analytics plugin initialized for:', context.splitId);
   },
 
-  onDragStart(event, context) {
+  onDragStart(event: DragStartEvent, context: PluginContext) {
     console.log('🎯 Drag started:', {
       paneIndex: event.paneIndex,
       splitId: context.splitId,
     });
   },
 
-  onDragMove(event, context) {
+  onDragMove(event: DragMoveEvent, _context: PluginContext) {
     // Track drag movements (debounce in production!)
     console.log('↔️  Dragging:', {
       prevSize: event.prevSize.toFixed(1),
@@ -32,7 +32,7 @@ const analyticsPlugin = createPlugin({
     });
   },
 
-  onDragEnd(event, context) {
+  onDragEnd(event: DragEndEvent, _context: PluginContext) {
     console.log('✋ Drag ended:', {
       paneIndex: event.paneIndex,
       finalSizes: {
@@ -45,23 +45,15 @@ const analyticsPlugin = createPlugin({
     // analytics.track('split_resized', { ... });
   },
 
-  onPaneAdd(event, context) {
+  onPaneAdd(event: PaneAddEvent, _context: PluginContext) {
     console.log('➕ Pane added:', event.pane.id);
   },
 
-  onPaneRemove(event, context) {
+  onPaneRemove(event: PaneRemoveEvent, _context: PluginContext) {
     console.log('➖ Pane removed:', event.pane.id);
   },
 
-  onPaneCollapse(event, context) {
-    console.log('📦 Pane collapsed:', event.pane.id);
-  },
-
-  onPaneExpand(event, context) {
-    console.log('📂 Pane expanded:', event.pane.id);
-  },
-
-  onDestroy(context) {
+  onDestroy(_context: PluginContext) {
     console.log('🔌 Analytics plugin destroyed');
   },
 });
@@ -74,23 +66,23 @@ export default function CustomPluginExample() {
     name: 'ui-logger',
     version: '1.0.0',
 
-    onDragEnd(event) {
+    onDragEnd(event: DragEndEvent) {
       setEvents(prev => [
         `Resized: ${event.prevSize.toFixed(1)}% / ${event.nextSize.toFixed(1)}%`,
         ...prev.slice(0, 4),
       ]);
     },
 
-    onPaneCollapse(event) {
+    onPaneAdd(event: PaneAddEvent) {
       setEvents(prev => [
-        `Collapsed: ${event.pane.id}`,
+        `Pane added: ${event.pane.id}`,
         ...prev.slice(0, 4),
       ]);
     },
 
-    onPaneExpand(event) {
+    onPaneRemove(event: PaneRemoveEvent) {
       setEvents(prev => [
-        `Expanded: ${event.pane.id}`,
+        `Pane removed: ${event.pane.id}`,
         ...prev.slice(0, 4),
       ]);
     },

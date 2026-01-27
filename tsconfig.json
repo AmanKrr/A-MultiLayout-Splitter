@@ -27,9 +27,6 @@
   "references": [
     {
       "path": "./packages/core"
-    },
-    {
-      "path": "./examples/basic"
     }
   ],
   "exclude": [

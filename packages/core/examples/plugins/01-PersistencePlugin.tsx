@@ -11,7 +11,7 @@ import { Split, persistencePlugin } from '../../src';
 // Configure persistence plugin
 const myPersistencePlugin = persistencePlugin({
   storage: 'localStorage',  // 'localStorage' or 'sessionStorage'
-  debounce: 500,           // Save after 500ms of inactivity
+  debounceDelay: 500,       // Save after 500ms of inactivity
 });
 
 export default function PersistencePluginExample() {

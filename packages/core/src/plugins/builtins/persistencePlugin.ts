@@ -33,7 +33,7 @@ export function persistencePlugin(options: PersistencePluginOptions = {}) {
     debounceDelay = 300,
   } = options;
 
-  let debounceTimer: NodeJS.Timeout | null = null;
+  let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   const getStorageKey = (splitId: string) =>
     customKey || `a-multilayout-splitter:${splitId}`;
