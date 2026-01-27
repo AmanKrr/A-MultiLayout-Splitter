@@ -1,20 +1,16 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "target": "es2015",
-    "module": "esnext",
-    "declaration": true,
-    "outDir": "./ts-build",
-    "strict": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "target": "ESNext",
     "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
+      "ESNext",
+      "DOM"
     ],
-    "jsx": "react-jsx",
-    "moduleResolution": "node",
-    "removeComments": false,
+    "strict": true,
     "skipLibCheck": true,
+    "composite": true,
+    "noEmit": true,
     "baseUrl": ".",
     "paths": {
       "@a-multilayout-splitter/core": [
@@ -25,12 +21,19 @@
       ]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*tsx",
-    "src/**/*.css"
+  "files": [
+    "playwright.config.ts"
+  ],
+  "references": [
+    {
+      "path": "./packages/core"
+    },
+    {
+      "path": "./examples/basic"
+    }
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "dist"
   ]
 }

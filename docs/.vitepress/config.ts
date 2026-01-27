@@ -1,3 +1,4 @@
+import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vitepress'
 import react from '@vitejs/plugin-react'
 
@@ -6,7 +7,7 @@ export default defineConfig({
     plugins: [react()],
     resolve: {
       alias: {
-        '@a-multilayout-splitter/core': '/Users/amankumar/Desktop/Projects/A-MultiLayout-Splitter/packages/core/src'
+        '@a-multilayout-splitter/core': fileURLToPath(new URL('../../packages/core/src', import.meta.url))
       }
     }
   },
