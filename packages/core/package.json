@@ -2,6 +2,17 @@
   "name": "@a-multilayout-splitter/core",
   "version": "6.0.0-alpha.1",
   "description": "A modern React component for building resizable, multi-pane layouts with flexible split views and complex layout support.",
+  "author": "Aman Kumar",
+  "license": "MIT",
+  "homepage": "https://amankrr.github.io/A-MultiLayout-Splitter/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AmanKrr/A-MultiLayout-Splitter.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/AmanKrr/A-MultiLayout-Splitter/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -15,7 +26,8 @@
     "./style.css": "./dist/style.css"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
   "scripts": {
     "dev": "vite build --watch",
