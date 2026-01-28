@@ -2,7 +2,7 @@ import { Split } from '@a-multilayout-splitter/core';
 
 export default function HomeDemo() {
   return (
-    <div style={{ height: '200px', width: '100%', maxWidth: '600px', margin: '0 auto', border: '1px solid var(--vp-c-divider)', borderRadius: '8px', overflow: 'hidden' }}>
+    <div style={{ height: '200px', width: '100%', border: '1px solid var(--vp-c-divider)', borderRadius: '8px', overflow: 'hidden' }}>
       <Split initialSizes={['30%', '70%']}>
         <div style={{ background: 'var(--vp-c-brand-soft)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           SIDEBAR

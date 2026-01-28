@@ -14,3 +14,16 @@
 .react-container>div {
   height: 100%;
 }
+
+/* Increase hero image size */
+.VPHero .image-container .image-bg {
+  transform: none;
+  width: auto;
+  height: 320px;
+}
+
+.VPHero .image-container img {
+  width: auto;
+  height: 280px;
+  max-width: unset;
+}

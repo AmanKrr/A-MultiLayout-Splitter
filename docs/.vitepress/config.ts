@@ -14,9 +14,10 @@ export default defineConfig({
   title: "A-MultiLayout-Splitter",
   description: "High-performance resizable split layouts for React",
   base: "/A-MultiLayout-Splitter/", // GitHub Pages base path
+  head: [["link", { rel: "icon", type: "image/svg+xml", href: "/A-MultiLayout-Splitter/logo.svg" }]],
 
   themeConfig: {
-    logo: "/logo.png", // Placeholder
+    logo: { src: "/logo.svg", width: 32, height: 32 },
     nav: [
       { text: "Guide", link: "/guide/getting-started" },
       { text: "API", link: "/api/props" },

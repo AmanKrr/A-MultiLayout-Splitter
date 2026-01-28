@@ -6,7 +6,7 @@ hero:
   text: "High-Performance React Splitters"
   tagline: Zero-lag resizable layouts with a modern React-First architecture.
   image:
-    src: /logo.png
+    src: /logo.svg
     alt: Splitter Logo
   actions:
     - theme: brand

@@ -1,0 +1,47 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 100 100"
+  width="100"
+  height="100"
+  fill="none"
+>
+  <!-- Top-left pane -->
+  <rect
+    x="0"
+    y="0"
+    width="48"
+    height="48"
+    rx="8"
+    fill="#4F8CFF"
+  />
+
+  <!-- Bottom-left pane (clean rectangle) -->
+  <rect
+    x="0"
+    y="52"
+    width="48"
+    height="48"
+    rx="8"
+    fill="#2F343C"
+  />
+
+  <!-- Diagonal splitter overlay (starts lower, no cut-out) -->
+  <path
+    d="M0 90
+       L48 66
+       L48 100
+       L0 100
+       Z"
+    fill="#3A3F47"
+  />
+
+  <!-- Right full-height pane -->
+  <rect
+    x="52"
+    y="0"
+    width="48"
+    height="100"
+    rx="8"
+    fill="#FFD400"
+  />
+</svg>
