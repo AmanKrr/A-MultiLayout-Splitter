@@ -1,6 +1,6 @@
 {
   "name": "@a-multilayout-splitter/core",
-  "version": "6.0.0-alpha.3",
+  "version": "6.0.0-alpha.4",
   "description": "A modern React component for building resizable, multi-pane layouts with flexible split views and complex layout support.",
   "author": "Aman Kumar",
   "license": "MIT",

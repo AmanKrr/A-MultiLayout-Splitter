@@ -1,3 +1,10 @@
+# [6.0.0-alpha.4](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v6.0.0-alpha.3...v6.0.0-alpha.4) (2026-01-28)
+
+
+### Bug Fixes
+
+* **docs:** update license badge link to v6 branch ([a85b293](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/a85b2938f7ef4cb081d1ff1091483269864b5cd4))
+
 # [6.0.0-alpha.3](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v6.0.0-alpha.2...v6.0.0-alpha.3) (2026-01-28)
 
 
