@@ -1,3 +1,11 @@
+# [6.0.0-alpha.2](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2026-01-28)
+
+
+### Bug Fixes
+
+* **ci:** update pnpm version to 10 for lockfile compatibility ([d9ed569](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/d9ed569692718ea0bf7ee5d1edf445cbe436a7e5))
+* **core:** add package metadata and README for npm ([12c7e7a](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/12c7e7a580eb24144fb679ac2587c50d47c499cb))
+
 # [6.0.0-alpha.1](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v5.2.1...v6.0.0-alpha.1) (2026-01-27)
 
 ### Bug Fixes
