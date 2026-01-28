@@ -1,3 +1,11 @@
+# [6.0.0-alpha.3](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v6.0.0-alpha.2...v6.0.0-alpha.3) (2026-01-28)
+
+
+### Features
+
+* **docs:** Add button star on github ([7170661](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/7170661c9bbf69798c075a170b18cb45a85a262e))
+* **docs:** add SVG logo, favicon, and improve UI styling ([e87a87f](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/e87a87ff7af96ee173729292f6043d1e68241f68))
+
 # [6.0.0-alpha.2](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v6.0.0-alpha.1...v6.0.0-alpha.2) (2026-01-28)
 
 
