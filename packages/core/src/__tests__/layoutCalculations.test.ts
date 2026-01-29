@@ -9,13 +9,12 @@ import {
   calculateFlexBasis,
   calculateFlexValues,
   calculateHandlebarPosition,
-  getContainerDimensions,
   normalizePaneSizes,
   canResize,
   getAxisProperty,
   getCoordinateProperty,
-} from '../layoutCalculations';
-import { Pane } from '../../types';
+} from '../utils/layoutCalculations';
+import { Pane } from '../types';
 
 describe('layoutCalculations utilities', () => {
   beforeEach(() => {
@@ -170,7 +169,6 @@ describe('layoutCalculations utilities', () => {
     });
 
     it('falls back to pixels for unknown units', () => {
-      // The actual implementation returns '500' not '500px' for unitless values
       expect(calculateFlexBasis('500', 1000)).toBe('500');
     });
   });
@@ -241,26 +239,6 @@ describe('layoutCalculations utilities', () => {
     it('calculates position for viewport height', () => {
       expect(calculateHandlebarPosition('50vh', 1000, 'horizontal')).toBe(400);
       expect(calculateHandlebarPosition('100vh', 1000, 'horizontal')).toBe(800);
-    });
-  });
-
-  describe('getContainerDimensions', () => {
-    it('returns dimensions for horizontal mode', () => {
-      const element = document.createElement('div');
-      Object.defineProperty(element, 'offsetWidth', { value: 1000, writable: true });
-      Object.defineProperty(element, 'offsetHeight', { value: 600, writable: true });
-
-      const result = getContainerDimensions(element, 'horizontal');
-      expect(result).toEqual({ width: 1000, height: 600, primary: 1000 });
-    });
-
-    it('returns dimensions for vertical mode', () => {
-      const element = document.createElement('div');
-      Object.defineProperty(element, 'offsetWidth', { value: 1000, writable: true });
-      Object.defineProperty(element, 'offsetHeight', { value: 600, writable: true });
-
-      const result = getContainerDimensions(element, 'vertical');
-      expect(result).toEqual({ width: 1000, height: 600, primary: 600 });
     });
   });
 

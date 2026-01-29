@@ -3,8 +3,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { render } from '../../test/testUtils';
-import { Pane } from '../Pane';
+import { render } from '../test/testUtils';
+import { Pane } from '../components/Pane';
 
 describe('Pane', () => {
   describe('Rendering', () => {

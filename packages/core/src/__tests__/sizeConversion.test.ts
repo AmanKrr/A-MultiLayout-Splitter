@@ -10,7 +10,7 @@ import {
   parseSize,
   haveSameUnit,
   clampSize,
-} from '../sizeConversion';
+} from '../utils/sizeConversion';
 
 describe('sizeConversion utilities', () => {
   describe('percentageToPixel', () => {

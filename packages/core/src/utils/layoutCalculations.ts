@@ -162,33 +162,6 @@ export function calculateHandlebarPosition(
 }
 
 /**
- * Default size of the resize handlebar in pixels.
- */
-export const HANDLEBAR_SIZE = 11;
-
-/**
- * Calculates the operational dimensions of the split container.
- * 
- * @param element - Container DOM element
- * @param mode - Layout orientation
- * @param handlebarCount - Number of resize bars
- */
-export function getContainerDimensions(
-  element: HTMLElement,
-  mode: SplitMode,
-  handlebarCount: number = 0
-): { width: number; height: number; primary: number; availableForPanes: number } {
-  const width = element.offsetWidth;
-  const height = element.offsetHeight;
-  const primary = mode === 'horizontal' ? width : height;
-
-  const handlebarSpace = handlebarCount * HANDLEBAR_SIZE;
-  const availableForPanes = primary - handlebarSpace;
-
-  return { width, height, primary, availableForPanes };
-}
-
-/**
  * Normalizes pane percentages so they sum exactly to 100%.
  */
 export function normalizePaneSizes(panes: Pane[]): Pane[] {

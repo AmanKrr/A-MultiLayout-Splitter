@@ -117,7 +117,6 @@ export {
   calculateFlexBasis,
   calculateFlexValues,
   calculateHandlebarPosition,
-  getContainerDimensions,
   normalizePaneSizes,
   canResize,
   getAxisProperty,

@@ -4,8 +4,8 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { usePersistence } from '../usePersistence';
-import { Pane } from '../../types';
+import { usePersistence } from '../hooks/usePersistence';
+import { Pane } from '../types';
 
 describe('usePersistence', () => {
   beforeEach(() => {
