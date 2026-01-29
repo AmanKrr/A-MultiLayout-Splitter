@@ -3,7 +3,7 @@
 **High-performance resizable split layouts for React.** Built for the modern web with a focus on speed, accessibility, and developer experience.
 
 [![CI](https://github.com/AmanKrr/A-MultiLayout-Splitter/actions/workflows/test.yml/badge.svg?branch=v6)](https://github.com/AmanKrr/A-MultiLayout-Splitter/actions/workflows/test.yml)
-[![npm version](https://img.shields.io/npm/v/@a-multilayout-splitter/core.svg?style=flat-square)](https://www.npmjs.com/package/@a-multilayout-splitter/core)
+[![npm version](https://img.shields.io/npm/v/@a-multilayout-splitter/core/alpha.svg?style=flat-square)](https://www.npmjs.com/package/@a-multilayout-splitter/core?activeTab=versions)
 ![React](https://img.shields.io/badge/React-18%20%7C%2019-61dafb?style=flat-square)
 [![license](https://img.shields.io/github/license/AmanKrr/A-MultiLayout-Splitter?style=flat-square)](https://github.com/AmanKrr/A-MultiLayout-Splitter/blob/v6/LICENSE)
 [![docs](https://img.shields.io/badge/docs-v6-blueviolet?style=flat-square)](https://amankrr.github.io/A-MultiLayout-Splitter/)
