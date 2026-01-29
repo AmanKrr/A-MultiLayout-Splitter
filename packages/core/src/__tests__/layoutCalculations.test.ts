@@ -102,7 +102,7 @@ describe('layoutCalculations utilities', () => {
 
       const result = validatePaneSizes(panes, 1000);
       expect(result.valid).toBe(false);
-      expect(result.errors.some(e => e.includes('exceeds 100%'))).toBe(true);
+      expect(result.errors.some((e) => e.includes('exceeds 100%'))).toBe(true);
     });
 
     it('allows small floating point errors', () => {
@@ -117,33 +117,27 @@ describe('layoutCalculations utilities', () => {
     });
 
     it('detects negative minSize', () => {
-      const panes: Pane[] = [
-        { id: '1', size: '50%', collapsed: false, minSize: -10, maxSize: 90, content: null, mode: 'horizontal' },
-      ];
+      const panes: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: -10, maxSize: 90, content: null, mode: 'horizontal' }];
 
       const result = validatePaneSizes(panes, 1000);
       expect(result.valid).toBe(false);
-      expect(result.errors.some(e => e.includes('cannot be negative'))).toBe(true);
+      expect(result.errors.some((e) => e.includes('cannot be negative'))).toBe(true);
     });
 
     it('detects maxSize less than minSize', () => {
-      const panes: Pane[] = [
-        { id: '1', size: '50%', collapsed: false, minSize: 80, maxSize: 20, content: null, mode: 'horizontal' },
-      ];
+      const panes: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: 80, maxSize: 20, content: null, mode: 'horizontal' }];
 
       const result = validatePaneSizes(panes, 1000);
       expect(result.valid).toBe(false);
-      expect(result.errors.some(e => e.includes('less than minSize'))).toBe(true);
+      expect(result.errors.some((e) => e.includes('less than minSize'))).toBe(true);
     });
 
     it('detects maxSize exceeding 100%', () => {
-      const panes: Pane[] = [
-        { id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 120, content: null, mode: 'horizontal' },
-      ];
+      const panes: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 120, content: null, mode: 'horizontal' }];
 
       const result = validatePaneSizes(panes, 1000);
       expect(result.valid).toBe(false);
-      expect(result.errors.some(e => e.includes('exceeds 100%'))).toBe(true);
+      expect(result.errors.some((e) => e.includes('exceeds 100%'))).toBe(true);
     });
   });
 

@@ -43,11 +43,16 @@ export default function HookBasedAPIExample() {
     <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Control Panel */}
       <div style={{ padding: '10px', background: '#f5f5f5', borderBottom: '1px solid #ddd' }}>
-        <button onClick={() => controller.addPane({
-          position: 1,
-          size: '200px',
-          content: <div style={{ padding: '20px' }}>New Pane</div>,
-        })} style={{ marginRight: '10px' }}>
+        <button
+          onClick={() =>
+            controller.addPane({
+              position: 1,
+              size: '200px',
+              content: <div style={{ padding: '20px' }}>New Pane</div>,
+            })
+          }
+          style={{ marginRight: '10px' }}
+        >
           Add Pane
         </button>
         <button onClick={() => controller.removePane(0)} style={{ marginRight: '10px' }}>
@@ -59,9 +64,7 @@ export default function HookBasedAPIExample() {
         <button onClick={() => controller.swapPanes(0, 1)} style={{ marginRight: '10px' }}>
           Swap 0 & 1
         </button>
-        <span style={{ marginLeft: '20px' }}>
-          Total Panes: {controller.panes.length}
-        </span>
+        <span style={{ marginLeft: '20px' }}>Total Panes: {controller.panes.length}</span>
       </div>
 
       {/* Manual Rendering */}

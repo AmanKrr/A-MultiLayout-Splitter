@@ -92,12 +92,28 @@
   height: inherit !important;
   margin-inline: 5px;
   cursor: col-resize;
-  background: linear-gradient(to bottom, var(--split-bg-color) 0%, var(--split-bg-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-bg-color) calc(50% + 14px), var(--split-bg-color) 100%);
+  background: linear-gradient(
+    to bottom,
+    var(--split-bg-color) 0%,
+    var(--split-bg-color) calc(50% - 14px),
+    transparent calc(50% - 14px),
+    transparent calc(50% + 14px),
+    var(--split-bg-color) calc(50% + 14px),
+    var(--split-bg-color) 100%
+  );
 }
 
 .a-split-handlebar-horizontal:hover,
 .a-split-handlebar-horizontal:active {
-  background: linear-gradient(to bottom, var(--split-primary-color) 0%, var(--split-primary-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-primary-color) calc(50% - 14px), var(--split-primary-color) 100%);
+  background: linear-gradient(
+    to bottom,
+    var(--split-primary-color) 0%,
+    var(--split-primary-color) calc(50% - 14px),
+    transparent calc(50% - 14px),
+    transparent calc(50% + 14px),
+    var(--split-primary-color) calc(50% - 14px),
+    var(--split-primary-color) 100%
+  );
 }
 
 /* Hit area enhancement for easier grabbing */
@@ -118,12 +134,28 @@
   width: inherit !important;
   margin-block: 5px;
   cursor: row-resize;
-  background: linear-gradient(to right, var(--split-bg-color) 0%, var(--split-bg-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-bg-color) calc(50% + 14px), var(--split-bg-color) 100%);
+  background: linear-gradient(
+    to right,
+    var(--split-bg-color) 0%,
+    var(--split-bg-color) calc(50% - 14px),
+    transparent calc(50% - 14px),
+    transparent calc(50% + 14px),
+    var(--split-bg-color) calc(50% + 14px),
+    var(--split-bg-color) 100%
+  );
 }
 
 .a-split-handlebar-vertical:hover,
 .a-split-handlebar-vertical:active {
-  background: linear-gradient(to right, var(--split-primary-color) 0%, var(--split-primary-color) calc(50% - 14px), transparent calc(50% - 14px), transparent calc(50% + 14px), var(--split-primary-color) calc(50% + 14px), var(--split-primary-color) 100%);
+  background: linear-gradient(
+    to right,
+    var(--split-primary-color) 0%,
+    var(--split-primary-color) calc(50% - 14px),
+    transparent calc(50% - 14px),
+    transparent calc(50% + 14px),
+    var(--split-primary-color) calc(50% + 14px),
+    var(--split-primary-color) 100%
+  );
 }
 
 /* Hit area enhancement for easier grabbing */
@@ -207,7 +239,10 @@
   border-radius: 50%;
   background-color: transparent;
   color: transparent;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .a-split-collapse-btn.hidden {

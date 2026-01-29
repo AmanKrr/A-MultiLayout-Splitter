@@ -32,11 +32,7 @@ export default function CustomHandlebarExample() {
 
   return (
     <div style={{ height: '100%', width: '100%' }}>
-      <Split
-        mode="horizontal"
-        initialSizes={['50%', '50%']}
-        renderBar={renderCustomBar}
-      >
+      <Split mode="horizontal" initialSizes={['50%', '50%']} renderBar={renderCustomBar}>
         <div style={{ padding: '20px', background: '#f0f8ff' }}>
           <h2>Left Pane</h2>
           <p>Custom gradient handlebar!</p>

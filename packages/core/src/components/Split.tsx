@@ -5,19 +5,19 @@
  * Uses direct DOM manipulation for 60fps drag performance.
  */
 
-import React, { forwardRef, useImperativeHandle, useRef, useEffect, useMemo, useState, useCallback } from "react";
+import React, { forwardRef, useImperativeHandle, useRef, useEffect, useMemo, useState, useCallback } from 'react';
 // @ts-ignore - SplitSnapshot is used in function signature
-import type { SplitProps, SplitRef, SplitState, SplitAction, SplitSnapshot } from "../types";
-import { usePaneManager } from "../hooks/usePaneManager";
-import { useDragHandler } from "../hooks/useDragHandler";
-import { usePersistence } from "../hooks/usePersistence";
-import { usePluginContext } from "../hooks/usePluginContext";
-import { isHandlebarDisabled, isHandlebarVisible, isLineBarStyle, shouldShowHandlebar } from "../utils/paneOperations";
-import { useNestingLevel, NestingProvider } from "../contexts/NestingContext";
-import { DragHandle } from "./DragHandle";
-import { Pane } from "./Pane";
-import { PluginManager } from "../plugins/PluginManager";
-import "../styles/split.css";
+import type { SplitProps, SplitRef, SplitState, SplitAction, SplitSnapshot } from '../types';
+import { usePaneManager } from '../hooks/usePaneManager';
+import { useDragHandler } from '../hooks/useDragHandler';
+import { usePersistence } from '../hooks/usePersistence';
+import { usePluginContext } from '../hooks/usePluginContext';
+import { isHandlebarDisabled, isHandlebarVisible, isLineBarStyle, shouldShowHandlebar } from '../utils/paneOperations';
+import { useNestingLevel, NestingProvider } from '../contexts/NestingContext';
+import { DragHandle } from './DragHandle';
+import { Pane } from './Pane';
+import { PluginManager } from '../plugins/PluginManager';
+import '../styles/split.css';
 
 /**
  * Split Component
@@ -43,7 +43,7 @@ import "../styles/split.css";
 export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
   const {
     id: providedId,
-    mode = "horizontal",
+    mode = 'horizontal',
     initialSizes = [],
     minSizes = [],
     maxSizes = [],
@@ -56,7 +56,7 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     enablePersistence = false,
     width = null,
     height = null,
-    className = "",
+    className = '',
     style = {},
     fixClass = false,
     children,
@@ -76,9 +76,10 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
 
   useEffect(() => {
     // Development-only validation warnings - use globalThis to avoid TypeScript errors
-    const isDevelopment = typeof globalThis !== "undefined" &&
+    const isDevelopment =
+      typeof globalThis !== 'undefined' &&
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (globalThis as any).process?.env?.NODE_ENV !== "production";
+      (globalThis as any).process?.env?.NODE_ENV !== 'production';
     if (isDevelopment) {
       if (initialSizes.length > 0) {
         const childArray = React.Children.toArray(children);
@@ -87,12 +88,12 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         }
 
         initialSizes.forEach((size, idx) => {
-          if (typeof size === "string") {
+          if (typeof size === 'string') {
             const parsed = parseFloat(size);
             if (isNaN(parsed)) {
               console.warn(`[Split] Invalid size at index ${idx}: "${size}". Expected format: "50%", "100px", etc.`);
             }
-            if (size.includes("%")) {
+            if (size.includes('%')) {
               const percent = parseFloat(size);
               if (percent < 0 || percent > 100) {
                 console.warn(`[Split] Size at index ${idx} is out of range: "${size}". Percentage should be 0-100.`);
@@ -102,7 +103,7 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         });
 
         const totalPercent = initialSizes.reduce((sum, size) => {
-          if (typeof size === "string" && size.includes("%")) {
+          if (typeof size === 'string' && size.includes('%')) {
             return sum + parseFloat(size);
           }
           return sum;
@@ -144,25 +145,25 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     collapsed,
     minSizes,
     maxSizes,
-    id,
+    id
   );
 
   const [dragState, setDragState] = useState<any>(null);
 
   useEffect(() => {
     if (dragState && dragState.active) {
-      document.body.classList.add("a-split-body-dragging");
-      document.body.classList.add(mode === "horizontal" ? "a-split-body-dragging-horizontal" : "a-split-body-dragging-vertical");
+      document.body.classList.add('a-split-body-dragging');
+      document.body.classList.add(mode === 'horizontal' ? 'a-split-body-dragging-horizontal' : 'a-split-body-dragging-vertical');
     } else {
-      document.body.classList.remove("a-split-body-dragging");
-      document.body.classList.remove("a-split-body-dragging-horizontal");
-      document.body.classList.remove("a-split-body-dragging-vertical");
+      document.body.classList.remove('a-split-body-dragging');
+      document.body.classList.remove('a-split-body-dragging-horizontal');
+      document.body.classList.remove('a-split-body-dragging-vertical');
     }
 
     return () => {
-      document.body.classList.remove("a-split-body-dragging");
-      document.body.classList.remove("a-split-body-dragging-horizontal");
-      document.body.classList.remove("a-split-body-dragging-vertical");
+      document.body.classList.remove('a-split-body-dragging');
+      document.body.classList.remove('a-split-body-dragging-horizontal');
+      document.body.classList.remove('a-split-body-dragging-vertical');
     };
   }, [dragState, mode]);
 
@@ -177,19 +178,19 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
   const dispatch = useCallback(
     (action: SplitAction) => {
       switch (action.type) {
-        case "ADD_PANE":
+        case 'ADD_PANE':
           addPane(action.payload);
           break;
-        case "REMOVE_PANE":
+        case 'REMOVE_PANE':
           removePane(action.payload);
           break;
-        case "TOGGLE_PANE":
+        case 'TOGGLE_PANE':
           togglePane(action.payload);
           break;
-        case "SET_PANE_SIZE":
+        case 'SET_PANE_SIZE':
           setPaneSize(action.payload.index, action.payload.size);
           break;
-        case "RESTORE_STATE":
+        case 'RESTORE_STATE':
           action.payload.panes.forEach((pane, idx) => {
             setPaneSize(idx, pane.size);
             if (pane.collapsed) {
@@ -197,13 +198,13 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
             }
           });
           break;
-        case "ADJUST_PANE_SIZE":
+        case 'ADJUST_PANE_SIZE':
           if (action.payload && dragState?.paneIndex != null) {
             const paneIndex = dragState.paneIndex;
             const currentPane = panes[paneIndex];
             if (currentPane) {
               const currentSize = parseFloat(currentPane.size);
-              const delta = action.payload.direction === "grow" ? action.payload.amount : -action.payload.amount;
+              const delta = action.payload.direction === 'grow' ? action.payload.amount : -action.payload.amount;
               const newSize = Math.max(currentPane.minSize || 0, Math.min(currentPane.maxSize || 100, currentSize + delta));
               setPaneSize(paneIndex, `${newSize}%`);
             }
@@ -211,7 +212,7 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
           break;
       }
     },
-    [addPane, removePane, togglePane, setPaneSize, panes, dragState],
+    [addPane, removePane, togglePane, setPaneSize, panes, dragState]
   );
 
   const pluginContext = usePluginContext(id, getState, dispatch, containerRef);
@@ -311,10 +312,10 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         const minSize = minSizes[idx];
         const maxSize = maxSizes[idx];
         if (minSize !== undefined) {
-          element.setAttribute("data-min-size", String(minSizes[idx]));
+          element.setAttribute('data-min-size', String(minSizes[idx]));
         }
         if (maxSize !== undefined) {
-          element.setAttribute("data-max-size", String(maxSizes[idx]));
+          element.setAttribute('data-max-size', String(maxSizes[idx]));
         }
       }
     });
@@ -323,28 +324,28 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const handlebars = containerRef.current.querySelectorAll(".a-split-handlebar");
+    const handlebars = containerRef.current.querySelectorAll('.a-split-handlebar');
     handlebars.forEach((handlebar, idx) => {
       const element = handlebar as HTMLElement;
       const handlebarIndex = idx + 1;
 
       const isDisabled = isHandlebarDisabled(handlebarIndex, disable);
       if (isDisabled) {
-        element.classList.add("a-split-handlebar-disabled");
-        element.style.cursor = "default";
+        element.classList.add('a-split-handlebar-disabled');
+        element.style.cursor = 'default';
       } else {
-        element.classList.remove("a-split-handlebar-disabled");
-        element.style.cursor = mode === "horizontal" ? "col-resize" : "row-resize";
+        element.classList.remove('a-split-handlebar-disabled');
+        element.style.cursor = mode === 'horizontal' ? 'col-resize' : 'row-resize';
       }
 
       const isVisible = isHandlebarVisible(handlebarIndex, visible);
-      element.style.display = isVisible ? "" : "none";
+      element.style.display = isVisible ? '' : 'none';
 
       const isLinebar = isLineBarStyle(handlebarIndex, lineBar);
       if (isLinebar) {
-        element.classList.add("a-split-handlebar-line");
+        element.classList.add('a-split-handlebar-line');
       } else {
-        element.classList.remove("a-split-handlebar-line");
+        element.classList.remove('a-split-handlebar-line');
       }
     });
   }, [disable, visible, lineBar, mode]);
@@ -355,7 +356,7 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
       pluginManagerRef.current?.onDragStart(event);
       const pane = panes[event.paneIndex];
       if (pane) {
-        onLayoutChange?.(event.paneIndex, pane.id, "dragging", null);
+        onLayoutChange?.(event.paneIndex, pane.id, 'dragging', null);
       }
     },
     onDragMove: (event) => {
@@ -372,41 +373,41 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
       onDragEnd?.(event.prevSize, event.nextSize, event.paneIndex);
       const pane = panes[event.paneIndex];
       if (pane) {
-        onLayoutChange?.(event.paneIndex, pane.id, "dragged", null);
+        onLayoutChange?.(event.paneIndex, pane.id, 'dragged', null);
       }
     },
   });
 
   const handleCollapse = useCallback(
-    (handlebarIndex: number, direction: "left" | "right") => {
-      const paneIndexToCollapse = direction === "left" ? handlebarIndex - 1 : handlebarIndex;
+    (handlebarIndex: number, direction: 'left' | 'right') => {
+      const paneIndexToCollapse = direction === 'left' ? handlebarIndex - 1 : handlebarIndex;
 
       if (paneIndexToCollapse >= 0 && paneIndexToCollapse < panes.length) {
         collapsePane(paneIndexToCollapse, { direction });
         const pane = panes[paneIndexToCollapse];
         if (pane) {
           pluginManagerRef.current?.onPaneCollapse({ pane, index: paneIndexToCollapse, direction });
-          onLayoutChange?.(paneIndexToCollapse, pane.id, "close", direction);
+          onLayoutChange?.(paneIndexToCollapse, pane.id, 'close', direction);
         }
       }
     },
-    [panes, collapsePane, onLayoutChange],
+    [panes, collapsePane, onLayoutChange]
   );
 
   const handleExpand = useCallback(
-    (handlebarIndex: number, direction: "left" | "right") => {
-      const paneIndexToExpand = direction === "left" ? handlebarIndex - 1 : handlebarIndex;
+    (handlebarIndex: number, direction: 'left' | 'right') => {
+      const paneIndexToExpand = direction === 'left' ? handlebarIndex - 1 : handlebarIndex;
 
       if (paneIndexToExpand >= 0 && paneIndexToExpand < panes.length) {
         expandPane(paneIndexToExpand, { direction });
         const pane = panes[paneIndexToExpand];
         if (pane) {
           pluginManagerRef.current?.onPaneExpand({ pane, index: paneIndexToExpand, direction });
-          onLayoutChange?.(paneIndexToExpand, pane.id, "open", direction);
+          onLayoutChange?.(paneIndexToExpand, pane.id, 'open', direction);
         }
       }
     },
-    [panes, expandPane, onLayoutChange],
+    [panes, expandPane, onLayoutChange]
   );
 
   useImperativeHandle(
@@ -424,7 +425,7 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
       resizePane,
       getSnapshot: () => {
         const container = containerRef.current;
-        const totalSize = container ? (mode === "horizontal" ? container.offsetWidth : container.offsetHeight) : 0;
+        const totalSize = container ? (mode === 'horizontal' ? container.offsetWidth : container.offsetHeight) : 0;
 
         return {
           panes: panes.map((p) => ({ ...p })),
@@ -449,32 +450,32 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         });
       },
     }),
-    [addPane, removePane, togglePane, setPaneSize, getPaneState, removePanes, swapPanes, collapsePane, expandPane, resizePane, panes, mode],
+    [addPane, removePane, togglePane, setPaneSize, getPaneState, removePanes, swapPanes, collapsePane, expandPane, resizePane, panes, mode]
   );
 
   const containerStyles = useMemo(() => {
     const baseStyles: React.CSSProperties = {
-      display: "flex",
-      flexDirection: mode === "horizontal" ? "row" : "column",
-      width: width || "100%",
-      height: height || "100%",
-      overflow: "hidden",
+      display: 'flex',
+      flexDirection: mode === 'horizontal' ? 'row' : 'column',
+      width: width || '100%',
+      height: height || '100%',
+      overflow: 'hidden',
       ...style,
     };
     return baseStyles;
   }, [mode, width, height, style]);
 
   const containerClass = useMemo(() => {
-    const classes = ["a-split-container"];
-    if (mode === "vertical") classes.push("a-split-vertical");
-    if (fixClass || autoFixClass) classes.push("a-split-fix");
+    const classes = ['a-split-container'];
+    if (mode === 'vertical') classes.push('a-split-vertical');
+    if (fixClass || autoFixClass) classes.push('a-split-fix');
 
     if (dragState?.active) {
-      classes.push("a-split-dragging");
+      classes.push('a-split-dragging');
     }
 
     if (className) classes.push(className);
-    return classes.join(" ");
+    return classes.join(' ');
   }, [mode, fixClass, autoFixClass, className, dragState?.active]);
 
   const renderContent = () => {
@@ -494,7 +495,7 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
           mode={mode}
           content={wrappedContent}
           flexGrow={pane.flexGrow}
-        />,
+        />
       );
 
       if (index < panes.length - 1) {
@@ -533,12 +534,12 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
                 lineBar={isLinebar}
                 explicitlyDisabled={explicitlyDisabled}
                 onMouseDown={(e: React.MouseEvent | React.TouchEvent) => handleMouseDown(handlebarIndex, e)}
-                onCollapse={(direction: "left" | "right") => handleCollapse(handlebarIndex, direction)}
-                onExpand={(direction: "left" | "right") => handleExpand(handlebarIndex, direction)}
+                onCollapse={(direction: 'left' | 'right') => handleCollapse(handlebarIndex, direction)}
+                onExpand={(direction: 'left' | 'right') => handleExpand(handlebarIndex, direction)}
                 renderCustom={renderBar}
                 leftPaneCollapsed={leftPaneCollapsed}
                 rightPaneCollapsed={rightPaneCollapsed}
-              />,
+              />
             );
           }
         }
@@ -555,4 +556,4 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
   );
 });
 
-Split.displayName = "Split";
+Split.displayName = 'Split';

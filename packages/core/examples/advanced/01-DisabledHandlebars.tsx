@@ -14,7 +14,7 @@ export default function DisabledHandlebarsExample() {
       <Split
         mode="horizontal"
         initialSizes={['25%', '50%', '25%']}
-        disable={[false, true]}  // Second handlebar is disabled
+        disable={[false, true]} // Second handlebar is disabled
       >
         <div style={{ padding: '20px', background: '#e8f5e9' }}>
           <h2>Left Pane</h2>

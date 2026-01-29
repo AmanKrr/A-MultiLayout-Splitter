@@ -21,9 +21,7 @@ describe('useSplitController', () => {
     });
 
     it('initializes with custom mode', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ mode: 'vertical' })
-      );
+      const { result } = renderHook(() => useSplitController({ mode: 'vertical' }));
 
       expect(result.current.mode).toBe('vertical');
     });
@@ -47,9 +45,7 @@ describe('useSplitController', () => {
         { id: 'pane-2', size: '50%', collapsed: true, minSize: 20, maxSize: 80, content: null },
       ];
 
-      const { result } = renderHook(() =>
-        useSplitController({ initialPanes })
-      );
+      const { result } = renderHook(() => useSplitController({ initialPanes }));
 
       expect(result.current.panes).toEqual(initialPanes);
     });
@@ -72,9 +68,7 @@ describe('useSplitController', () => {
 
   describe('addPane', () => {
     it('adds a pane', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ initialSizes: ['50%', '50%'] })
-      );
+      const { result } = renderHook(() => useSplitController({ initialSizes: ['50%', '50%'] }));
 
       act(() => {
         result.current.addPane({ size: '30%' });
@@ -84,9 +78,7 @@ describe('useSplitController', () => {
     });
 
     it('adds a pane at specific position', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ initialSizes: ['50%', '50%'] })
-      );
+      const { result } = renderHook(() => useSplitController({ initialSizes: ['50%', '50%'] }));
 
       act(() => {
         result.current.addPane({ size: '30%', position: 0 });
@@ -116,9 +108,7 @@ describe('useSplitController', () => {
 
   describe('removePane', () => {
     it('removes a pane by index', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ initialSizes: ['33%', '34%', '33%'] })
-      );
+      const { result } = renderHook(() => useSplitController({ initialSizes: ['33%', '34%', '33%'] }));
 
       act(() => {
         result.current.removePane(1);
@@ -128,9 +118,7 @@ describe('useSplitController', () => {
     });
 
     it('redistributes sizes after removal', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ initialSizes: ['50%', '50%'] })
-      );
+      const { result } = renderHook(() => useSplitController({ initialSizes: ['50%', '50%'] }));
 
       act(() => {
         result.current.removePane(0);
@@ -141,9 +129,7 @@ describe('useSplitController', () => {
     });
 
     it('handles invalid index', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ initialSizes: ['50%', '50%'] })
-      );
+      const { result } = renderHook(() => useSplitController({ initialSizes: ['50%', '50%'] }));
 
       act(() => {
         result.current.removePane(-1);
@@ -156,9 +142,7 @@ describe('useSplitController', () => {
 
   describe('removePanes', () => {
     it('removes multiple panes', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ initialSizes: ['25%', '25%', '25%', '25%'] })
-      );
+      const { result } = renderHook(() => useSplitController({ initialSizes: ['25%', '25%', '25%', '25%'] }));
 
       act(() => {
         result.current.removePanes([0, 2]);
@@ -168,27 +152,20 @@ describe('useSplitController', () => {
     });
 
     it('redistributes sizes after removal', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ initialSizes: ['25%', '25%', '25%', '25%'] })
-      );
+      const { result } = renderHook(() => useSplitController({ initialSizes: ['25%', '25%', '25%', '25%'] }));
 
       act(() => {
         result.current.removePanes([0, 3]);
       });
 
-      const totalSize = result.current.panes.reduce(
-        (sum, p) => sum + parseFloat(p.size),
-        0
-      );
+      const totalSize = result.current.panes.reduce((sum, p) => sum + parseFloat(p.size), 0);
       expect(totalSize).toBeCloseTo(100);
     });
   });
 
   describe('togglePane', () => {
     it('toggles pane collapsed state', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ initialSizes: ['50%', '50%'] })
-      );
+      const { result } = renderHook(() => useSplitController({ initialSizes: ['50%', '50%'] }));
 
       expect(result.current.panes[0].collapsed).toBe(false);
 
@@ -208,9 +185,7 @@ describe('useSplitController', () => {
 
   describe('collapsePane', () => {
     it('collapses a pane', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ initialSizes: ['50%', '50%'] })
-      );
+      const { result } = renderHook(() => useSplitController({ initialSizes: ['50%', '50%'] }));
 
       act(() => {
         result.current.collapsePane(0);
@@ -225,9 +200,7 @@ describe('useSplitController', () => {
         { id: 'pane-2', size: '50%', collapsed: false, minSize: 0, maxSize: 100, content: null },
       ];
 
-      const { result } = renderHook(() =>
-        useSplitController({ initialPanes })
-      );
+      const { result } = renderHook(() => useSplitController({ initialPanes }));
 
       act(() => {
         result.current.collapsePane(0);
@@ -244,9 +217,7 @@ describe('useSplitController', () => {
         { id: 'pane-2', size: '50%', collapsed: false, minSize: 0, maxSize: 100, content: null },
       ];
 
-      const { result } = renderHook(() =>
-        useSplitController({ initialPanes })
-      );
+      const { result } = renderHook(() => useSplitController({ initialPanes }));
 
       act(() => {
         result.current.expandPane(0);
@@ -256,9 +227,7 @@ describe('useSplitController', () => {
     });
 
     it('does not modify already expanded pane', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ initialSizes: ['50%', '50%'] })
-      );
+      const { result } = renderHook(() => useSplitController({ initialSizes: ['50%', '50%'] }));
 
       act(() => {
         result.current.expandPane(0);
@@ -270,9 +239,7 @@ describe('useSplitController', () => {
 
   describe('setPaneSize', () => {
     it('sets pane size', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ initialSizes: ['50%', '50%'] })
-      );
+      const { result } = renderHook(() => useSplitController({ initialSizes: ['50%', '50%'] }));
 
       act(() => {
         result.current.setPaneSize(0, '30%');
@@ -282,9 +249,7 @@ describe('useSplitController', () => {
     });
 
     it('handles invalid index', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ initialSizes: ['50%', '50%'] })
-      );
+      const { result } = renderHook(() => useSplitController({ initialSizes: ['50%', '50%'] }));
 
       act(() => {
         result.current.setPaneSize(-1, '30%');
@@ -297,9 +262,7 @@ describe('useSplitController', () => {
 
   describe('swapPanes', () => {
     it('swaps two panes', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ initialSizes: ['30%', '40%', '30%'] })
-      );
+      const { result } = renderHook(() => useSplitController({ initialSizes: ['30%', '40%', '30%'] }));
 
       const originalFirst = result.current.panes[0].id;
       const originalLast = result.current.panes[2].id;
@@ -313,9 +276,7 @@ describe('useSplitController', () => {
     });
 
     it('handles same index', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ initialSizes: ['50%', '50%'] })
-      );
+      const { result } = renderHook(() => useSplitController({ initialSizes: ['50%', '50%'] }));
 
       const originalOrder = result.current.panes.map((p) => p.id);
 
@@ -329,9 +290,7 @@ describe('useSplitController', () => {
 
   describe('setPanes', () => {
     it('sets panes directly', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ initialSizes: ['50%', '50%'] })
-      );
+      const { result } = renderHook(() => useSplitController({ initialSizes: ['50%', '50%'] }));
 
       const newPanes = [
         { id: 'new-1', size: '60%', collapsed: false, minSize: 0, maxSize: 100, content: null },
@@ -346,14 +305,10 @@ describe('useSplitController', () => {
     });
 
     it('accepts function updater', () => {
-      const { result } = renderHook(() =>
-        useSplitController({ initialSizes: ['50%', '50%'] })
-      );
+      const { result } = renderHook(() => useSplitController({ initialSizes: ['50%', '50%'] }));
 
       act(() => {
-        result.current.setPanes((prev) =>
-          prev.map((p) => ({ ...p, collapsed: true }))
-        );
+        result.current.setPanes((prev) => prev.map((p) => ({ ...p, collapsed: true })));
       });
 
       expect(result.current.panes[0].collapsed).toBe(true);
@@ -418,9 +373,7 @@ describe('useSplitController', () => {
 
       const snapshot = {
         mode: 'vertical' as const,
-        panes: [
-          { id: 'pane-1', size: '30%', collapsed: false, minSize: 0, maxSize: 100, content: null },
-        ],
+        panes: [{ id: 'pane-1', size: '30%', collapsed: false, minSize: 0, maxSize: 100, content: null }],
         totalSize: 1000,
         timestamp: Date.now(),
       };

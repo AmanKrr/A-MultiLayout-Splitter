@@ -10,7 +10,7 @@
 }
 
 /* Ensure React content looks consistent */
-.react-container>div {
+.react-container > div {
   height: 100%;
 }
 
@@ -29,7 +29,9 @@
   font-size: 14px;
   font-weight: 600;
   line-height: 48px;
-  transition: background-color 0.25s, border-color 0.25s;
+  transition:
+    background-color 0.25s,
+    border-color 0.25s;
 }
 
 .github-star-btn:hover {

@@ -7,14 +7,17 @@ export default function KeyboardPluginDemo() {
   const [lastAction, setLastAction] = useState<string>('Click on the split area to focus');
 
   // Memoize the plugin to prevent recreation on every render
-  const plugins = useMemo(() => [
-    keyboardPlugin({
-      enableArrowKeys: true,
-      enableNumberKeys: true,
-      enableTabNavigation: true,
-      stepSize: 5,
-    })
-  ], []);
+  const plugins = useMemo(
+    () => [
+      keyboardPlugin({
+        enableArrowKeys: true,
+        enableNumberKeys: true,
+        enableTabNavigation: true,
+        stepSize: 5,
+      }),
+    ],
+    []
+  );
 
   const handleFocus = () => {
     setLastAction('Split focused - use keyboard now!');
@@ -43,24 +46,32 @@ export default function KeyboardPluginDemo() {
 
   return (
     <div style={{ padding: '20px', background: 'var(--vp-c-bg-soft)', borderRadius: '8px' }}>
-      <div style={{
-        display: 'flex',
-        gap: '12px',
-        marginBottom: '15px',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        padding: '12px',
-        background: 'var(--vp-c-bg)',
-        borderRadius: '6px',
-        border: '1px solid var(--vp-c-divider)'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: '12px',
+          marginBottom: '15px',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          padding: '12px',
+          background: 'var(--vp-c-bg)',
+          borderRadius: '6px',
+          border: '1px solid var(--vp-c-divider)',
+        }}
+      >
         <div style={{ fontSize: '12px', color: 'var(--vp-c-text-2)' }}>
           <strong>Keyboard Controls:</strong>
         </div>
         <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', fontSize: '12px' }}>
-          <span><span style={keyStyle}>←</span> <span style={keyStyle}>→</span> Resize</span>
-          <span><span style={keyStyle}>1</span>-<span style={keyStyle}>3</span> Focus pane</span>
-          <span><span style={keyStyle}>Tab</span> Cycle panes</span>
+          <span>
+            <span style={keyStyle}>←</span> <span style={keyStyle}>→</span> Resize
+          </span>
+          <span>
+            <span style={keyStyle}>1</span>-<span style={keyStyle}>3</span> Focus pane
+          </span>
+          <span>
+            <span style={keyStyle}>Tab</span> Cycle panes
+          </span>
         </div>
       </div>
 
@@ -74,13 +85,7 @@ export default function KeyboardPluginDemo() {
         }}
         onFocus={handleFocus}
       >
-        <Split
-          ref={splitRef}
-          mode="horizontal"
-          initialSizes={['33%', '34%', '33%']}
-          minSizes={[15, 15, 15]}
-          plugins={plugins}
-        >
+        <Split ref={splitRef} mode="horizontal" initialSizes={['33%', '34%', '33%']} minSizes={[15, 15, 15]} plugins={plugins}>
           <div
             style={{
               ...paneStyle,
@@ -90,7 +95,9 @@ export default function KeyboardPluginDemo() {
             onBlur={() => setFocusedPane(null)}
           >
             <strong>Pane 1</strong>
-            <span style={{ fontSize: '11px', opacity: 0.7 }}>Press <span style={keyStyle}>1</span> to focus</span>
+            <span style={{ fontSize: '11px', opacity: 0.7 }}>
+              Press <span style={keyStyle}>1</span> to focus
+            </span>
           </div>
           <div
             style={{
@@ -101,7 +108,9 @@ export default function KeyboardPluginDemo() {
             onBlur={() => setFocusedPane(null)}
           >
             <strong>Pane 2</strong>
-            <span style={{ fontSize: '11px', opacity: 0.7 }}>Press <span style={keyStyle}>2</span> to focus</span>
+            <span style={{ fontSize: '11px', opacity: 0.7 }}>
+              Press <span style={keyStyle}>2</span> to focus
+            </span>
           </div>
           <div
             style={{
@@ -112,37 +121,49 @@ export default function KeyboardPluginDemo() {
             onBlur={() => setFocusedPane(null)}
           >
             <strong>Pane 3</strong>
-            <span style={{ fontSize: '11px', opacity: 0.7 }}>Press <span style={keyStyle}>3</span> to focus</span>
+            <span style={{ fontSize: '11px', opacity: 0.7 }}>
+              Press <span style={keyStyle}>3</span> to focus
+            </span>
           </div>
         </Split>
       </div>
 
-      <div style={{
-        marginTop: '10px',
-        padding: '10px',
-        background: 'var(--vp-c-bg)',
-        borderRadius: '6px',
-        fontSize: '12px',
-        color: 'var(--vp-c-text-2)',
-        fontFamily: 'monospace',
-        textAlign: 'center' as const,
-      }}>
+      <div
+        style={{
+          marginTop: '10px',
+          padding: '10px',
+          background: 'var(--vp-c-bg)',
+          borderRadius: '6px',
+          fontSize: '12px',
+          color: 'var(--vp-c-text-2)',
+          fontFamily: 'monospace',
+          textAlign: 'center' as const,
+        }}
+      >
         {lastAction}
       </div>
 
-      <div style={{
-        marginTop: '10px',
-        padding: '10px',
-        background: 'var(--vp-c-bg)',
-        borderRadius: '6px',
-        fontSize: '12px',
-        color: 'var(--vp-c-text-2)',
-      }}>
+      <div
+        style={{
+          marginTop: '10px',
+          padding: '10px',
+          background: 'var(--vp-c-bg)',
+          borderRadius: '6px',
+          fontSize: '12px',
+          color: 'var(--vp-c-text-2)',
+        }}
+      >
         <strong>Accessibility Features:</strong>
         <ul style={{ margin: '8px 0 0 20px', padding: 0 }}>
-          <li><strong>Arrow Keys:</strong> Resize the focused pane</li>
-          <li><strong>Number Keys (1-9):</strong> Jump to specific pane</li>
-          <li><strong>Tab/Shift+Tab:</strong> Cycle through panes</li>
+          <li>
+            <strong>Arrow Keys:</strong> Resize the focused pane
+          </li>
+          <li>
+            <strong>Number Keys (1-9):</strong> Jump to specific pane
+          </li>
+          <li>
+            <strong>Tab/Shift+Tab:</strong> Cycle through panes
+          </li>
         </ul>
       </div>
     </div>

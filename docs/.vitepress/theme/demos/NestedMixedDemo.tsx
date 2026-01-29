@@ -17,7 +17,7 @@ export default function NestedMixedDemo() {
     ],
   });
 
-  const rightPanelCollapsed = rightPanelController.panes.map(p => p.collapsed);
+  const rightPanelCollapsed = rightPanelController.panes.map((p) => p.collapsed);
 
   const buttonStyle = {
     padding: '6px 12px',
@@ -54,17 +54,19 @@ export default function NestedMixedDemo() {
 
   return (
     <div style={{ padding: '20px', background: 'var(--vp-c-bg-soft)', borderRadius: '8px' }}>
-      <div style={{
-        display: 'flex',
-        gap: '8px',
-        marginBottom: '15px',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        padding: '10px',
-        background: 'var(--vp-c-bg)',
-        borderRadius: '6px',
-        border: '1px solid var(--vp-c-divider)'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: '8px',
+          marginBottom: '15px',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          padding: '10px',
+          background: 'var(--vp-c-bg)',
+          borderRadius: '6px',
+          border: '1px solid var(--vp-c-divider)',
+        }}
+      >
         <span style={{ fontSize: '11px', color: 'var(--vp-c-text-2)', marginRight: '4px' }}>Outer (Ref):</span>
         <button onClick={() => outerRef.current?.togglePane(0)} style={buttonStyle}>
           Toggle Sidebar
@@ -73,24 +75,28 @@ export default function NestedMixedDemo() {
           Toggle Right
         </button>
 
-        <span style={{
-          width: '1px',
-          height: '20px',
-          background: 'var(--vp-c-divider)',
-          margin: '0 8px'
-        }} />
+        <span
+          style={{
+            width: '1px',
+            height: '20px',
+            background: 'var(--vp-c-divider)',
+            margin: '0 8px',
+          }}
+        />
 
         <span style={{ fontSize: '11px', color: 'var(--vp-c-text-2)', marginRight: '4px' }}>Center (Ref):</span>
         <button onClick={() => centerRef.current?.togglePane(1)} style={secondaryStyle}>
           Toggle Terminal
         </button>
 
-        <span style={{
-          width: '1px',
-          height: '20px',
-          background: 'var(--vp-c-divider)',
-          margin: '0 8px'
-        }} />
+        <span
+          style={{
+            width: '1px',
+            height: '20px',
+            background: 'var(--vp-c-divider)',
+            margin: '0 8px',
+          }}
+        />
 
         <span style={{ fontSize: '11px', color: 'var(--vp-c-text-2)', marginRight: '4px' }}>Right (Hook):</span>
         <button onClick={() => rightPanelController.togglePane(1)} style={hookStyle}>
@@ -98,29 +104,21 @@ export default function NestedMixedDemo() {
         </button>
       </div>
 
-      <div style={{
-        height: '300px',
-        border: '1px solid var(--vp-c-divider)',
-        borderRadius: '6px',
-        overflow: 'hidden',
-      }}>
-        <Split
-          ref={outerRef}
-          mode="horizontal"
-          initialSizes={['20%', '50%', '30%']}
-          minSizes={[10, 30, 15]}
-        >
+      <div
+        style={{
+          height: '300px',
+          border: '1px solid var(--vp-c-divider)',
+          borderRadius: '6px',
+          overflow: 'hidden',
+        }}
+      >
+        <Split ref={outerRef} mode="horizontal" initialSizes={['20%', '50%', '30%']} minSizes={[10, 30, 15]}>
           <div style={{ ...paneStyle, background: '#252526', color: '#ccc' }}>
             <strong>Sidebar</strong>
             <span style={{ opacity: 0.6, fontSize: '10px' }}>Ref API</span>
           </div>
 
-          <Split
-            ref={centerRef}
-            mode="vertical"
-            initialSizes={['70%', '30%']}
-            minSizes={[30, 15]}
-          >
+          <Split ref={centerRef} mode="vertical" initialSizes={['70%', '30%']} minSizes={[30, 15]}>
             <div style={{ ...paneStyle, background: '#1e1e1e', color: '#d4d4d4' }}>
               <strong>Editor</strong>
               <span style={{ opacity: 0.6, fontSize: '10px' }}>Ref API</span>
@@ -131,12 +129,7 @@ export default function NestedMixedDemo() {
             </div>
           </Split>
 
-          <Split
-            mode="vertical"
-            initialSizes={['60%', '40%']}
-            collapsed={rightPanelCollapsed}
-            minSizes={[20, 15]}
-          >
+          <Split mode="vertical" initialSizes={['60%', '40%']} collapsed={rightPanelCollapsed} minSizes={[20, 15]}>
             <div style={{ ...paneStyle, background: 'var(--vp-c-bg)', color: 'var(--vp-c-text-1)' }}>
               <strong>Preview</strong>
               <span style={{ opacity: 0.6, fontSize: '10px', color: '#22c55e' }}>Hook API</span>
@@ -144,20 +137,20 @@ export default function NestedMixedDemo() {
             <div style={{ ...paneStyle, background: 'var(--vp-c-bg-alt)', color: 'var(--vp-c-text-2)' }}>
               <strong>Console</strong>
               <span style={{ opacity: 0.6, fontSize: '10px', color: '#22c55e' }}>Hook API</span>
-              <span style={{ fontSize: '10px', color: 'var(--vp-c-text-3)' }}>
-                ({rightPanelController.panes[1]?.collapsed ? 'collapsed' : 'expanded'})
-              </span>
+              <span style={{ fontSize: '10px', color: 'var(--vp-c-text-3)' }}>({rightPanelController.panes[1]?.collapsed ? 'collapsed' : 'expanded'})</span>
             </div>
           </Split>
         </Split>
       </div>
 
-      <div style={{
-        marginTop: '10px',
-        fontSize: '11px',
-        color: 'var(--vp-c-text-3)',
-        fontFamily: 'monospace'
-      }}>
+      <div
+        style={{
+          marginTop: '10px',
+          fontSize: '11px',
+          color: 'var(--vp-c-text-3)',
+          fontFamily: 'monospace',
+        }}
+      >
         Console state: {rightPanelController.panes[1]?.collapsed ? 'collapsed' : 'expanded'} (reactive via Hook)
       </div>
     </div>

@@ -20,11 +20,13 @@ const GripHandle: React.FC<HandleRenderProps> = ({ index, mode, disabled, onMous
       onMouseDown={disabled ? undefined : onMouseDown}
       onTouchStart={disabled ? undefined : onMouseDown}
     >
-      <div style={{
-        display: 'flex',
-        flexDirection: isHorizontal ? 'column' : 'row',
-        gap: '2px',
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: isHorizontal ? 'column' : 'row',
+          gap: '2px',
+        }}
+      >
         {[0, 1, 2].map((i) => (
           <div
             key={i}
@@ -51,9 +53,7 @@ const GradientHandle = (props: HandleRenderProps) => {
       style={{
         width: isHorizontal ? '8px' : '100%',
         height: isHorizontal ? '100%' : '8px',
-        background: disabled
-          ? 'var(--vp-c-divider)'
-          : 'linear-gradient(135deg, var(--vp-c-brand) 0%, var(--vp-c-brand-light) 100%)',
+        background: disabled ? 'var(--vp-c-divider)' : 'linear-gradient(135deg, var(--vp-c-brand) 0%, var(--vp-c-brand-light) 100%)',
         cursor: disabled ? 'default' : isHorizontal ? 'col-resize' : 'row-resize',
         transition: 'opacity 0.2s ease',
         opacity: disabled ? 0.5 : 1,
@@ -119,17 +119,19 @@ export default function CustomHandlePluginDemo() {
 
   return (
     <div style={{ padding: '20px', background: 'var(--vp-c-bg-soft)', borderRadius: '8px' }}>
-      <div style={{
-        display: 'flex',
-        gap: '8px',
-        marginBottom: '15px',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        padding: '10px',
-        background: 'var(--vp-c-bg)',
-        borderRadius: '6px',
-        border: '1px solid var(--vp-c-divider)'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: '8px',
+          marginBottom: '15px',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          padding: '10px',
+          background: 'var(--vp-c-bg)',
+          borderRadius: '6px',
+          border: '1px solid var(--vp-c-divider)',
+        }}
+      >
         <span style={{ fontSize: '12px', color: 'var(--vp-c-text-2)', marginRight: '4px' }}>Handle Style:</span>
         <button onClick={() => setHandleType('default')} style={buttonStyle(handleType === 'default')}>
           Default
@@ -145,43 +147,39 @@ export default function CustomHandlePluginDemo() {
         </button>
       </div>
 
-      <div style={{
-        height: '200px',
-        border: '1px solid var(--vp-c-divider)',
-        borderRadius: '6px',
-        overflow: 'hidden',
-      }}>
-        <Split
-          key={handleType}
-          mode="horizontal"
-          initialSizes={['33%', '34%', '33%']}
-          minSizes={[15, 15, 15]}
-          plugins={plugins}
-        >
-          <div style={{ ...paneStyle, background: 'var(--vp-c-bg)' }}>
-            Panel A
-          </div>
-          <div style={{ ...paneStyle, background: 'var(--vp-c-bg-alt)' }}>
-            Panel B
-          </div>
-          <div style={{ ...paneStyle, background: 'var(--vp-c-bg)' }}>
-            Panel C
-          </div>
+      <div
+        style={{
+          height: '200px',
+          border: '1px solid var(--vp-c-divider)',
+          borderRadius: '6px',
+          overflow: 'hidden',
+        }}
+      >
+        <Split key={handleType} mode="horizontal" initialSizes={['33%', '34%', '33%']} minSizes={[15, 15, 15]} plugins={plugins}>
+          <div style={{ ...paneStyle, background: 'var(--vp-c-bg)' }}>Panel A</div>
+          <div style={{ ...paneStyle, background: 'var(--vp-c-bg-alt)' }}>Panel B</div>
+          <div style={{ ...paneStyle, background: 'var(--vp-c-bg)' }}>Panel C</div>
         </Split>
       </div>
 
-      <div style={{
-        marginTop: '10px',
-        padding: '10px',
-        background: 'var(--vp-c-bg)',
-        borderRadius: '6px',
-        fontSize: '12px',
-        color: 'var(--vp-c-text-2)',
-      }}>
+      <div
+        style={{
+          marginTop: '10px',
+          padding: '10px',
+          background: 'var(--vp-c-bg)',
+          borderRadius: '6px',
+          fontSize: '12px',
+          color: 'var(--vp-c-text-2)',
+        }}
+      >
         <strong>Two ways to create custom handles:</strong>
         <ul style={{ margin: '8px 0 0 20px', padding: 0 }}>
-          <li><code>customHandlePlugin(Component)</code> - Pass a React component</li>
-          <li><code>customHandleRenderPlugin(renderFn)</code> - Pass a render function</li>
+          <li>
+            <code>customHandlePlugin(Component)</code> - Pass a React component
+          </li>
+          <li>
+            <code>customHandleRenderPlugin(renderFn)</code> - Pass a render function
+          </li>
         </ul>
       </div>
     </div>

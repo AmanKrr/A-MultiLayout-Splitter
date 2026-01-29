@@ -10,7 +10,7 @@ import { Split, keyboardPlugin } from '../../src';
 
 // Configure keyboard plugin
 const myKeyboardPlugin = keyboardPlugin({
-  stepSize: 5,  // Resize by 5% per keystroke
+  stepSize: 5, // Resize by 5% per keystroke
   enableArrowKeys: true,
   enableTabNavigation: true,
 });
@@ -18,17 +18,19 @@ const myKeyboardPlugin = keyboardPlugin({
 export default function KeyboardPluginExample() {
   return (
     <div style={{ height: '100%', width: '100%' }}>
-      <div style={{
-        position: 'fixed',
-        top: 10,
-        left: 10,
-        background: '#9c27b0',
-        color: 'white',
-        padding: '15px 20px',
-        borderRadius: '8px',
-        zIndex: 1000,
-        fontSize: '14px'
-      }}>
+      <div
+        style={{
+          position: 'fixed',
+          top: 10,
+          left: 10,
+          background: '#9c27b0',
+          color: 'white',
+          padding: '15px 20px',
+          borderRadius: '8px',
+          zIndex: 1000,
+          fontSize: '14px',
+        }}
+      >
         <div style={{ fontWeight: 'bold', marginBottom: '8px' }}>⌨️ Keyboard Plugin Active</div>
         <div style={{ fontSize: '12px' }}>
           <div>Tab: Focus handlebars</div>
@@ -38,12 +40,7 @@ export default function KeyboardPluginExample() {
         </div>
       </div>
 
-      <Split
-        id="keyboard-example"
-        mode="horizontal"
-        initialSizes={['50%', '50%']}
-        plugins={[myKeyboardPlugin]}
-      >
+      <Split id="keyboard-example" mode="horizontal" initialSizes={['50%', '50%']} plugins={[myKeyboardPlugin]}>
         <div style={{ padding: '20px', background: '#e8f5e9', paddingTop: '120px' }}>
           <h2>Left Pane</h2>
           <h3>Keyboard Shortcuts:</h3>
@@ -83,14 +80,21 @@ export default function KeyboardPluginExample() {
           <h2>Right Pane</h2>
           <h3>Try It Now:</h3>
           <ol style={{ lineHeight: '1.8' }}>
-            <li>Press <kbd style={{ background: '#fff', padding: '2px 8px', border: '1px solid #ccc', borderRadius: '3px' }}>Tab</kbd> to focus the handlebar</li>
+            <li>
+              Press <kbd style={{ background: '#fff', padding: '2px 8px', border: '1px solid #ccc', borderRadius: '3px' }}>Tab</kbd> to focus the handlebar
+            </li>
             <li>Notice the focus indicator (blue outline)</li>
-            <li>Use <kbd style={{ background: '#fff', padding: '2px 8px', border: '1px solid #ccc', borderRadius: '3px' }}>←</kbd> <kbd style={{ background: '#fff', padding: '2px 8px', border: '1px solid #ccc', borderRadius: '3px' }}>→</kbd> to resize</li>
-            <li>Press <kbd style={{ background: '#fff', padding: '2px 8px', border: '1px solid #ccc', borderRadius: '3px' }}>Space</kbd> to collapse this pane</li>
+            <li>
+              Use <kbd style={{ background: '#fff', padding: '2px 8px', border: '1px solid #ccc', borderRadius: '3px' }}>←</kbd>{' '}
+              <kbd style={{ background: '#fff', padding: '2px 8px', border: '1px solid #ccc', borderRadius: '3px' }}>→</kbd> to resize
+            </li>
+            <li>
+              Press <kbd style={{ background: '#fff', padding: '2px 8px', border: '1px solid #ccc', borderRadius: '3px' }}>Space</kbd> to collapse this pane
+            </li>
           </ol>
           <h3>Configuration:</h3>
           <pre style={{ background: '#f5f5f5', padding: '15px', borderRadius: '4px', fontSize: '13px' }}>
-{`const plugin = keyboardPlugin({
+            {`const plugin = keyboardPlugin({
   resizeStep: 5,
   enableFocusIndicator: true,
 });`}

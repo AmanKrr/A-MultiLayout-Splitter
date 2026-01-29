@@ -1,13 +1,10 @@
 /**
  * Converts a percentage value to pixels based on a reference width.
- * 
+ *
  * @param percentage - Numeric percentage (0-100)
  * @param referenceWidth - Container or viewport width string
  */
-export function percentageToPixel(
-  percentage: number,
-  referenceWidth: string
-): number {
+export function percentageToPixel(percentage: number, referenceWidth: string): number {
   if (referenceWidth.includes('vw')) {
     const vwValue = parseFloat(referenceWidth);
     return (percentage / 100) * window.innerWidth * (vwValue / 100);
@@ -33,14 +30,11 @@ export function percentageToPixel(
 
 /**
  * Converts a pixel value to a percentage based on a reference width.
- * 
+ *
  * @param pixelValue - Size in pixels
  * @param referenceWidth - Container or viewport width string
  */
-export function pixelToPercentage(
-  pixelValue: number,
-  referenceWidth: string
-): number {
+export function pixelToPercentage(pixelValue: number, referenceWidth: string): number {
   if (referenceWidth.includes('vw')) {
     const vwValue = parseFloat(referenceWidth);
     const containerPx = window.innerWidth * (vwValue / 100);
@@ -69,16 +63,12 @@ export function pixelToPercentage(
 
 /**
  * Normalizes a size string to a target unit (px or %).
- * 
+ *
  * @param value - Original size string
  * @param containerSize - Current container dimension in pixels
  * @param targetUnit - The unit to convert into
  */
-export function normalizeSize(
-  value: string,
-  containerSize: number,
-  targetUnit: 'px' | '%'
-): string {
+export function normalizeSize(value: string, containerSize: number, targetUnit: 'px' | '%'): string {
   const numericValue = parseFloat(value);
 
   if (value.includes('%')) {
@@ -100,7 +90,7 @@ export function normalizeSize(
 
 /**
  * Parses a size string and extracts the numeric value and unit.
- * 
+ *
  * @param value - The size string (e.g., "50%", "100px")
  */
 export function parseSize(value: string): { value: number; unit: string } {
@@ -140,18 +130,13 @@ export function haveSameUnit(size1: string, size2: string): boolean {
 
 /**
  * Clamps a size value and appends the appropriate unit.
- * 
+ *
  * @param value - Target size
  * @param min - Minimum bound
  * @param max - Maximum bound
  * @param unit - CSS unit string
  */
-export function clampSize(
-  value: number,
-  min: number,
-  max: number,
-  unit: string
-): string {
+export function clampSize(value: number, min: number, max: number, unit: string): string {
   const clamped = Math.max(min, Math.min(max, value));
   return `${clamped}${unit}`;
 }

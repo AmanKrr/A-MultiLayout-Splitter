@@ -3,22 +3,15 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "target": "ESNext",
-    "lib": [
-      "ESNext",
-      "DOM"
-    ],
+    "lib": ["ESNext", "DOM"],
     "strict": true,
     "skipLibCheck": true,
     "composite": true,
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@a-multilayout-splitter/core": [
-        "packages/core/src"
-      ],
-      "@a-multilayout-splitter/core/*": [
-        "packages/core/src/*"
-      ]
+      "@a-multilayout-splitter/core": ["packages/core/src"],
+      "@a-multilayout-splitter/core/*": ["packages/core/src/*"]
     }
   },
   "references": [
@@ -26,8 +19,5 @@
       "path": "./packages/core"
     }
   ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "exclude": ["node_modules", "dist"]
 }

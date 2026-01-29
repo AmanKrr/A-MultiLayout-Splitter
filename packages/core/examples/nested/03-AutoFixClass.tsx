@@ -11,17 +11,19 @@ import { Split } from '../../src';
 export default function AutoFixClassExample() {
   return (
     <div style={{ height: '100%', width: '100%' }}>
-      <div style={{
-        position: 'fixed',
-        top: 10,
-        left: 10,
-        background: '#ff9800',
-        color: 'white',
-        padding: '10px 20px',
-        borderRadius: '8px',
-        zIndex: 1000,
-        fontSize: '14px'
-      }}>
+      <div
+        style={{
+          position: 'fixed',
+          top: 10,
+          left: 10,
+          background: '#ff9800',
+          color: 'white',
+          padding: '10px 20px',
+          borderRadius: '8px',
+          zIndex: 1000,
+          fontSize: '14px',
+        }}
+      >
         🔧 Auto Fix Class enabled for deep nesting
       </div>
 
@@ -46,10 +48,8 @@ export default function AutoFixClassExample() {
               <p>⚠️ Auto fix class applied!</p>
               <p>This prevents layout collapse in deep nesting</p>
               <p style={{ fontSize: '12px', marginTop: '10px', opacity: 0.7 }}>
-                When nesting level {'>'}  2, the component automatically applies
-                <code style={{ background: '#000', color: '#0f0', padding: '2px 5px' }}>
-                  .a-split-fix
-                </code> class
+                When nesting level {'>'} 2, the component automatically applies
+                <code style={{ background: '#000', color: '#0f0', padding: '2px 5px' }}>.a-split-fix</code> class
               </p>
             </div>
 

@@ -1,34 +1,17 @@
 import { useState, useCallback, useMemo, useRef } from 'react';
-import {
-  Pane,
-  AddPaneConfig,
-  AnimationOptions,
-  SplitSnapshot,
-  SplitControllerState,
-  SplitControllerActions,
-  UseSplitControllerOptions,
-} from '../types';
+import { Pane, AddPaneConfig, AnimationOptions, SplitSnapshot, SplitControllerState, SplitControllerActions, UseSplitControllerOptions } from '../types';
 
 /**
  * useSplitController
- * 
+ *
  * Provides a React-friendly hook to manage the state of a Split layout externally.
- * Ideal for building custom UIs where panes need to be synchronized or manipulated 
+ * Ideal for building custom UIs where panes need to be synchronized or manipulated
  * from outside the actual Split component boundary.
- * 
+ *
  * @param options - Configuration for initializing the controller
  */
-export function useSplitController(
-  options: UseSplitControllerOptions = {}
-): SplitControllerState & SplitControllerActions {
-  const {
-    mode = 'horizontal',
-    initialPanes = [],
-    initialSizes = [],
-    minSizes = [],
-    maxSizes = [],
-    onPaneChange,
-  } = options;
+export function useSplitController(options: UseSplitControllerOptions = {}): SplitControllerState & SplitControllerActions {
+  const { mode = 'horizontal', initialPanes = [], initialSizes = [], minSizes = [], maxSizes = [], onPaneChange } = options;
 
   const [panes, setPanesInternal] = useState<Pane[]>(() => {
     if (initialPanes.length > 0) {
@@ -237,13 +220,7 @@ export function useSplitController(
   const swapPanes = useCallback(
     (indexA: number, indexB: number) => {
       setPanes((prevPanes) => {
-        if (
-          indexA < 0 ||
-          indexA >= prevPanes.length ||
-          indexB < 0 ||
-          indexB >= prevPanes.length ||
-          indexA === indexB
-        ) {
+        if (indexA < 0 || indexA >= prevPanes.length || indexB < 0 || indexB >= prevPanes.length || indexA === indexB) {
           return prevPanes;
         }
 
@@ -276,18 +253,16 @@ export function useSplitController(
   const restore = useCallback(
     (snapshot: SplitSnapshot) => {
       if (snapshot.mode !== mode) {
-        console.warn(
-          `Cannot restore snapshot with different mode. Current: ${mode}, Snapshot: ${snapshot.mode}`
-        );
+        console.warn(`Cannot restore snapshot with different mode. Current: ${mode}, Snapshot: ${snapshot.mode}`);
         return;
       }
 
       isBatchUpdateRef.current = true;
-      setPanes((prevPanes) => 
+      setPanes((prevPanes) =>
         snapshot.panes.map((snapshotPane, index) => {
           // Try to find matching pane by id, or use index as fallback
-          const existingPane = prevPanes.find(p => p.id === snapshotPane.id) || prevPanes[index];
-          
+          const existingPane = prevPanes.find((p) => p.id === snapshotPane.id) || prevPanes[index];
+
           return {
             id: snapshotPane.id,
             size: snapshotPane.size,
@@ -328,21 +303,6 @@ export function useSplitController(
       getSnapshot,
       restore,
     }),
-    [
-      panes,
-      mode,
-      isDragging,
-      addPane,
-      removePane,
-      removePanes,
-      togglePane,
-      collapsePane,
-      expandPane,
-      setPaneSize,
-      swapPanes,
-      setPanes,
-      getSnapshot,
-      restore,
-    ]
+    [panes, mode, isDragging, addPane, removePane, removePanes, togglePane, collapsePane, expandPane, setPaneSize, swapPanes, setPanes, getSnapshot, restore]
   );
 }

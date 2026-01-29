@@ -15,19 +15,12 @@ interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   providerProps?: Partial<SplitProviderProps>;
 }
 
-export function renderWithProvider(
-  ui: ReactElement,
-  options?: CustomRenderOptions
-) {
+export function renderWithProvider(ui: ReactElement, options?: CustomRenderOptions) {
   const { providerProps, ...renderOptions } = options || {};
 
   function Wrapper({ children }: { children: ReactNode }) {
     return (
-      <SplitProvider
-        id={providerProps?.id || 'test-split'}
-        mode={providerProps?.mode || 'horizontal'}
-        {...providerProps}
-      >
+      <SplitProvider id={providerProps?.id || 'test-split'} mode={providerProps?.mode || 'horizontal'} {...providerProps}>
         {children}
       </SplitProvider>
     );
@@ -50,10 +43,7 @@ export function createMockPanes(count: number): ReactNode[] {
 /**
  * Mock getBoundingClientRect for an element
  */
-export function mockElementSize(
-  element: HTMLElement,
-  size: { width: number; height: number; x?: number; y?: number }
-) {
+export function mockElementSize(element: HTMLElement, size: { width: number; height: number; x?: number; y?: number }) {
   Object.defineProperty(element, 'offsetWidth', {
     configurable: true,
     value: size.width,
@@ -79,10 +69,7 @@ export function mockElementSize(
 /**
  * Simulate drag operation on a handlebar
  */
-export function simulateDrag(
-  handlebar: HTMLElement,
-  delta: { x?: number; y?: number }
-) {
+export function simulateDrag(handlebar: HTMLElement, delta: { x?: number; y?: number }) {
   const startX = 100;
   const startY = 100;
 

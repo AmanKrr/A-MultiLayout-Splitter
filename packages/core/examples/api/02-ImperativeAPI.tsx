@@ -15,10 +15,12 @@ export default function ImperativeAPIExample() {
     splitRef.current?.addPane({
       position: 1,
       size: '200px',
-      content: <div style={{ padding: '20px', background: '#ffecb3' }}>
-        <h3>New Pane</h3>
-        <p>Added programmatically!</p>
-      </div>,
+      content: (
+        <div style={{ padding: '20px', background: '#ffecb3' }}>
+          <h3>New Pane</h3>
+          <p>Added programmatically!</p>
+        </div>
+      ),
     });
   };
 
@@ -70,26 +72,42 @@ export default function ImperativeAPIExample() {
 
       {/* Split Component */}
       <div style={{ flex: 1 }}>
-        <Split
-          ref={splitRef}
-          mode="horizontal"
-          initialSizes={['50%', '50%']}
-        >
+        <Split ref={splitRef} mode="horizontal" initialSizes={['50%', '50%']}>
           <div style={{ padding: '20px', background: '#e3f2fd' }}>
             <h2>Pane 1</h2>
             <p>Use the buttons above to manipulate me!</p>
             <h3>Available Methods:</h3>
             <ul>
-              <li><code>addPane(config)</code></li>
-              <li><code>removePane(index)</code></li>
-              <li><code>togglePane(index)</code></li>
-              <li><code>setPaneSize(index, size)</code></li>
-              <li><code>swapPanes(a, b)</code></li>
-              <li><code>collapsePane(index)</code></li>
-              <li><code>expandPane(index)</code></li>
-              <li><code>resizePane(index, size, options)</code></li>
-              <li><code>getSnapshot()</code></li>
-              <li><code>restore(snapshot)</code></li>
+              <li>
+                <code>addPane(config)</code>
+              </li>
+              <li>
+                <code>removePane(index)</code>
+              </li>
+              <li>
+                <code>togglePane(index)</code>
+              </li>
+              <li>
+                <code>setPaneSize(index, size)</code>
+              </li>
+              <li>
+                <code>swapPanes(a, b)</code>
+              </li>
+              <li>
+                <code>collapsePane(index)</code>
+              </li>
+              <li>
+                <code>expandPane(index)</code>
+              </li>
+              <li>
+                <code>resizePane(index, size, options)</code>
+              </li>
+              <li>
+                <code>getSnapshot()</code>
+              </li>
+              <li>
+                <code>restore(snapshot)</code>
+              </li>
             </ul>
           </div>
           <div style={{ padding: '20px', background: '#fce4ec' }}>

@@ -12,7 +12,7 @@ export default function UseSplitControllerDemo() {
   });
 
   // Derive collapsed array from controller state to sync with Split
-  const collapsedState = controller.panes.map(p => p.collapsed);
+  const collapsedState = controller.panes.map((p) => p.collapsed);
 
   const buttonStyle = {
     padding: '8px 16px',
@@ -49,46 +49,38 @@ export default function UseSplitControllerDemo() {
         <button onClick={() => controller.togglePane(2)} style={secondaryButtonStyle}>
           {controller.panes[2]?.collapsed ? 'Show' : 'Hide'} Panel
         </button>
-        <span style={{
-          marginLeft: 'auto',
-          fontSize: '14px',
-          color: 'var(--vp-c-text-2)',
-          fontFamily: 'monospace'
-        }}>
-          Panes: {controller.panes.length} |
-          Collapsed: {controller.panes.filter(p => p.collapsed).length}
+        <span
+          style={{
+            marginLeft: 'auto',
+            fontSize: '14px',
+            color: 'var(--vp-c-text-2)',
+            fontFamily: 'monospace',
+          }}
+        >
+          Panes: {controller.panes.length} | Collapsed: {controller.panes.filter((p) => p.collapsed).length}
         </span>
       </div>
 
-      <div style={{
-        height: '300px',
-        border: '1px solid var(--vp-c-divider)',
-        borderRadius: '6px',
-        overflow: 'hidden',
-      }}>
-        <Split
-          initialSizes={['25%', '50%', '25%']}
-          collapsed={collapsedState}
-          minSizes={[10, 20, 10]}
-          maxSizes={[50, 80, 50]}
-        >
+      <div
+        style={{
+          height: '300px',
+          border: '1px solid var(--vp-c-divider)',
+          borderRadius: '6px',
+          overflow: 'hidden',
+        }}
+      >
+        <Split initialSizes={['25%', '50%', '25%']} collapsed={collapsedState} minSizes={[10, 20, 10]} maxSizes={[50, 80, 50]}>
           <div style={{ ...paneContentStyle, background: 'var(--vp-c-bg-alt)' }}>
             <strong>Sidebar</strong>
-            <span style={{ fontSize: '12px', color: 'var(--vp-c-text-2)' }}>
-              {controller.panes[0]?.collapsed ? 'Collapsed' : 'Expanded'}
-            </span>
+            <span style={{ fontSize: '12px', color: 'var(--vp-c-text-2)' }}>{controller.panes[0]?.collapsed ? 'Collapsed' : 'Expanded'}</span>
           </div>
           <div style={{ ...paneContentStyle, background: 'var(--vp-c-bg)' }}>
             <strong>Main</strong>
-            <span style={{ fontSize: '12px', color: 'var(--vp-c-text-2)' }}>
-              Drag handles to resize
-            </span>
+            <span style={{ fontSize: '12px', color: 'var(--vp-c-text-2)' }}>Drag handles to resize</span>
           </div>
           <div style={{ ...paneContentStyle, background: 'var(--vp-c-bg-alt)' }}>
             <strong>Panel</strong>
-            <span style={{ fontSize: '12px', color: 'var(--vp-c-text-2)' }}>
-              {controller.panes[2]?.collapsed ? 'Collapsed' : 'Expanded'}
-            </span>
+            <span style={{ fontSize: '12px', color: 'var(--vp-c-text-2)' }}>{controller.panes[2]?.collapsed ? 'Collapsed' : 'Expanded'}</span>
           </div>
         </Split>
       </div>

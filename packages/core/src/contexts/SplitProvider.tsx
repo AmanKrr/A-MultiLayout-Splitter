@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useRef,
-  useMemo,
-  ReactNode,
-} from 'react';
+import { createContext, useContext, useRef, useMemo, ReactNode } from 'react';
 import { Pane, SplitMode, AddPaneConfig, AnimationOptions } from '../types';
 
 /**
@@ -82,10 +76,10 @@ export interface SplitProviderProps {
 
 /**
  * SplitProvider
- * 
+ *
  * An optional context provider that exposes split state and actions to nested components.
  * Useful for building custom toolbars or complex layouts that need to interact with the splitter.
- * 
+ *
  * @param props - Provider configuration
  */
 export function SplitProvider({
@@ -140,9 +134,7 @@ export function SplitProvider({
   return (
     <ConfigContext.Provider value={config}>
       <StateContext.Provider value={state}>
-        <ActionsContext.Provider value={actions}>
-          {children}
-        </ActionsContext.Provider>
+        <ActionsContext.Provider value={actions}>{children}</ActionsContext.Provider>
       </StateContext.Provider>
     </ConfigContext.Provider>
   );
@@ -150,7 +142,7 @@ export function SplitProvider({
 
 /**
  * useSplitConfig
- * 
+ *
  * Hook to retrieve the static configuration of the current Split instance.
  */
 export function useSplitConfig(): SplitConfig {
@@ -163,7 +155,7 @@ export function useSplitConfig(): SplitConfig {
 
 /**
  * useSplitState
- * 
+ *
  * Hook to subscribe to the reactive state (panes, drag status) of the Split instance.
  */
 export function useSplitState(): SplitState {
@@ -176,7 +168,7 @@ export function useSplitState(): SplitState {
 
 /**
  * useSplitActions
- * 
+ *
  * Hook to access methods for controlling the Split instance.
  * These methods are stable and do not trigger re-renders.
  */
@@ -187,7 +179,7 @@ export function useSplitActions(): SplitActions | null {
 
 /**
  * useSplit
- * 
+ *
  * Convenience hook that returns the full split context (config, state, and actions).
  */
 export function useSplit(): {
@@ -208,7 +200,7 @@ export function useSplit(): {
 
 /**
  * usePane
- * 
+ *
  * Fine-grained hook to subscribe to state updates for a specific pane.
  */
 export function usePane(index: number): Pane | undefined {
@@ -218,7 +210,7 @@ export function usePane(index: number): Pane | undefined {
 
 /**
  * usePaneCount
- * 
+ *
  * Hook to retrieve and subscribe to the total number of panes.
  */
 export function usePaneCount(): number {
@@ -228,7 +220,7 @@ export function usePaneCount(): number {
 
 /**
  * useIsDragging
- * 
+ *
  * Hook to subscribe specifically to the active dragging status.
  */
 export function useIsDragging(): boolean {
@@ -238,7 +230,7 @@ export function useIsDragging(): boolean {
 
 /**
  * useIsCollapsed
- * 
+ *
  * Hook to check and subscribe to the collapsed state of a specific pane.
  */
 export function useIsCollapsed(index: number): boolean {
@@ -248,7 +240,7 @@ export function useIsCollapsed(index: number): boolean {
 
 /**
  * useVisiblePanes
- * 
+ *
  * Hook to retrieve and subscribe to only the currently expanded panes.
  */
 export function useVisiblePanes(): Pane[] {

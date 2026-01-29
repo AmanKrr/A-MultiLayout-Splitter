@@ -1,14 +1,14 @@
-import { useCallback, useRef, useEffect, RefObject } from "react";
-import { throttle } from "../utils/native/throttle";
-import { DragState, DragCallbacks, SplitMode } from "../types";
+import { useCallback, useRef, useEffect, RefObject } from 'react';
+import { throttle } from '../utils/native/throttle';
+import { DragState, DragCallbacks, SplitMode } from '../types';
 
 /**
  * useDragHandler
- * 
- * Orchestrates the low-level pointer events and DOM manipulation required for 
- * high-performance pane resizing. Bypasses React's render loop during active 
+ *
+ * Orchestrates the low-level pointer events and DOM manipulation required for
+ * high-performance pane resizing. Bypasses React's render loop during active
  * dragging to maintain a consistent 60fps experience even in nested layouts.
- * 
+ *
  * @param containerRef - DOM reference to the master split container
  * @param mode - Active layout orientation
  * @param callbacks - Lifecycle callbacks for the drag sequence
@@ -21,9 +21,9 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
 
   /**
    * handleMouseDown
-   * 
-   * Captures initial state and attaches window-level listeners to begin the 
-   * drag sequence. Calculates and caches container dimensions to avoid 
+   *
+   * Captures initial state and attaches window-level listeners to begin the
+   * drag sequence. Calculates and caches container dimensions to avoid
    * layout thrashing during movement.
    */
   const handleMouseDown = useCallback(
@@ -49,23 +49,21 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
 
       if (!prevElement || !nextElement) return;
 
-      if (prevElement.classList.contains("a-split-hidden") || nextElement.classList.contains("a-split-hidden")) {
+      if (prevElement.classList.contains('a-split-hidden') || nextElement.classList.contains('a-split-hidden')) {
         return;
       }
 
-      const clientX = "touches" in e ? (e.touches[0]?.clientX ?? 0) : e.clientX;
-      const clientY = "touches" in e ? (e.touches[0]?.clientY ?? 0) : e.clientY;
+      const clientX = 'touches' in e ? (e.touches[0]?.clientX ?? 0) : e.clientX;
+      const clientY = 'touches' in e ? (e.touches[0]?.clientY ?? 0) : e.clientY;
 
-      const handlebars = Array.from(container.querySelectorAll(".a-split-handlebar")).filter(
-        (h) => h.parentElement === container
-      );
+      const handlebars = Array.from(container.querySelectorAll('.a-split-handlebar')).filter((h) => h.parentElement === container);
 
       let totalHandlebarSpace = 0;
       handlebars.forEach((handlebar) => {
         const h = handlebar as HTMLElement;
         const style = window.getComputedStyle(h);
-        
-        if (mode === "horizontal") {
+
+        if (mode === 'horizontal') {
           const marginLeft = parseFloat(style.marginLeft) || 0;
           const marginRight = parseFloat(style.marginRight) || 0;
           totalHandlebarSpace += h.offsetWidth + marginLeft + marginRight;
@@ -75,7 +73,6 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
           totalHandlebarSpace += h.offsetHeight + marginTop + marginBottom;
         }
       });
-
 
       dragState.current = {
         active: true,
@@ -88,24 +85,24 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
         nextInitialWidth: nextElement.offsetWidth,
         prevInitialHeight: prevElement.offsetHeight,
         nextInitialHeight: nextElement.offsetHeight,
-        containerWidth: container.offsetWidth - (mode === "horizontal" ? totalHandlebarSpace : 0),
-        containerHeight: container.offsetHeight - (mode === "vertical" ? totalHandlebarSpace : 0),
-        minPrevSize: parseFloat(prevElement.getAttribute("data-min-size") || "0"),
-        maxPrevSize: parseFloat(prevElement.getAttribute("data-max-size") || "100"),
-        minNextSize: parseFloat(nextElement.getAttribute("data-min-size") || "0"),
-        maxNextSize: parseFloat(nextElement.getAttribute("data-max-size") || "100"),
+        containerWidth: container.offsetWidth - (mode === 'horizontal' ? totalHandlebarSpace : 0),
+        containerHeight: container.offsetHeight - (mode === 'vertical' ? totalHandlebarSpace : 0),
+        minPrevSize: parseFloat(prevElement.getAttribute('data-min-size') || '0'),
+        maxPrevSize: parseFloat(prevElement.getAttribute('data-max-size') || '100'),
+        minNextSize: parseFloat(nextElement.getAttribute('data-min-size') || '0'),
+        maxNextSize: parseFloat(nextElement.getAttribute('data-max-size') || '100'),
       };
 
       finalSizes.current = null;
 
       onDragStart?.({ paneIndex });
     },
-    [containerRef, onDragStart, mode],
+    [containerRef, onDragStart, mode]
   );
 
   /**
    * calculateDragState
-   * 
+   *
    * Pure logic to determine new percentage sizes based on current pointer offset.
    */
   const calculateDragState = useCallback(
@@ -113,10 +110,10 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
       const state = dragState.current;
       if (!state?.active) return null;
 
-      const isHorizontal = mode === "horizontal";
+      const isHorizontal = mode === 'horizontal';
 
-      const clientX = "touches" in e ? (e.touches[0]?.clientX ?? 0) : (e as MouseEvent).clientX;
-      const clientY = "touches" in e ? (e.touches[0]?.clientY ?? 0) : (e as MouseEvent).clientY;
+      const clientX = 'touches' in e ? (e.touches[0]?.clientX ?? 0) : (e as MouseEvent).clientX;
+      const clientY = 'touches' in e ? (e.touches[0]?.clientY ?? 0) : (e as MouseEvent).clientY;
 
       const delta = isHorizontal ? clientX - state.startX : clientY - state.startY;
 
@@ -138,7 +135,7 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
       const hitMaxPrev = prevSize >= state.maxPrevSize;
       const hitMinNext = nextSize <= state.minNextSize;
       const hitMaxNext = nextSize >= state.maxNextSize;
-      
+
       if (hitMinPrev || hitMaxPrev || hitMinNext || hitMaxNext) return null;
 
       return {
@@ -146,15 +143,15 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
         nextSize,
         prevSizePx,
         nextSizePx,
-        state
+        state,
       };
-    }, 
+    },
     [mode]
   );
 
   /**
    * handleMouseMove
-   * 
+   *
    * Throttled handler that performs the raw DOM updates for flex-basis properties.
    */
   const handleMouseMove = useCallback(
@@ -164,7 +161,7 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
 
       const { prevSize, nextSize, prevSizePx, nextSizePx, state } = result;
       const { prevInitialWidth, prevInitialHeight } = state;
-      const prevInitialSize = mode === "horizontal" ? prevInitialWidth : prevInitialHeight;
+      const prevInitialSize = mode === 'horizontal' ? prevInitialWidth : prevInitialHeight;
 
       if (Math.abs(result.prevSizePx - prevInitialSize) <= 1) {
         return;
@@ -175,8 +172,8 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
       requestAnimationFrame(() => {
         if (!state.prevElement || !state.nextElement) return;
 
-        const prevHasPercent = state.prevElement.style.flexBasis.includes("%");
-        const nextHasPercent = state.nextElement.style.flexBasis.includes("%");
+        const prevHasPercent = state.prevElement.style.flexBasis.includes('%');
+        const nextHasPercent = state.nextElement.style.flexBasis.includes('%');
 
         if (prevHasPercent) {
           state.prevElement.style.flexBasis = `${prevSize}%`;
@@ -193,46 +190,49 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
 
       onDragMove?.({ paneIndex: state.paneIndex, prevSize, nextSize });
     }, 16),
-    [calculateDragState, mode, onDragMove],
+    [calculateDragState, mode, onDragMove]
   );
 
   /**
    * handleMouseUp
-   * 
+   *
    * Cleans up the drag sequence and triggers the final React-level update.
    */
-  const handleMouseUp = useCallback((e: MouseEvent | TouchEvent) => {
-    const state = dragState.current;
-    if (!state?.active) return;
+  const handleMouseUp = useCallback(
+    (e: MouseEvent | TouchEvent) => {
+      const state = dragState.current;
+      if (!state?.active) return;
 
-    const result = calculateDragState(e);
-    if (result) {
-      finalSizes.current = { prevSize: result.prevSize, nextSize: result.nextSize };
-    }
+      const result = calculateDragState(e);
+      if (result) {
+        finalSizes.current = { prevSize: result.prevSize, nextSize: result.nextSize };
+      }
 
-    const sizes = finalSizes.current;
-    if (sizes) {
-      onDragEnd?.({ paneIndex: state.paneIndex, prevSize: sizes.prevSize, nextSize: sizes.nextSize });
-    }
+      const sizes = finalSizes.current;
+      if (sizes) {
+        onDragEnd?.({ paneIndex: state.paneIndex, prevSize: sizes.prevSize, nextSize: sizes.nextSize });
+      }
 
-    dragState.current = null;
-    finalSizes.current = null;
-  }, [calculateDragState, onDragEnd]);
+      dragState.current = null;
+      finalSizes.current = null;
+    },
+    [calculateDragState, onDragEnd]
+  );
 
   useEffect(() => {
     const moveHandler = handleMouseMove as any;
     const upHandler = handleMouseUp;
 
-    window.addEventListener("mousemove", moveHandler);
-    window.addEventListener("mouseup", upHandler);
-    window.addEventListener("touchmove", moveHandler, { passive: false });
-    window.addEventListener("touchend", upHandler);
+    window.addEventListener('mousemove', moveHandler);
+    window.addEventListener('mouseup', upHandler);
+    window.addEventListener('touchmove', moveHandler, { passive: false });
+    window.addEventListener('touchend', upHandler);
 
     return () => {
-      window.removeEventListener("mousemove", moveHandler);
-      window.removeEventListener("mouseup", upHandler);
-      window.removeEventListener("touchmove", moveHandler);
-      window.removeEventListener("touchend", upHandler);
+      window.removeEventListener('mousemove', moveHandler);
+      window.removeEventListener('mouseup', upHandler);
+      window.removeEventListener('touchmove', moveHandler);
+      window.removeEventListener('touchend', upHandler);
     };
   }, [handleMouseMove, handleMouseUp]);
 

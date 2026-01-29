@@ -14,7 +14,7 @@ export default function LineBarStyleExample() {
       <Split
         mode="horizontal"
         initialSizes={['50%', '50%']}
-        lineBar={true}  // Minimal line style
+        lineBar={true} // Minimal line style
       >
         <div style={{ padding: '20px', background: '#fafafa' }}>
           <h2>Left Pane</h2>

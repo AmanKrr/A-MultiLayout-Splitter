@@ -32,10 +32,7 @@ export interface CustomHandleComponentProps extends HandleRenderProps {
  * </Split>
  * ```
  */
-export function customHandlePlugin(
-  component: ComponentType<CustomHandleComponentProps>,
-  additionalProps?: Record<string, any>
-) {
+export function customHandlePlugin(component: ComponentType<CustomHandleComponentProps>, additionalProps?: Record<string, any>) {
   return createPlugin({
     name: 'custom-handle',
     version: '1.0.0',
@@ -67,9 +64,7 @@ export function customHandlePlugin(
  * </Split>
  * ```
  */
-export function customHandleRenderPlugin(
-  render: (props: HandleRenderProps) => ReactNode
-) {
+export function customHandleRenderPlugin(render: (props: HandleRenderProps) => ReactNode) {
   return createPlugin({
     name: 'custom-handle-render',
     version: '1.0.0',

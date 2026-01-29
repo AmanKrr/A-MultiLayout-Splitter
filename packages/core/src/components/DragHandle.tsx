@@ -3,11 +3,11 @@ import { DragHandleProps } from '../types';
 
 /**
  * DragHandle
- * 
+ *
  * A functional component that renders the resize handlebar between panes.
  * Includes interactive buttons for collapsing/expanding adjacent panes and a central grip icon.
  * Supports custom rendering via the `renderCustom` prop.
- * 
+ *
  * @param props - Component properties including drag and collapse handlers
  */
 export const DragHandle: React.FC<DragHandleProps> = ({
@@ -37,11 +37,7 @@ export const DragHandle: React.FC<DragHandleProps> = ({
     };
 
     return (
-      <div
-        className="a-split-handlebar"
-        onMouseDown={(e) => !disabled && onMouseDown(e)}
-        onTouchStart={(e) => !disabled && (onTouchStart ? onTouchStart(e) : onMouseDown(e))}
-      >
+      <div className="a-split-handlebar" onMouseDown={(e) => !disabled && onMouseDown(e)} onTouchStart={(e) => !disabled && (onTouchStart ? onTouchStart(e) : onMouseDown(e))}>
         {renderCustom(handleRenderProps, index)}
       </div>
     );
@@ -52,7 +48,9 @@ export const DragHandle: React.FC<DragHandleProps> = ({
     mode === 'horizontal' ? 'a-split-handlebar-horizontal' : 'a-split-handlebar-vertical',
     disabled ? 'a-split-handlebar-disabled' : '',
     lineBar ? 'a-split-handlebar-line' : '',
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   const handleLeftClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
@@ -79,8 +77,8 @@ export const DragHandle: React.FC<DragHandleProps> = ({
   const hideLeftButton = leftPaneCollapsed && !rightPaneCollapsed;
   const hideRightButton = rightPaneCollapsed && !leftPaneCollapsed;
 
-  const arrowLeft = isHorizontal ? "M8 3L4 6L8 9" : "M3 8L6 4L9 8";
-  const arrowRight = isHorizontal ? "M4 3L8 6L4 9" : "M3 4L6 8L9 4";
+  const arrowLeft = isHorizontal ? 'M8 3L4 6L8 9' : 'M3 8L6 4L9 8';
+  const arrowRight = isHorizontal ? 'M4 3L8 6L4 9' : 'M3 4L6 8L9 4';
 
   const leftArrow = arrowLeft;
   const rightArrow = arrowRight;

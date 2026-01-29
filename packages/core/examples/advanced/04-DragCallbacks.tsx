@@ -14,18 +14,20 @@ export default function DragCallbacksExample() {
 
   return (
     <div style={{ height: '100%', width: '100%' }}>
-      <div style={{
-        position: 'fixed',
-        top: 10,
-        right: 10,
-        background: 'rgba(0,0,0,0.8)',
-        color: 'white',
-        padding: '10px 20px',
-        borderRadius: '8px',
-        zIndex: 1000,
-        fontFamily: 'monospace',
-        fontSize: '12px'
-      }}>
+      <div
+        style={{
+          position: 'fixed',
+          top: 10,
+          right: 10,
+          background: 'rgba(0,0,0,0.8)',
+          color: 'white',
+          padding: '10px 20px',
+          borderRadius: '8px',
+          zIndex: 1000,
+          fontFamily: 'monospace',
+          fontSize: '12px',
+        }}
+      >
         <div>{dragInfo}</div>
         {finalSizes && <div style={{ marginTop: '5px' }}>{finalSizes}</div>}
       </div>

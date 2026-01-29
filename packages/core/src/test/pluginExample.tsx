@@ -4,13 +4,7 @@
  */
 
 import React from 'react';
-import {
-  Split,
-  createPlugin,
-  persistencePlugin,
-  keyboardPlugin,
-  customHandlePlugin,
-} from '../index';
+import { Split, createPlugin, persistencePlugin, keyboardPlugin, customHandlePlugin } from '../index';
 
 // Example 1: Simple analytics plugin
 const analyticsPlugin = createPlugin({
@@ -83,48 +77,26 @@ export function PluginExample() {
             }),
           ]}
         >
-          <div style={{ background: '#f0f0f0', padding: '20px' }}>
-            Pane 1 - State persisted to localStorage
-          </div>
-          <div style={{ background: '#e0e0e0', padding: '20px' }}>
-            Pane 2 - Use arrow keys to resize
-          </div>
+          <div style={{ background: '#f0f0f0', padding: '20px' }}>Pane 1 - State persisted to localStorage</div>
+          <div style={{ background: '#e0e0e0', padding: '20px' }}>Pane 2 - Use arrow keys to resize</div>
         </Split>
       </section>
 
       {/* Example 2: Custom analytics plugin */}
       <section>
         <h2>2. Custom Analytics Plugin</h2>
-        <Split
-          id="example-2"
-          mode="horizontal"
-          initialSizes={['40%', '60%']}
-          plugins={[analyticsPlugin]}
-        >
-          <div style={{ background: '#e8f4f8', padding: '20px' }}>
-            Pane 1 - Check console for analytics
-          </div>
-          <div style={{ background: '#d4e9f2', padding: '20px' }}>
-            Pane 2 - Drag to trigger analytics
-          </div>
+        <Split id="example-2" mode="horizontal" initialSizes={['40%', '60%']} plugins={[analyticsPlugin]}>
+          <div style={{ background: '#e8f4f8', padding: '20px' }}>Pane 1 - Check console for analytics</div>
+          <div style={{ background: '#d4e9f2', padding: '20px' }}>Pane 2 - Drag to trigger analytics</div>
         </Split>
       </section>
 
       {/* Example 3: Custom handle plugin */}
       <section>
         <h2>3. Custom Handle Component</h2>
-        <Split
-          id="example-3"
-          mode="horizontal"
-          initialSizes={['50%', '50%']}
-          plugins={[customHandlePlugin(CustomHandle)]}
-        >
-          <div style={{ background: '#fff3cd', padding: '20px' }}>
-            Pane 1 - Custom handle
-          </div>
-          <div style={{ background: '#ffe69c', padding: '20px' }}>
-            Pane 2 - Custom styled
-          </div>
+        <Split id="example-3" mode="horizontal" initialSizes={['50%', '50%']} plugins={[customHandlePlugin(CustomHandle)]}>
+          <div style={{ background: '#fff3cd', padding: '20px' }}>Pane 1 - Custom handle</div>
+          <div style={{ background: '#ffe69c', padding: '20px' }}>Pane 2 - Custom styled</div>
         </Split>
       </section>
 
@@ -135,22 +107,11 @@ export function PluginExample() {
           id="example-4"
           mode="vertical"
           initialSizes={['33%', '33%', '34%']}
-          plugins={[
-            persistencePlugin(),
-            keyboardPlugin(),
-            analyticsPlugin,
-            customHandlePlugin(CustomHandle),
-          ]}
+          plugins={[persistencePlugin(), keyboardPlugin(), analyticsPlugin, customHandlePlugin(CustomHandle)]}
         >
-          <div style={{ background: '#d1ecf1', padding: '20px' }}>
-            Pane 1 - All features enabled
-          </div>
-          <div style={{ background: '#bee5eb', padding: '20px' }}>
-            Pane 2 - Persistence + Keyboard + Analytics
-          </div>
-          <div style={{ background: '#9fcddc', padding: '20px' }}>
-            Pane 3 - Custom handle styling
-          </div>
+          <div style={{ background: '#d1ecf1', padding: '20px' }}>Pane 1 - All features enabled</div>
+          <div style={{ background: '#bee5eb', padding: '20px' }}>Pane 2 - Persistence + Keyboard + Analytics</div>
+          <div style={{ background: '#9fcddc', padding: '20px' }}>Pane 3 - Custom handle styling</div>
         </Split>
       </section>
     </div>

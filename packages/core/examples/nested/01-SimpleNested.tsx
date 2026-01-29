@@ -12,10 +12,7 @@ export default function SimpleNestedExample() {
   return (
     <div style={{ height: '100%', width: '100%' }}>
       {/* Outer horizontal split */}
-      <Split
-        mode="horizontal"
-        initialSizes={['30%', '70%']}
-      >
+      <Split mode="horizontal" initialSizes={['30%', '70%']}>
         {/* Left sidebar */}
         <div style={{ padding: '20px', background: '#e3f2fd' }}>
           <h2>Sidebar</h2>
@@ -29,15 +26,12 @@ export default function SimpleNestedExample() {
         </div>
 
         {/* Right side: vertical split for editor and terminal */}
-        <Split
-          mode="vertical"
-          initialSizes={['70%', '30%']}
-        >
+        <Split mode="vertical" initialSizes={['70%', '30%']}>
           {/* Editor area */}
           <div style={{ padding: '20px', background: '#ffffff' }}>
             <h2>Editor</h2>
             <pre style={{ background: '#f5f5f5', padding: '10px' }}>
-{`function App() {
+              {`function App() {
   return <div>Hello World</div>;
 }`}
             </pre>
@@ -46,8 +40,10 @@ export default function SimpleNestedExample() {
           {/* Terminal area */}
           <div style={{ padding: '20px', background: '#263238', color: '#aed581' }}>
             <h3 style={{ color: '#aed581' }}>Terminal</h3>
-            <pre>$ npm run dev
-<span style={{ color: '#80cbc4' }}>Server running on http://localhost:3000</span></pre>
+            <pre>
+              $ npm run dev
+              <span style={{ color: '#80cbc4' }}>Server running on http://localhost:3000</span>
+            </pre>
           </div>
         </Split>
       </Split>

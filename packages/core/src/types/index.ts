@@ -266,7 +266,7 @@ export interface PluginContext {
 
 /**
  * SplitPlugin
- * 
+ *
  * Defines the structure for custom plugins to tap into Split life-cycles.
  */
 export interface SplitPlugin {
@@ -396,12 +396,7 @@ export interface SplitProps {
   /** Callback triggered after resizing completes */
   onDragEnd?: (preSize: number, nextSize: number, paneNumber: number) => void;
   /** Generic callback for any layout state change */
-  onLayoutChange?: (
-    sectionNumber: number,
-    paneId: string,
-    status: PaneStatus,
-    direction: Direction | null
-  ) => void;
+  onLayoutChange?: (sectionNumber: number, paneId: string, status: PaneStatus, direction: Direction | null) => void;
   /** Legacy dimension overrides */
   width?: number | string | null;
   height?: number | string | null;

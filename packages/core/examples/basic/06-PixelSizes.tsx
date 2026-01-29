@@ -11,10 +11,7 @@ import { Split } from '../../src';
 export default function PixelSizesExample() {
   return (
     <div style={{ height: '100%', width: '100%' }}>
-      <Split
-        mode="horizontal"
-        initialSizes={['200px', '1fr', '300px']}
-      >
+      <Split mode="horizontal" initialSizes={['200px', '1fr', '300px']}>
         <div style={{ padding: '20px', background: '#e3f2fd' }}>
           <h2>Fixed Sidebar</h2>
           <p>200px width</p>

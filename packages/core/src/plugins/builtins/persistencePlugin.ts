@@ -20,23 +20,18 @@ export interface PersistencePluginOptions {
 
 /**
  * persistencePlugin
- * 
+ *
  * Automatically captures and restores the state of split panes across page reloads.
  * Uses a debounced save mechanism to ensure performance during active resizing.
- * 
+ *
  * @param options - Plugin configuration options
  */
 export function persistencePlugin(options: PersistencePluginOptions = {}) {
-  const {
-    storage = 'localStorage',
-    key: customKey,
-    debounceDelay = 300,
-  } = options;
+  const { storage = 'localStorage', key: customKey, debounceDelay = 300 } = options;
 
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
-  const getStorageKey = (splitId: string) =>
-    customKey || `a-multilayout-splitter:${splitId}`;
+  const getStorageKey = (splitId: string) => customKey || `a-multilayout-splitter:${splitId}`;
 
   const getStorage = (): Storage | null => {
     if (typeof window === 'undefined') return null;
@@ -50,7 +45,7 @@ export function persistencePlugin(options: PersistencePluginOptions = {}) {
     try {
       const key = getStorageKey(splitId);
       const serialized = JSON.stringify({
-        panes: state.panes.map(pane => ({
+        panes: state.panes.map((pane) => ({
           id: pane.id,
           size: pane.size,
           collapsed: pane.collapsed,
@@ -168,16 +163,12 @@ export function persistencePlugin(options: PersistencePluginOptions = {}) {
 
 /**
  * Utility to manually clear the persisted state for a specific split ID.
- * 
+ *
  * @param splitId - Unique ID of the split instance to clear
  * @param storage - The storage backend that was used
  */
-export function clearPersistedState(
-  splitId: string,
-  storage: StorageType = 'localStorage'
-): void {
-  const storageInstance =
-    storage === 'localStorage' ? window.localStorage : window.sessionStorage;
+export function clearPersistedState(splitId: string, storage: StorageType = 'localStorage'): void {
+  const storageInstance = storage === 'localStorage' ? window.localStorage : window.sessionStorage;
 
   try {
     const key = `a-multilayout-splitter:${splitId}`;

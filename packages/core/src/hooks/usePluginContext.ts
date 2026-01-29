@@ -31,13 +31,16 @@ export function usePluginContext(
   dispatchRef.current = dispatch;
 
   // Create stable context object once per splitId
-  const context = useMemo<PluginContext>(() => ({
-    splitId,
-    getState: () => getStateRef.current(),
-    dispatch: (action: SplitAction) => dispatchRef.current(action),
-    getElement: () => containerRef.current,
-    getPanes: () => getStateRef.current().panes,
-  }), [splitId, containerRef]);
+  const context = useMemo<PluginContext>(
+    () => ({
+      splitId,
+      getState: () => getStateRef.current(),
+      dispatch: (action: SplitAction) => dispatchRef.current(action),
+      getElement: () => containerRef.current,
+      getPanes: () => getStateRef.current().panes,
+    }),
+    [splitId, containerRef]
+  );
 
   return context;
 }

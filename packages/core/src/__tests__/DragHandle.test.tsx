@@ -92,9 +92,7 @@ describe('DragHandle', () => {
 
     it('does not call onMouseDown when disabled', () => {
       const onMouseDown = vi.fn();
-      const { container } = render(
-        <DragHandle {...defaultProps} disabled={true} onMouseDown={onMouseDown} />
-      );
+      const { container } = render(<DragHandle {...defaultProps} disabled={true} onMouseDown={onMouseDown} />);
 
       const handlebar = container.querySelector('.a-split-handlebar')!;
       fireEvent.mouseDown(handlebar);
@@ -157,9 +155,7 @@ describe('DragHandle', () => {
 
     it('calls onExpand when right pane is collapsed and left button clicked', () => {
       const onExpand = vi.fn();
-      const { container } = render(
-        <DragHandle {...defaultProps} rightPaneCollapsed={true} onExpand={onExpand} />
-      );
+      const { container } = render(<DragHandle {...defaultProps} rightPaneCollapsed={true} onExpand={onExpand} />);
 
       const leftButton = container.querySelector('.a-split-collapse-btn-left')!;
       fireEvent.click(leftButton);
@@ -169,9 +165,7 @@ describe('DragHandle', () => {
 
     it('calls onExpand when left pane is collapsed and right button clicked', () => {
       const onExpand = vi.fn();
-      const { container } = render(
-        <DragHandle {...defaultProps} leftPaneCollapsed={true} onExpand={onExpand} />
-      );
+      const { container } = render(<DragHandle {...defaultProps} leftPaneCollapsed={true} onExpand={onExpand} />);
 
       const rightButton = container.querySelector('.a-split-collapse-btn-right')!;
       fireEvent.click(rightButton);
@@ -180,18 +174,14 @@ describe('DragHandle', () => {
     });
 
     it('hides left button when left pane is collapsed', () => {
-      const { container } = render(
-        <DragHandle {...defaultProps} leftPaneCollapsed={true} />
-      );
+      const { container } = render(<DragHandle {...defaultProps} leftPaneCollapsed={true} />);
 
       const leftButton = container.querySelector('.a-split-collapse-btn-left');
       expect(leftButton).toHaveClass('hidden');
     });
 
     it('hides right button when right pane is collapsed', () => {
-      const { container } = render(
-        <DragHandle {...defaultProps} rightPaneCollapsed={true} />
-      );
+      const { container } = render(<DragHandle {...defaultProps} rightPaneCollapsed={true} />);
 
       const rightButton = container.querySelector('.a-split-collapse-btn-right');
       expect(rightButton).toHaveClass('hidden');
@@ -225,9 +215,7 @@ describe('DragHandle', () => {
   describe('Custom Render', () => {
     it('uses custom render function when provided', () => {
       const renderCustom = vi.fn(() => <div data-testid="custom-handle">Custom</div>);
-      const { getByTestId } = render(
-        <DragHandle {...defaultProps} renderCustom={renderCustom} />
-      );
+      const { getByTestId } = render(<DragHandle {...defaultProps} renderCustom={renderCustom} />);
 
       expect(getByTestId('custom-handle')).toBeInTheDocument();
       expect(renderCustom).toHaveBeenCalled();
@@ -235,9 +223,7 @@ describe('DragHandle', () => {
 
     it('passes correct props to custom render function', () => {
       const renderCustom = vi.fn(() => <div>Custom</div>);
-      render(
-        <DragHandle {...defaultProps} index={2} mode="vertical" renderCustom={renderCustom} />
-      );
+      render(<DragHandle {...defaultProps} index={2} mode="vertical" renderCustom={renderCustom} />);
 
       const callProps = renderCustom.mock.calls[0][0];
       expect(callProps.index).toBe(2);
@@ -257,9 +243,7 @@ describe('DragHandle', () => {
     });
 
     it('has correct aria-label when right pane is collapsed', () => {
-      const { container } = render(
-        <DragHandle {...defaultProps} mode="horizontal" rightPaneCollapsed={true} />
-      );
+      const { container } = render(<DragHandle {...defaultProps} mode="horizontal" rightPaneCollapsed={true} />);
 
       const leftButton = container.querySelector('.a-split-collapse-btn-left');
       expect(leftButton?.getAttribute('aria-label')).toContain('Expand');

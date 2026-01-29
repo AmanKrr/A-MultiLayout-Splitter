@@ -23,12 +23,7 @@ export interface KeyboardPluginOptions {
  * @param options - Plugin configuration options
  */
 export function keyboardPlugin(options: KeyboardPluginOptions = {}) {
-  const {
-    enableArrowKeys = true,
-    enableNumberKeys = true,
-    stepSize = 5,
-    enableTabNavigation = true,
-  } = options;
+  const { enableArrowKeys = true, enableNumberKeys = true, stepSize = 5, enableTabNavigation = true } = options;
 
   let currentFocusedPaneIndex = 0;
   let keydownHandler: ((e: KeyboardEvent) => void) | null = null;
@@ -65,18 +60,11 @@ export function keyboardPlugin(options: KeyboardPluginOptions = {}) {
         const panesState = state.panes;
 
         if (enableArrowKeys) {
-          if (
-            e.key === 'ArrowLeft' ||
-            e.key === 'ArrowRight' ||
-            e.key === 'ArrowUp' ||
-            e.key === 'ArrowDown'
-          ) {
+          if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown') {
             e.preventDefault();
 
             const isHorizontal = state.mode === 'horizontal';
-            const isIncrease =
-              (isHorizontal && e.key === 'ArrowRight') ||
-              (!isHorizontal && e.key === 'ArrowDown');
+            const isIncrease = (isHorizontal && e.key === 'ArrowRight') || (!isHorizontal && e.key === 'ArrowDown');
 
             // Use currentFocusedPaneIndex to determine which pane to resize
             // Resize the focused pane and the next pane (or previous if last pane)
@@ -140,9 +128,7 @@ export function keyboardPlugin(options: KeyboardPluginOptions = {}) {
         if (enableTabNavigation && e.key === 'Tab') {
           e.preventDefault();
 
-          let nextIndex = e.shiftKey
-            ? currentFocusedPaneIndex - 1
-            : currentFocusedPaneIndex + 1;
+          let nextIndex = e.shiftKey ? currentFocusedPaneIndex - 1 : currentFocusedPaneIndex + 1;
 
           if (nextIndex < 0) {
             nextIndex = panesState.length - 1;

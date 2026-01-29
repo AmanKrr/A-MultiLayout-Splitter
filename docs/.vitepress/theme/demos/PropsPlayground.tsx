@@ -10,33 +10,52 @@ export default function PropsPlayground() {
   const [minSize, setMinSize] = useState(10);
 
   const panes = Array.from({ length: paneCount }).map((_, i) => (
-    <div key={i} style={{ 
-      background: i % 2 === 0 ? 'var(--vp-c-bg-alt)' : 'var(--vp-c-bg-soft)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: '100%',
-      fontSize: '14px',
-      color: 'var(--vp-c-text-2)'
-    }}>
+    <div
+      key={i}
+      style={{
+        background: i % 2 === 0 ? 'var(--vp-c-bg-alt)' : 'var(--vp-c-bg-soft)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+        fontSize: '14px',
+        color: 'var(--vp-c-text-2)',
+      }}
+    >
       Pane {i + 1}
     </div>
   ));
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', border: '1px solid var(--vp-c-divider)', borderRadius: '12px', padding: '20px', background: 'var(--vp-c-bg)' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px',
+        border: '1px solid var(--vp-c-divider)',
+        borderRadius: '12px',
+        padding: '20px',
+        background: 'var(--vp-c-bg)',
+      }}
+    >
       {/* Control Panel */}
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', 
-        gap: '15px',
-        paddingBottom: '20px',
-        borderBottom: '1px solid var(--vp-c-divider)',
-        fontSize: '13px'
-      }}>
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+          gap: '15px',
+          paddingBottom: '20px',
+          borderBottom: '1px solid var(--vp-c-divider)',
+          fontSize: '13px',
+        }}
+      >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
           <label>Mode</label>
-          <select value={mode} onChange={(e) => setMode(e.target.value as any)} style={{ padding: '4px', borderRadius: '4px', border: '1px solid var(--vp-c-divider)', background: 'var(--vp-c-bg-alt)' }}>
+          <select
+            value={mode}
+            onChange={(e) => setMode(e.target.value as any)}
+            style={{ padding: '4px', borderRadius: '4px', border: '1px solid var(--vp-c-divider)', background: 'var(--vp-c-bg-alt)' }}
+          >
             <option value="horizontal">Horizontal</option>
             <option value="vertical">Vertical</option>
           </select>
@@ -69,30 +88,30 @@ export default function PropsPlayground() {
       </div>
 
       {/* Live Demo */}
-      <div style={{ 
-        height: '400px', 
-        width: '100%', 
-        border: '1px solid var(--vp-c-divider)', 
-        borderRadius: '8px', 
-        overflow: 'hidden',
-        position: 'relative'
-      }}>
-        <Split 
+      <div
+        style={{
+          height: '400px',
+          width: '100%',
+          border: '1px solid var(--vp-c-divider)',
+          borderRadius: '8px',
+          overflow: 'hidden',
+          position: 'relative',
+        }}
+      >
+        <Split
           key={`${mode}-${paneCount}-${minSize}`} // Re-mount when structural props change for clean demo
           mode={mode}
           lineBar={lineBar}
           disable={disabled}
           visible={visible}
           minSizes={Array(paneCount).fill(minSize)}
-          initialSizes={Array(paneCount).fill(`${100/paneCount}%`)}
+          initialSizes={Array(paneCount).fill(`${100 / paneCount}%`)}
         >
           {panes}
         </Split>
       </div>
 
-      <div style={{ fontSize: '12px', color: 'var(--vp-c-text-3)', fontStyle: 'italic' }}>
-        Tip: Change the Mode or LineBar to see the instant visual feedback.
-      </div>
+      <div style={{ fontSize: '12px', color: 'var(--vp-c-text-3)', fontStyle: 'italic' }}>Tip: Change the Mode or LineBar to see the instant visual feedback.</div>
     </div>
   );
 }

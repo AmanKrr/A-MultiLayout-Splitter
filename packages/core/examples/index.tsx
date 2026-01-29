@@ -200,32 +200,32 @@ export default function ExamplesIndex() {
   const [selectedExample, setSelectedExample] = useState<Example>(EXAMPLES[0]);
   const [category, setCategory] = useState<string>('basic');
 
-  const filteredExamples = EXAMPLES.filter(ex => ex.category === category);
+  const filteredExamples = EXAMPLES.filter((ex) => ex.category === category);
   const SelectedComponent = selectedExample.component;
 
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100vw', flexDirection: 'column' }}>
       {/* Header */}
-      <div style={{
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        color: 'white',
-        padding: '20px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      }}>
+      <div
+        style={{
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          color: 'white',
+          padding: '20px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        }}
+      >
         <h1 style={{ margin: 0, fontSize: '24px' }}>A-MultiLayout-Splitter v6</h1>
-        <p style={{ margin: '5px 0 0 0', opacity: 0.9 }}>
-          Comprehensive Examples Showcase - {EXAMPLES.length} Examples
-        </p>
+        <p style={{ margin: '5px 0 0 0', opacity: 0.9 }}>Comprehensive Examples Showcase - {EXAMPLES.length} Examples</p>
       </div>
 
       {/* Category Tabs */}
       <div style={{ background: '#f5f5f5', borderBottom: '1px solid #ddd', padding: '10px 20px' }}>
-        {['basic', 'advanced', 'api', 'nested', 'plugins'].map(cat => (
+        {['basic', 'advanced', 'api', 'nested', 'plugins'].map((cat) => (
           <button
             key={cat}
             onClick={() => {
               setCategory(cat);
-              const firstExample = EXAMPLES.find(ex => ex.category === cat);
+              const firstExample = EXAMPLES.find((ex) => ex.category === cat);
               if (firstExample) setSelectedExample(firstExample);
             }}
             style={{
@@ -240,7 +240,7 @@ export default function ExamplesIndex() {
               textTransform: 'capitalize',
             }}
           >
-            {cat} ({EXAMPLES.filter(ex => ex.category === cat).length})
+            {cat} ({EXAMPLES.filter((ex) => ex.category === cat).length})
           </button>
         ))}
       </div>
@@ -248,13 +248,15 @@ export default function ExamplesIndex() {
       {/* Main Content */}
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
         {/* Sidebar - Example List */}
-        <div style={{
-          width: '300px',
-          background: '#fafafa',
-          borderRight: '1px solid #ddd',
-          overflowY: 'auto',
-        }}>
-          {filteredExamples.map(example => (
+        <div
+          style={{
+            width: '300px',
+            background: '#fafafa',
+            borderRight: '1px solid #ddd',
+            overflowY: 'auto',
+          }}
+        >
+          {filteredExamples.map((example) => (
             <div
               key={example.id}
               onClick={() => setSelectedExample(example)}
@@ -266,12 +268,8 @@ export default function ExamplesIndex() {
                 borderLeft: selectedExample.id === example.id ? '3px solid #667eea' : '3px solid transparent',
               }}
             >
-              <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>
-                {example.title}
-              </div>
-              <div style={{ fontSize: '12px', color: '#666' }}>
-                {example.description}
-              </div>
+              <div style={{ fontWeight: 'bold', marginBottom: '5px' }}>{example.title}</div>
+              <div style={{ fontSize: '12px', color: '#666' }}>{example.description}</div>
             </div>
           ))}
         </div>
@@ -283,13 +281,15 @@ export default function ExamplesIndex() {
       </div>
 
       {/* Footer Info */}
-      <div style={{
-        background: '#f5f5f5',
-        padding: '10px 20px',
-        borderTop: '1px solid #ddd',
-        fontSize: '12px',
-        color: '#666',
-      }}>
+      <div
+        style={{
+          background: '#f5f5f5',
+          padding: '10px 20px',
+          borderTop: '1px solid #ddd',
+          fontSize: '12px',
+          color: '#666',
+        }}
+      >
         <strong>{selectedExample.title}</strong> - {selectedExample.description}
       </div>
     </div>

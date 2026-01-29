@@ -13,26 +13,20 @@ describe('usePaneManager', () => {
   });
 
   const createChildren = (count: number) => {
-    return Array.from({ length: count }, (_, i) => (
-      <div key={i}>Pane {i + 1}</div>
-    ));
+    return Array.from({ length: count }, (_, i) => <div key={i}>Pane {i + 1}</div>);
   };
 
   describe('Initialization', () => {
     it('initializes with children', () => {
       const children = createChildren(3);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['30%', '40%', '30%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['30%', '40%', '30%'], [], [], [], 'test-split'));
 
       expect(result.current.panes).toHaveLength(3);
     });
 
     it('applies initial sizes', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['40%', '60%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['40%', '60%'], [], [], [], 'test-split'));
 
       expect(result.current.panes[0].size).toBe('40%');
       expect(result.current.panes[1].size).toBe('60%');
@@ -40,9 +34,7 @@ describe('usePaneManager', () => {
 
     it('applies initial collapsed state', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [true, false], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [true, false], [], [], 'test-split'));
 
       expect(result.current.panes[0].collapsed).toBe(true);
       expect(result.current.panes[1].collapsed).toBe(false);
@@ -50,9 +42,7 @@ describe('usePaneManager', () => {
 
     it('applies min and max sizes', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [], [20, 30], [80, 70], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [20, 30], [80, 70], 'test-split'));
 
       expect(result.current.panes[0].minSize).toBe(20);
       expect(result.current.panes[0].maxSize).toBe(80);
@@ -62,9 +52,7 @@ describe('usePaneManager', () => {
 
     it('defaults to 100% size when no initialSizes provided', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, [], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, [], [], [], [], 'test-split'));
 
       expect(result.current.panes[0].size).toBe('100%');
       expect(result.current.panes[1].size).toBe('100%');
@@ -72,11 +60,9 @@ describe('usePaneManager', () => {
 
     it('generates unique pane IDs', () => {
       const children = createChildren(3);
-      const { result } = renderHook(() =>
-        usePaneManager(children, [], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, [], [], [], [], 'test-split'));
 
-      const ids = result.current.panes.map(p => p.id);
+      const ids = result.current.panes.map((p) => p.id);
       const uniqueIds = new Set(ids);
       expect(uniqueIds.size).toBe(ids.length);
     });
@@ -85,9 +71,7 @@ describe('usePaneManager', () => {
   describe('addPane', () => {
     it('adds a pane at the end by default', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split'));
 
       act(() => {
         result.current.addPane({
@@ -101,9 +85,7 @@ describe('usePaneManager', () => {
 
     it('adds a pane at specific position', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split'));
 
       act(() => {
         result.current.addPane({
@@ -118,9 +100,7 @@ describe('usePaneManager', () => {
 
     it('redistributes sizes when adding percentage pane', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split'));
 
       act(() => {
         result.current.addPane({
@@ -138,9 +118,7 @@ describe('usePaneManager', () => {
   describe('removePane', () => {
     it('removes a pane by index', () => {
       const children = createChildren(3);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['33%', '34%', '33%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['33%', '34%', '33%'], [], [], [], 'test-split'));
 
       act(() => {
         result.current.removePane(1);
@@ -151,14 +129,9 @@ describe('usePaneManager', () => {
 
     it('redistributes size to remaining panes', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['40%', '60%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['40%', '60%'], [], [], [], 'test-split'));
 
-      const initialTotal = result.current.panes.reduce(
-        (sum, p) => sum + parseFloat(p.size),
-        0
-      );
+      const initialTotal = result.current.panes.reduce((sum, p) => sum + parseFloat(p.size), 0);
 
       act(() => {
         result.current.removePane(0);
@@ -170,9 +143,7 @@ describe('usePaneManager', () => {
 
     it('handles invalid index gracefully', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split'));
 
       act(() => {
         result.current.removePane(-1);
@@ -186,9 +157,7 @@ describe('usePaneManager', () => {
   describe('togglePane', () => {
     it('toggles pane collapsed state', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [false, false], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [false, false], [], [], 'test-split'));
 
       expect(result.current.panes[0].collapsed).toBe(false);
 
@@ -207,9 +176,7 @@ describe('usePaneManager', () => {
 
     it('handles invalid index gracefully', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split'));
 
       act(() => {
         result.current.togglePane(-1);
@@ -224,9 +191,7 @@ describe('usePaneManager', () => {
   describe('setPaneSize', () => {
     it('sets pane size', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split'));
 
       act(() => {
         result.current.setPaneSize(0, '30%');
@@ -237,9 +202,7 @@ describe('usePaneManager', () => {
 
     it('handles invalid index gracefully', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split'));
 
       act(() => {
         result.current.setPaneSize(-1, '30%');
@@ -254,9 +217,7 @@ describe('usePaneManager', () => {
   describe('getPaneState', () => {
     it('returns current pane state', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split'));
 
       const state = result.current.getPaneState();
       expect(state).toEqual(result.current.panes);
@@ -266,9 +227,7 @@ describe('usePaneManager', () => {
   describe('removePanes', () => {
     it('removes multiple panes by indices', () => {
       const children = createChildren(4);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['25%', '25%', '25%', '25%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['25%', '25%', '25%', '25%'], [], [], [], 'test-split'));
 
       act(() => {
         result.current.removePanes([0, 2]);
@@ -279,9 +238,7 @@ describe('usePaneManager', () => {
 
     it('redistributes sizes after removal', () => {
       const children = createChildren(3);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['33%', '34%', '33%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['33%', '34%', '33%'], [], [], [], 'test-split'));
 
       act(() => {
         result.current.removePanes([0, 2]);
@@ -295,9 +252,7 @@ describe('usePaneManager', () => {
   describe('swapPanes', () => {
     it('swaps two panes', () => {
       const children = createChildren(3);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['30%', '40%', '30%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['30%', '40%', '30%'], [], [], [], 'test-split'));
 
       const originalFirst = result.current.panes[0].id;
       const originalLast = result.current.panes[2].id;
@@ -312,34 +267,30 @@ describe('usePaneManager', () => {
 
     it('handles same index gracefully', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split'));
 
-      const originalOrder = result.current.panes.map(p => p.id);
+      const originalOrder = result.current.panes.map((p) => p.id);
 
       act(() => {
         result.current.swapPanes(0, 0);
       });
 
-      const newOrder = result.current.panes.map(p => p.id);
+      const newOrder = result.current.panes.map((p) => p.id);
       expect(newOrder).toEqual(originalOrder);
     });
 
     it('handles invalid indices gracefully', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split'));
 
-      const originalOrder = result.current.panes.map(p => p.id);
+      const originalOrder = result.current.panes.map((p) => p.id);
 
       act(() => {
         result.current.swapPanes(-1, 0);
         result.current.swapPanes(0, 10);
       });
 
-      const newOrder = result.current.panes.map(p => p.id);
+      const newOrder = result.current.panes.map((p) => p.id);
       expect(newOrder).toEqual(originalOrder);
     });
   });
@@ -347,9 +298,7 @@ describe('usePaneManager', () => {
   describe('collapsePane', () => {
     it('collapses a pane', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split'));
 
       act(() => {
         result.current.collapsePane(0);
@@ -360,9 +309,7 @@ describe('usePaneManager', () => {
 
     it('does not collapse already collapsed pane', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [true, false], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [true, false], [], [], 'test-split'));
 
       act(() => {
         result.current.collapsePane(0);
@@ -373,9 +320,7 @@ describe('usePaneManager', () => {
 
     it('handles direction option for left', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [], [], 'test-split'));
 
       act(() => {
         result.current.collapsePane(0, { direction: 'left' });
@@ -389,9 +334,7 @@ describe('usePaneManager', () => {
   describe('expandPane', () => {
     it('expands a collapsed pane', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [true, false], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [true, false], [], [], 'test-split'));
 
       expect(result.current.panes[0].collapsed).toBe(true);
 
@@ -404,9 +347,7 @@ describe('usePaneManager', () => {
 
     it('does not expand already expanded pane', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [false, false], [], [], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [false, false], [], [], 'test-split'));
 
       act(() => {
         result.current.expandPane(0);
@@ -419,9 +360,7 @@ describe('usePaneManager', () => {
   describe('resizePane', () => {
     it('resizes pane by delta', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [], [0, 0], [100, 100], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [0, 0], [100, 100], 'test-split'));
 
       act(() => {
         result.current.resizePane(0, 10);
@@ -432,9 +371,7 @@ describe('usePaneManager', () => {
 
     it('respects minSize constraint', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [], [30, 0], [100, 100], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [30, 0], [100, 100], 'test-split'));
 
       act(() => {
         result.current.resizePane(0, -50);
@@ -445,9 +382,7 @@ describe('usePaneManager', () => {
 
     it('respects maxSize constraint', () => {
       const children = createChildren(2);
-      const { result } = renderHook(() =>
-        usePaneManager(children, ['50%', '50%'], [], [0, 0], [70, 100], 'test-split')
-      );
+      const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [0, 0], [70, 100], 'test-split'));
 
       act(() => {
         result.current.resizePane(0, 50);

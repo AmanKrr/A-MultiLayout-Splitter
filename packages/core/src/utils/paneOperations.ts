@@ -2,7 +2,7 @@ import { Pane, AnimationOptions } from '../types';
 
 /**
  * Applies collapse state styles directly to a pane element.
- * 
+ *
  * @param element - The pane HTMLElement
  * @param collapsed - Whether the pane should be hidden
  */
@@ -21,16 +21,12 @@ export function applyCollapseState(element: HTMLElement, collapsed: boolean): vo
 
 /**
  * Animates a pane's size change using CSS transitions.
- * 
+ *
  * @param element - The pane HTMLElement
  * @param targetSize - The target size string (e.g., "50%")
  * @param options - Animation configuration
  */
-export function animatePaneSize(
-  element: HTMLElement,
-  targetSize: string,
-  options: AnimationOptions = {}
-): Promise<void> {
+export function animatePaneSize(element: HTMLElement, targetSize: string, options: AnimationOptions = {}): Promise<void> {
   return new Promise((resolve) => {
     const duration = options.duration || 300;
 
@@ -99,12 +95,7 @@ export function constrainSize(value: number, minSize: number, maxSize: number): 
 /**
  * Factory function to create a new pane object with default values.
  */
-export function createPane(
-  id: string,
-  size: string,
-  content: React.ReactNode,
-  options: Partial<Pane> = {}
-): Pane {
+export function createPane(id: string, size: string, content: React.ReactNode, options: Partial<Pane> = {}): Pane {
   return {
     id,
     size,
@@ -128,10 +119,7 @@ export function updatePaneSize(pane: Pane, newSize: string): Pane {
 /**
  * Applies multiple updates to an array of panes based on their IDs.
  */
-export function batchUpdatePanes(
-  panes: Pane[],
-  updates: Map<string, Partial<Pane>>
-): Pane[] {
+export function batchUpdatePanes(panes: Pane[], updates: Map<string, Partial<Pane>>): Pane[] {
   return panes.map((pane) => {
     const update = updates.get(pane.id);
     return update ? { ...pane, ...update } : pane;
@@ -141,10 +129,7 @@ export function batchUpdatePanes(
 /**
  * Restores a pane's state from a saved persistence object.
  */
-export function restorePaneState(
-  pane: Pane,
-  savedState: { id: string; size: string; collapsed: boolean }
-): Pane {
+export function restorePaneState(pane: Pane, savedState: { id: string; size: string; collapsed: boolean }): Pane {
   return {
     ...pane,
     size: savedState.size,
@@ -177,10 +162,7 @@ export function shouldShowHandlebar(_prevPane: Pane, _nextPane: Pane): boolean {
 /**
  * Calculates whether a specific handlebar should be interaction-disabled.
  */
-export function isHandlebarDisabled(
-  index: number,
-  disable?: boolean | boolean[] | number[]
-): boolean {
+export function isHandlebarDisabled(index: number, disable?: boolean | boolean[] | number[]): boolean {
   if (typeof disable === 'boolean') {
     return disable;
   }
@@ -196,10 +178,7 @@ export function isHandlebarDisabled(
 /**
  * Calculates whether a specific handlebar should be visible in the DOM.
  */
-export function isHandlebarVisible(
-  index: number,
-  visible?: boolean | boolean[] | number[]
-): boolean {
+export function isHandlebarVisible(index: number, visible?: boolean | boolean[] | number[]): boolean {
   if (typeof visible === 'boolean') {
     return visible;
   }
@@ -215,10 +194,7 @@ export function isHandlebarVisible(
 /**
  * Calculates whether a handlebar should use the simplified line style.
  */
-export function isLineBarStyle(
-  index: number,
-  lineBar?: boolean | boolean[] | number[]
-): boolean {
+export function isLineBarStyle(index: number, lineBar?: boolean | boolean[] | number[]): boolean {
   if (typeof lineBar === 'boolean') {
     return lineBar;
   }

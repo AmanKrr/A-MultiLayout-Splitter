@@ -10,10 +10,7 @@ import { Split } from '../../src';
 export default function ThreePanesExample() {
   return (
     <div style={{ height: '100%', width: '100%' }}>
-      <Split
-        mode="horizontal"
-        initialSizes={['30%', '40%', '30%']}
-      >
+      <Split mode="horizontal" initialSizes={['30%', '40%', '30%']}>
         <div style={{ padding: '20px', background: '#e8f5e9' }}>
           <h2>Left Pane</h2>
           <p>30% width</p>

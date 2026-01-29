@@ -3,7 +3,7 @@ import { parseSize } from './sizeConversion';
 
 /**
  * Calculates the total size of an array of panes.
- * 
+ *
  * @param panes - Array of pane configurations
  * @returns Total size and the unit of the first pane
  */
@@ -21,9 +21,7 @@ export function calculateTotalSize(panes: Pane[]): { total: number; unit: string
     if (parsed.unit === firstParsed.unit) {
       total += parsed.value;
     } else {
-      console.warn(
-        `Mixed units detected: ${firstParsed.unit} and ${parsed.unit}. Results may be inaccurate.`
-      );
+      console.warn(`Mixed units detected: ${firstParsed.unit} and ${parsed.unit}. Results may be inaccurate.`);
       total += parsed.value;
     }
   }
@@ -33,15 +31,12 @@ export function calculateTotalSize(panes: Pane[]): { total: number; unit: string
 
 /**
  * Validates pane size configurations against container constraints.
- * 
+ *
  * @param panes - Array of panes
  * @param _containerSize - Container size in pixels
  * @returns Object indicating validity and a list of errors
  */
-export function validatePaneSizes(
-  panes: Pane[],
-  _containerSize: number
-): { valid: boolean; errors: string[] } {
+export function validatePaneSizes(panes: Pane[], _containerSize: number): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
 
   if (panes.length === 0) {
@@ -77,7 +72,7 @@ export function validatePaneSizes(
 
 /**
  * Calculates the appropriate flex-basis value for CSS layout.
- * 
+ *
  * @param size - Original size string
  * @param _containerSize - Container dimension in pixels
  * @returns Formatted CSS flex-basis value
@@ -103,14 +98,11 @@ export function calculateFlexBasis(size: string, _containerSize: number): string
 
 /**
  * Determines CSS flex-grow and flex-shrink values based on pane state.
- * 
+ *
  * @param pane - Pane configuration
  * @param isCollapsed - Whether the pane is currently hidden
  */
-export function calculateFlexValues(
-  pane: Pane,
-  isCollapsed: boolean = false
-): { flexGrow: number; flexShrink: number } {
+export function calculateFlexValues(pane: Pane, isCollapsed: boolean = false): { flexGrow: number; flexShrink: number } {
   if (isCollapsed) {
     return { flexGrow: 0, flexShrink: 0 };
   }
@@ -130,16 +122,12 @@ export function calculateFlexValues(
 
 /**
  * Calculates the pixel position for a handlebar relative to its container.
- * 
+ *
  * @param prevPaneSize - Size of the pane preceding the handlebar
  * @param containerSize - Total dimension of the container
  * @param _mode - Layout orientation
  */
-export function calculateHandlebarPosition(
-  prevPaneSize: string,
-  containerSize: number,
-  _mode: SplitMode
-): number {
+export function calculateHandlebarPosition(prevPaneSize: string, containerSize: number, _mode: SplitMode): number {
   const parsed = parseSize(prevPaneSize);
 
   if (parsed.unit === '%') {

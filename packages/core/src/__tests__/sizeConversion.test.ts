@@ -3,14 +3,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import {
-  percentageToPixel,
-  pixelToPercentage,
-  normalizeSize,
-  parseSize,
-  haveSameUnit,
-  clampSize,
-} from '../utils/sizeConversion';
+import { percentageToPixel, pixelToPercentage, normalizeSize, parseSize, haveSameUnit, clampSize } from '../utils/sizeConversion';
 
 describe('sizeConversion utilities', () => {
   describe('percentageToPixel', () => {

@@ -4,23 +4,19 @@ import { Pane, SplitMode } from '../types';
 
 /**
  * usePersistence
- * 
+ *
  * Manages the serialization and retrieval of pane dimensions to localStorage.
- * Handles mode-specific keys to ensure horizontal and vertical layouts for the 
+ * Handles mode-specific keys to ensure horizontal and vertical layouts for the
  * same ID remain distinct.
- * 
+ *
  * @param enabled - Whether auto-persistence is toggled on
  * @param storageKey - Base identifier for the storage entry
  * @param mode - Current split orientation
  */
-export function usePersistence(
-  enabled: boolean,
-  storageKey: string,
-  mode: SplitMode
-) {
+export function usePersistence(enabled: boolean, storageKey: string, mode: SplitMode) {
   /**
    * save
-   * 
+   *
    * Debounced write operation to commit current pane states to localStorage.
    */
   const save = useCallback(
@@ -45,7 +41,7 @@ export function usePersistence(
 
   /**
    * load
-   * 
+   *
    * Retrieves and parses the saved layout state from localStorage.
    */
   const load = useCallback((): Array<{
@@ -70,7 +66,7 @@ export function usePersistence(
 
   /**
    * clear
-   * 
+   *
    * Formally removes the stored state for this specific instance and mode.
    */
   const clear = useCallback(() => {

@@ -4,10 +4,10 @@ import { calculateFlexBasis, calculateFlexValues } from '../utils/layoutCalculat
 
 /**
  * Pane
- * 
+ *
  * Individual split pane component.
  * Responsible for rendering individual pane content and applying flex styles.
- * 
+ *
  * @param props - Component properties
  */
 export const Pane: React.FC<PaneProps> = ({

@@ -119,16 +119,7 @@ export function ImperativeExample() {
 // ===========================================
 
 export function HookBasedExample() {
-  const {
-    panes,
-    mode,
-    addPane,
-    removePane,
-    togglePane,
-    swapPanes,
-    getSnapshot,
-    restore,
-  } = useSplitController({
+  const { panes, mode, addPane, removePane, togglePane, swapPanes, getSnapshot, restore } = useSplitController({
     mode: 'horizontal',
     initialPanes: [
       {
@@ -176,9 +167,7 @@ export function HookBasedExample() {
         </button>
         <button onClick={() => removePane(panes.length - 1)}>Remove Last</button>
         <button onClick={() => togglePane(0)}>Toggle First</button>
-        <button onClick={() => swapPanes(0, panes.length - 1)}>
-          Swap First & Last
-        </button>
+        <button onClick={() => swapPanes(0, panes.length - 1)}>Swap First & Last</button>
       </div>
 
       <div style={{ marginBottom: '10px' }}>
@@ -228,10 +217,7 @@ export function IDELayoutExample() {
         content: (
           <div style={{ padding: '10px' }}>
             <h3>Editor</h3>
-            <textarea
-              style={{ width: '100%', height: '300px' }}
-              defaultValue="// Your code here..."
-            />
+            <textarea style={{ width: '100%', height: '300px' }} defaultValue="// Your code here..." />
           </div>
         ),
       },
@@ -358,15 +344,11 @@ export function CombinedAPIsExample() {
       <div style={{ marginBottom: '10px' }}>
         <h3>Combined APIs</h3>
         {/* Hook-based controls */}
-        <button onClick={() => controller.addPane({ size: '200px', content: <div>New</div> })}>
-          Add (Hook)
-        </button>
+        <button onClick={() => controller.addPane({ size: '200px', content: <div>New</div> })}>Add (Hook)</button>
         {/* Imperative controls */}
         <button onClick={() => splitRef.current?.swapPanes(0, 1)}>Swap (Ref)</button>
         {/* Declarative controls */}
-        <button onClick={() => setCollapsed([!collapsed[0], collapsed[1]])}>
-          Toggle (State)
-        </button>
+        <button onClick={() => setCollapsed([!collapsed[0], collapsed[1]])}>Toggle (State)</button>
       </div>
 
       <Split

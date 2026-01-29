@@ -36,7 +36,7 @@ export default function ComplexNestedExample() {
               </div>
               <div style={{ padding: '20px' }}>
                 <pre style={{ margin: 0, fontSize: '14px' }}>
-{`import React from 'react';
+                  {`import React from 'react';
 
 export function App() {
   return (
@@ -53,8 +53,8 @@ export function App() {
             <div style={{ background: '#1e1e1e', color: '#d4d4d4', padding: '15px' }}>
               <div style={{ color: '#4ec9b0' }}>TERMINAL</div>
               <pre style={{ margin: '10px 0 0 0', fontSize: '13px' }}>
-$ npm run dev
-<span style={{ color: '#89d185' }}>✓ Ready in 450ms</span>
+                $ npm run dev
+                <span style={{ color: '#89d185' }}>✓ Ready in 450ms</span>
               </pre>
             </div>
           </Split>

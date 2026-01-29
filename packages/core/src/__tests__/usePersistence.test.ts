@@ -19,9 +19,7 @@ describe('usePersistence', () => {
 
   describe('save', () => {
     it('saves pane state to localStorage when enabled', async () => {
-      const { result } = renderHook(() =>
-        usePersistence(true, 'test-split', 'horizontal')
-      );
+      const { result } = renderHook(() => usePersistence(true, 'test-split', 'horizontal'));
 
       const panes: Pane[] = [
         { id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
@@ -46,13 +44,9 @@ describe('usePersistence', () => {
     });
 
     it('does not save when disabled', async () => {
-      const { result } = renderHook(() =>
-        usePersistence(false, 'test-split', 'horizontal')
-      );
+      const { result } = renderHook(() => usePersistence(false, 'test-split', 'horizontal'));
 
-      const panes: Pane[] = [
-        { id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-      ];
+      const panes: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' }];
 
       act(() => {
         result.current.save(panes);
@@ -65,21 +59,13 @@ describe('usePersistence', () => {
     });
 
     it('uses different keys for different modes', async () => {
-      const { result: horizontalResult } = renderHook(() =>
-        usePersistence(true, 'test-split', 'horizontal')
-      );
+      const { result: horizontalResult } = renderHook(() => usePersistence(true, 'test-split', 'horizontal'));
 
-      const { result: verticalResult } = renderHook(() =>
-        usePersistence(true, 'test-split', 'vertical')
-      );
+      const { result: verticalResult } = renderHook(() => usePersistence(true, 'test-split', 'vertical'));
 
-      const panesH: Pane[] = [
-        { id: 'h1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-      ];
+      const panesH: Pane[] = [{ id: 'h1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' }];
 
-      const panesV: Pane[] = [
-        { id: 'v1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'vertical' },
-      ];
+      const panesV: Pane[] = [{ id: 'v1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'vertical' }];
 
       act(() => {
         horizontalResult.current.save(panesH);
@@ -106,13 +92,9 @@ describe('usePersistence', () => {
         throw new Error('Storage quota exceeded');
       });
 
-      const { result } = renderHook(() =>
-        usePersistence(true, 'test-split', 'horizontal')
-      );
+      const { result } = renderHook(() => usePersistence(true, 'test-split', 'horizontal'));
 
-      const panes: Pane[] = [
-        { id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-      ];
+      const panes: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' }];
 
       act(() => {
         result.current.save(panes);
@@ -127,19 +109,11 @@ describe('usePersistence', () => {
     });
 
     it('debounces multiple rapid calls', async () => {
-      const { result } = renderHook(() =>
-        usePersistence(true, 'test-split', 'horizontal')
-      );
+      const { result } = renderHook(() => usePersistence(true, 'test-split', 'horizontal'));
 
-      const panes1: Pane[] = [
-        { id: '1', size: '30%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-      ];
-      const panes2: Pane[] = [
-        { id: '1', size: '40%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-      ];
-      const panes3: Pane[] = [
-        { id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-      ];
+      const panes1: Pane[] = [{ id: '1', size: '30%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' }];
+      const panes2: Pane[] = [{ id: '1', size: '40%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' }];
+      const panes3: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' }];
 
       act(() => {
         result.current.save(panes1);
@@ -166,33 +140,25 @@ describe('usePersistence', () => {
 
       localStorage.setItem('test-split-horizontal', JSON.stringify(data));
 
-      const { result } = renderHook(() =>
-        usePersistence(true, 'test-split', 'horizontal')
-      );
+      const { result } = renderHook(() => usePersistence(true, 'test-split', 'horizontal'));
 
       const loaded = result.current.load();
       expect(loaded).toEqual(data);
     });
 
     it('returns null when no data stored', () => {
-      const { result } = renderHook(() =>
-        usePersistence(true, 'test-split', 'horizontal')
-      );
+      const { result } = renderHook(() => usePersistence(true, 'test-split', 'horizontal'));
 
       const loaded = result.current.load();
       expect(loaded).toBeNull();
     });
 
     it('returns null when disabled', () => {
-      const data = [
-        { id: '1', size: '50%', collapsed: false },
-      ];
+      const data = [{ id: '1', size: '50%', collapsed: false }];
 
       localStorage.setItem('test-split-horizontal', JSON.stringify(data));
 
-      const { result } = renderHook(() =>
-        usePersistence(false, 'test-split', 'horizontal')
-      );
+      const { result } = renderHook(() => usePersistence(false, 'test-split', 'horizontal'));
 
       const loaded = result.current.load();
       expect(loaded).toBeNull();
@@ -203,9 +169,7 @@ describe('usePersistence', () => {
 
       localStorage.setItem('test-split-horizontal', 'invalid json{');
 
-      const { result } = renderHook(() =>
-        usePersistence(true, 'test-split', 'horizontal')
-      );
+      const { result } = renderHook(() => usePersistence(true, 'test-split', 'horizontal'));
 
       const loaded = result.current.load();
       expect(loaded).toBeNull();
@@ -221,13 +185,9 @@ describe('usePersistence', () => {
       localStorage.setItem('test-split-horizontal', JSON.stringify(dataH));
       localStorage.setItem('test-split-vertical', JSON.stringify(dataV));
 
-      const { result: horizontalResult } = renderHook(() =>
-        usePersistence(true, 'test-split', 'horizontal')
-      );
+      const { result: horizontalResult } = renderHook(() => usePersistence(true, 'test-split', 'horizontal'));
 
-      const { result: verticalResult } = renderHook(() =>
-        usePersistence(true, 'test-split', 'vertical')
-      );
+      const { result: verticalResult } = renderHook(() => usePersistence(true, 'test-split', 'vertical'));
 
       const loadedH = horizontalResult.current.load();
       const loadedV = verticalResult.current.load();
@@ -239,15 +199,11 @@ describe('usePersistence', () => {
 
   describe('clear', () => {
     it('clears pane state from localStorage when enabled', () => {
-      const data = [
-        { id: '1', size: '50%', collapsed: false },
-      ];
+      const data = [{ id: '1', size: '50%', collapsed: false }];
 
       localStorage.setItem('test-split-horizontal', JSON.stringify(data));
 
-      const { result } = renderHook(() =>
-        usePersistence(true, 'test-split', 'horizontal')
-      );
+      const { result } = renderHook(() => usePersistence(true, 'test-split', 'horizontal'));
 
       act(() => {
         result.current.clear();
@@ -258,15 +214,11 @@ describe('usePersistence', () => {
     });
 
     it('does not clear when disabled', () => {
-      const data = [
-        { id: '1', size: '50%', collapsed: false },
-      ];
+      const data = [{ id: '1', size: '50%', collapsed: false }];
 
       localStorage.setItem('test-split-horizontal', JSON.stringify(data));
 
-      const { result } = renderHook(() =>
-        usePersistence(false, 'test-split', 'horizontal')
-      );
+      const { result } = renderHook(() => usePersistence(false, 'test-split', 'horizontal'));
 
       act(() => {
         result.current.clear();
@@ -285,9 +237,7 @@ describe('usePersistence', () => {
         throw new Error('Storage error');
       });
 
-      const { result } = renderHook(() =>
-        usePersistence(true, 'test-split', 'horizontal')
-      );
+      const { result } = renderHook(() => usePersistence(true, 'test-split', 'horizontal'));
 
       act(() => {
         result.current.clear();
@@ -306,9 +256,7 @@ describe('usePersistence', () => {
       localStorage.setItem('test-split-horizontal', JSON.stringify(dataH));
       localStorage.setItem('test-split-vertical', JSON.stringify(dataV));
 
-      const { result } = renderHook(() =>
-        usePersistence(true, 'test-split', 'horizontal')
-      );
+      const { result } = renderHook(() => usePersistence(true, 'test-split', 'horizontal'));
 
       act(() => {
         result.current.clear();
@@ -324,9 +272,7 @@ describe('usePersistence', () => {
 
   describe('hook stability', () => {
     it('returns stable function references', () => {
-      const { result, rerender } = renderHook(() =>
-        usePersistence(true, 'test-split', 'horizontal')
-      );
+      const { result, rerender } = renderHook(() => usePersistence(true, 'test-split', 'horizontal'));
 
       const initialFunctions = result.current;
 

@@ -10,10 +10,7 @@ import { Split } from '../../src';
 export default function SimpleVerticalExample() {
   return (
     <div style={{ height: '100%', width: '100%' }}>
-      <Split
-        mode="vertical"
-        initialSizes={['50%', '50%']}
-      >
+      <Split mode="vertical" initialSizes={['50%', '50%']}>
         <div style={{ padding: '20px', background: '#e6f3ff' }}>
           <h2>Top Pane</h2>
           <p>This is the top pane. Drag the handlebar to resize.</p>

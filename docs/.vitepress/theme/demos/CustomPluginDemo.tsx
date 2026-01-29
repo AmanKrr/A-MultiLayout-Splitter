@@ -71,15 +71,12 @@ export default function CustomPluginDemo() {
       event,
       data,
     };
-    setLogs(prev => [...prev.slice(-9), newLog]); // Keep last 10 logs
+    setLogs((prev) => [...prev.slice(-9), newLog]); // Keep last 10 logs
   });
 
   // Memoize plugins to prevent infinite re-renders
   // Plugins are only created once and use refs internally for callbacks
-  const plugins = useMemo(() => [
-    createAnalyticsPlugin(handleEventRef),
-    createResizeLimiterPlugin(60),
-  ], []);
+  const plugins = useMemo(() => [createAnalyticsPlugin(handleEventRef), createResizeLimiterPlugin(60)], []);
 
   useEffect(() => {
     if (logsContainerRef.current) {
@@ -113,26 +110,33 @@ export default function CustomPluginDemo() {
 
   const getEventColor = (event: string) => {
     switch (event) {
-      case 'init': return '#22c55e';
-      case 'drag_start': return '#3b82f6';
-      case 'drag_end': return '#8b5cf6';
-      case 'destroy': return '#ef4444';
-      default: return 'var(--vp-c-text-2)';
+      case 'init':
+        return '#22c55e';
+      case 'drag_start':
+        return '#3b82f6';
+      case 'drag_end':
+        return '#8b5cf6';
+      case 'destroy':
+        return '#ef4444';
+      default:
+        return 'var(--vp-c-text-2)';
     }
   };
 
   return (
     <div style={{ padding: '20px', background: 'var(--vp-c-bg-soft)', borderRadius: '8px' }}>
-      <div style={{
-        display: 'flex',
-        gap: '8px',
-        marginBottom: '15px',
-        alignItems: 'center',
-        padding: '10px',
-        background: 'var(--vp-c-bg)',
-        borderRadius: '6px',
-        border: '1px solid var(--vp-c-divider)'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: '8px',
+          marginBottom: '15px',
+          alignItems: 'center',
+          padding: '10px',
+          background: 'var(--vp-c-bg)',
+          borderRadius: '6px',
+          border: '1px solid var(--vp-c-divider)',
+        }}
+      >
         <span style={{ fontSize: '12px', color: 'var(--vp-c-text-2)' }}>
           Active Plugins: <code>analyticsPlugin</code> + <code>resizeLimiterPlugin</code>
         </span>
@@ -143,42 +147,39 @@ export default function CustomPluginDemo() {
 
       <div style={{ display: 'flex', gap: '15px' }}>
         <div style={{ flex: 1 }}>
-          <div style={{
-            height: '200px',
-            border: '1px solid var(--vp-c-divider)',
-            borderRadius: '6px',
-            overflow: 'hidden',
-          }}>
-            <Split
-              mode="horizontal"
-              initialSizes={['50%', '50%']}
-              minSizes={[20, 20]}
-              plugins={plugins}
-            >
-              <div style={{ ...paneStyle, background: 'var(--vp-c-bg)' }}>
-                Panel A
-              </div>
-              <div style={{ ...paneStyle, background: 'var(--vp-c-bg-alt)' }}>
-                Panel B
-              </div>
+          <div
+            style={{
+              height: '200px',
+              border: '1px solid var(--vp-c-divider)',
+              borderRadius: '6px',
+              overflow: 'hidden',
+            }}
+          >
+            <Split mode="horizontal" initialSizes={['50%', '50%']} minSizes={[20, 20]} plugins={plugins}>
+              <div style={{ ...paneStyle, background: 'var(--vp-c-bg)' }}>Panel A</div>
+              <div style={{ ...paneStyle, background: 'var(--vp-c-bg-alt)' }}>Panel B</div>
             </Split>
           </div>
         </div>
 
-        <div style={{
-          width: '280px',
-          background: '#1e1e1e',
-          borderRadius: '6px',
-          overflow: 'hidden',
-        }}>
-          <div style={{
-            padding: '8px 12px',
-            background: '#2d2d2d',
-            fontSize: '11px',
-            fontWeight: 'bold',
-            color: '#ccc',
-            borderBottom: '1px solid #3d3d3d',
-          }}>
+        <div
+          style={{
+            width: '280px',
+            background: '#1e1e1e',
+            borderRadius: '6px',
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              padding: '8px 12px',
+              background: '#2d2d2d',
+              fontSize: '11px',
+              fontWeight: 'bold',
+              color: '#ccc',
+              borderBottom: '1px solid #3d3d3d',
+            }}
+          >
             Event Log
           </div>
           <div
@@ -192,19 +193,12 @@ export default function CustomPluginDemo() {
             }}
           >
             {logs.length === 0 ? (
-              <div style={{ color: '#666', fontStyle: 'italic' }}>
-                Drag the split handle to see events...
-              </div>
+              <div style={{ color: '#666', fontStyle: 'italic' }}>Drag the split handle to see events...</div>
             ) : (
-              logs.map(log => (
+              logs.map((log) => (
                 <div key={log.id} style={{ marginBottom: '6px' }}>
-                  <span style={{ color: '#666' }}>[{log.timestamp}]</span>{' '}
-                  <span style={{ color: getEventColor(log.event), fontWeight: 'bold' }}>
-                    {log.event}
-                  </span>
-                  <div style={{ color: '#888', marginLeft: '12px', fontSize: '10px' }}>
-                    {JSON.stringify(log.data)}
-                  </div>
+                  <span style={{ color: '#666' }}>[{log.timestamp}]</span> <span style={{ color: getEventColor(log.event), fontWeight: 'bold' }}>{log.event}</span>
+                  <div style={{ color: '#888', marginLeft: '12px', fontSize: '10px' }}>{JSON.stringify(log.data)}</div>
                 </div>
               ))
             )}
@@ -212,18 +206,24 @@ export default function CustomPluginDemo() {
         </div>
       </div>
 
-      <div style={{
-        marginTop: '15px',
-        padding: '12px',
-        background: 'var(--vp-c-bg)',
-        borderRadius: '6px',
-        fontSize: '12px',
-        color: 'var(--vp-c-text-2)',
-      }}>
+      <div
+        style={{
+          marginTop: '15px',
+          padding: '12px',
+          background: 'var(--vp-c-bg)',
+          borderRadius: '6px',
+          fontSize: '12px',
+          color: 'var(--vp-c-text-2)',
+        }}
+      >
         <strong>This demo shows two custom plugins:</strong>
         <ul style={{ margin: '8px 0 0 20px', padding: 0 }}>
-          <li><strong>analyticsPlugin:</strong> Logs all lifecycle events (init, drag start/end, destroy)</li>
-          <li><strong>resizeLimiterPlugin:</strong> Prevents combined pane size from going below 60% (returns <code>false</code> from <code>onDragMove</code> to cancel)</li>
+          <li>
+            <strong>analyticsPlugin:</strong> Logs all lifecycle events (init, drag start/end, destroy)
+          </li>
+          <li>
+            <strong>resizeLimiterPlugin:</strong> Prevents combined pane size from going below 60% (returns <code>false</code> from <code>onDragMove</code> to cancel)
+          </li>
         </ul>
       </div>
     </div>

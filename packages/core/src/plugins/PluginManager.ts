@@ -16,7 +16,7 @@ import { ReactNode } from 'react';
 
 /**
  * PluginManager
- * 
+ *
  * Internal class that orchestrates the lifecycle and events of Split plugins.
  * Acts as a bridge between the Split component and registered plugin instances.
  */
@@ -33,7 +33,7 @@ export class PluginManager {
    */
   registerPlugins(plugins: SplitPlugin[]): void {
     this.plugins = plugins;
-    this.plugins.forEach(plugin => {
+    this.plugins.forEach((plugin) => {
       if (plugin.onInit) {
         plugin.onInit(this.context);
       }
@@ -44,7 +44,7 @@ export class PluginManager {
    * Cleans up all plugins and triggers their destruction hooks.
    */
   destroy(): void {
-    this.plugins.forEach(plugin => {
+    this.plugins.forEach((plugin) => {
       if (plugin.onDestroy) {
         plugin.onDestroy(this.context);
       }
@@ -56,7 +56,7 @@ export class PluginManager {
    * Notifies plugins when a pane is added.
    */
   onPaneAdd(event: PaneAddEvent): void {
-    this.plugins.forEach(plugin => {
+    this.plugins.forEach((plugin) => {
       if (plugin.onPaneAdd) {
         plugin.onPaneAdd(event, this.context);
       }
@@ -67,7 +67,7 @@ export class PluginManager {
    * Notifies plugins when a pane is removed.
    */
   onPaneRemove(event: PaneRemoveEvent): void {
-    this.plugins.forEach(plugin => {
+    this.plugins.forEach((plugin) => {
       if (plugin.onPaneRemove) {
         plugin.onPaneRemove(event, this.context);
       }
@@ -78,7 +78,7 @@ export class PluginManager {
    * Notifies plugins when a pane is collapsed.
    */
   onPaneCollapse(event: PaneCollapseEvent): void {
-    this.plugins.forEach(plugin => {
+    this.plugins.forEach((plugin) => {
       if (plugin.onPaneCollapse) {
         plugin.onPaneCollapse(event, this.context);
       }
@@ -89,7 +89,7 @@ export class PluginManager {
    * Notifies plugins when a pane is expanded.
    */
   onPaneExpand(event: PaneExpandEvent): void {
-    this.plugins.forEach(plugin => {
+    this.plugins.forEach((plugin) => {
       if (plugin.onPaneExpand) {
         plugin.onPaneExpand(event, this.context);
       }
@@ -100,7 +100,7 @@ export class PluginManager {
    * Notifies plugins when a drag operation begins.
    */
   onDragStart(event: DragStartEvent): void {
-    this.plugins.forEach(plugin => {
+    this.plugins.forEach((plugin) => {
       if (plugin.onDragStart) {
         plugin.onDragStart(event, this.context);
       }
@@ -130,7 +130,7 @@ export class PluginManager {
    * Notifies plugins when a drag operation ends.
    */
   onDragEnd(event: DragEndEvent): void {
-    this.plugins.forEach(plugin => {
+    this.plugins.forEach((plugin) => {
       if (plugin.onDragEnd) {
         plugin.onDragEnd(event, this.context);
       }
@@ -141,7 +141,7 @@ export class PluginManager {
    * Notifies plugins when the split container is resized.
    */
   onResize(event: ResizeEvent): void {
-    this.plugins.forEach(plugin => {
+    this.plugins.forEach((plugin) => {
       if (plugin.onResize) {
         plugin.onResize(event, this.context);
       }
@@ -191,13 +191,13 @@ export class PluginManager {
    * Retrieves a specific plugin by its unique name.
    */
   getPlugin(name: string): SplitPlugin | undefined {
-    return this.plugins.find(plugin => plugin.name === name);
+    return this.plugins.find((plugin) => plugin.name === name);
   }
 
   /**
    * Checks if a plugin with the given name is currently registered.
    */
   hasPlugin(name: string): boolean {
-    return this.plugins.some(plugin => plugin.name === name);
+    return this.plugins.some((plugin) => plugin.name === name);
   }
 }

@@ -34,17 +34,19 @@ export default function NestedRefDemo() {
 
   return (
     <div style={{ padding: '20px', background: 'var(--vp-c-bg-soft)', borderRadius: '8px' }}>
-      <div style={{
-        display: 'flex',
-        gap: '8px',
-        marginBottom: '15px',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        padding: '10px',
-        background: 'var(--vp-c-bg)',
-        borderRadius: '6px',
-        border: '1px solid var(--vp-c-divider)'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: '8px',
+          marginBottom: '15px',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          padding: '10px',
+          background: 'var(--vp-c-bg)',
+          borderRadius: '6px',
+          border: '1px solid var(--vp-c-divider)',
+        }}
+      >
         <span style={{ fontSize: '11px', color: 'var(--vp-c-text-2)', marginRight: '4px' }}>Outer:</span>
         <button onClick={() => outerRef.current?.togglePane(0)} style={buttonStyle}>
           Toggle Sidebar
@@ -53,12 +55,14 @@ export default function NestedRefDemo() {
           Toggle Right
         </button>
 
-        <span style={{
-          width: '1px',
-          height: '20px',
-          background: 'var(--vp-c-divider)',
-          margin: '0 8px'
-        }} />
+        <span
+          style={{
+            width: '1px',
+            height: '20px',
+            background: 'var(--vp-c-divider)',
+            margin: '0 8px',
+          }}
+        />
 
         <span style={{ fontSize: '11px', color: 'var(--vp-c-text-2)', marginRight: '4px' }}>Inner:</span>
         <button onClick={() => innerRef.current?.togglePane(1)} style={secondaryStyle}>
@@ -66,29 +70,21 @@ export default function NestedRefDemo() {
         </button>
       </div>
 
-      <div style={{
-        height: '300px',
-        border: '1px solid var(--vp-c-divider)',
-        borderRadius: '6px',
-        overflow: 'hidden',
-      }}>
-        <Split
-          ref={outerRef}
-          mode="horizontal"
-          initialSizes={['20%', '50%', '30%']}
-          minSizes={[10, 30, 15]}
-        >
+      <div
+        style={{
+          height: '300px',
+          border: '1px solid var(--vp-c-divider)',
+          borderRadius: '6px',
+          overflow: 'hidden',
+        }}
+      >
+        <Split ref={outerRef} mode="horizontal" initialSizes={['20%', '50%', '30%']} minSizes={[10, 30, 15]}>
           <div style={{ ...paneStyle, background: '#252526', color: '#ccc' }}>
             <strong>Sidebar</strong>
             <span style={{ opacity: 0.6 }}>outerRef[0]</span>
           </div>
 
-          <Split
-            ref={innerRef}
-            mode="vertical"
-            initialSizes={['70%', '30%']}
-            minSizes={[30, 15]}
-          >
+          <Split ref={innerRef} mode="vertical" initialSizes={['70%', '30%']} minSizes={[30, 15]}>
             <div style={{ ...paneStyle, background: '#1e1e1e', color: '#d4d4d4' }}>
               <strong>Editor</strong>
               <span style={{ opacity: 0.6 }}>innerRef[0]</span>
