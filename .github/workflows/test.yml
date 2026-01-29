@@ -11,7 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        react-version: [17, 18, 19]
+        include:
+          - react-version: 17
+            testing-library-version: 12
+          - react-version: 18
+            testing-library-version: 14
+          - react-version: 19
+            testing-library-version: 16
       fail-fast: false
 
     name: Test (React ${{ matrix.react-version }})
@@ -34,9 +40,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Install React ${{ matrix.react-version }}
+      - name: Install React ${{ matrix.react-version }} and compatible Testing Library
         working-directory: packages/core
-        run: pnpm add -D react@${{ matrix.react-version }} react-dom@${{ matrix.react-version }}
+        run: |
+          pnpm add -D react@${{ matrix.react-version }} react-dom@${{ matrix.react-version }} @testing-library/react@${{ matrix.testing-library-version }}
 
       - name: Run tests
         working-directory: packages/core
