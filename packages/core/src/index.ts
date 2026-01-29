@@ -1,14 +1,14 @@
 /**
  * @a-multilayout-splitter/core
- * 
+ *
  * High-performance split pane component for React.
  * Uses direct DOM manipulation to achieve 60fps drag performance.
  */
 
 // --- Main Components ---
-export { Split } from './components/Split';
-export { DragHandle } from './components/DragHandle';
-export { Pane as PaneComponent } from './components/Pane';
+export { Split } from "./components/Split";
+export { DragHandle } from "./components/DragHandle";
+export { Pane as PaneComponent } from "./components/Pane";
 
 // --- Type Definitions ---
 export type {
@@ -42,32 +42,19 @@ export type {
   SplitControllerState,
   SplitControllerActions,
   UseSplitControllerOptions,
-} from './types';
+} from "./types";
 
 // --- Lifecycle Hooks ---
-export { useDragHandler } from './hooks/useDragHandler';
-export { usePaneManager } from './hooks/usePaneManager';
-export { usePersistence } from './hooks/usePersistence';
-export { usePluginContext } from './hooks/usePluginContext';
-export { useSplitController } from './hooks/useSplitController';
+export { useDragHandler } from "./hooks/useDragHandler";
+export { usePaneManager } from "./hooks/usePaneManager";
+export { usePersistence } from "./hooks/usePersistence";
+export { usePluginContext } from "./hooks/usePluginContext";
+export { useSplitController } from "./hooks/useSplitController";
 
 // --- Plugin System ---
-export {
-  PluginManager,
-  createPlugin,
-  persistencePlugin,
-  clearPersistedState,
-  keyboardPlugin,
-  customHandlePlugin,
-  customHandleRenderPlugin,
-} from './plugins';
+export { PluginManager, createPlugin, persistencePlugin, clearPersistedState, keyboardPlugin, customHandlePlugin, customHandleRenderPlugin } from "./plugins";
 
-export type {
-  PersistencePluginOptions,
-  StorageType,
-  KeyboardPluginOptions,
-  CustomHandleComponentProps,
-} from './plugins';
+export type { PersistencePluginOptions, StorageType, KeyboardPluginOptions, CustomHandleComponentProps } from "./plugins";
 
 // --- Reactive Context Providers ---
 export {
@@ -81,35 +68,17 @@ export {
   useIsDragging,
   useIsCollapsed,
   useVisiblePanes,
-} from './contexts/SplitProvider';
+} from "./contexts/SplitProvider";
 
-export type {
-  SplitConfig,
-  SplitState,
-  SplitActions,
-  SplitProviderProps,
-} from './contexts/SplitProvider';
+export type { SplitConfig, SplitState, SplitActions, SplitProviderProps } from "./contexts/SplitProvider";
 
 // --- Nesting Support ---
-export {
-  NestingProvider,
-  useNestingLevel,
-  withNesting,
-} from './contexts/NestingContext';
+export { NestingProvider, useNestingLevel, withNesting } from "./contexts/NestingContext";
 
-export type {
-  NestingProviderProps,
-} from './contexts/NestingContext';
+export type { NestingProviderProps } from "./contexts/NestingContext";
 
 // --- Low-level Utilities ---
-export {
-  percentageToPixel,
-  pixelToPercentage,
-  normalizeSize,
-  parseSize,
-  haveSameUnit,
-  clampSize,
-} from './utils/sizeConversion';
+export { percentageToPixel, pixelToPercentage, normalizeSize, parseSize, haveSameUnit, clampSize } from "./utils/sizeConversion";
 
 export {
   calculateTotalSize,
@@ -121,7 +90,7 @@ export {
   canResize,
   getAxisProperty,
   getCoordinateProperty,
-} from './utils/layoutCalculations';
+} from "./utils/layoutCalculations";
 
 export {
   applyCollapseState,
@@ -141,9 +110,6 @@ export {
   isHandlebarDisabled,
   isHandlebarVisible,
   isLineBarStyle,
-} from './utils/paneOperations';
+} from "./utils/paneOperations";
 
-export { throttle, debounce } from './utils/native/throttle';
-
-// --- Default Export ---
-export { Split as default } from './components/Split';
+export { throttle, debounce } from "./utils/native/throttle";
