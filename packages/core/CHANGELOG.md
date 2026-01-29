@@ -1,3 +1,16 @@
+# [6.0.0-alpha.5](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v6.0.0-alpha.4...v6.0.0-alpha.5) (2026-01-29)
+
+
+### Bug Fixes
+
+* remove default export to avoid CJS/ESM interop issues ([64d116f](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/64d116fc59c30d9e629a4617f0ae4f73fb893303))
+
+
+### Features
+
+* Added new test cases ([de3da5e](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/de3da5e1a08ba2a37ed8efa6c260a1f92a1e9570))
+* Added support for react 17 and 19 ([1521e17](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/1521e17bd6e473e6ad71fca3829e8ad387bbbaa1))
+
 # [6.0.0-alpha.4](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v6.0.0-alpha.3...v6.0.0-alpha.4) (2026-01-28)
 
 
