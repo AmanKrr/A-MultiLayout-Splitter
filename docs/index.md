@@ -29,6 +29,8 @@ features:
     details: Full keyboard navigation support and ARIA compliance built into the core handle logic.
   - title: 📦 Lightweight
     details: Zero dependencies (no lodash!), optimized for modern ESM ecosystems and small bundle sizes.
+  - title: ⚛️ React 17, 18 & 19
+    details: Compatible with React 17, 18, and 19. Works seamlessly with the latest React features.
 ---
 
 <script setup>

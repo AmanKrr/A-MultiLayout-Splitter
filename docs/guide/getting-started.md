@@ -2,6 +2,11 @@
 
 Learn how to get up and running with **A-MultiLayout-Splitter v6**.
 
+## Prerequisites
+
+- **React**: `^17.0.0 || ^18.0.0 || ^19.0.0`
+- **React DOM**: `^17.0.0 || ^18.0.0 || ^19.0.0`
+
 ## Installation
 
 Install the package via your preferred package manager:
