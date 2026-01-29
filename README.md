@@ -39,13 +39,21 @@ Our documentation site contains:
 ## 📦 Installation
 
 ```bash
+# npm
 npm install @a-multilayout-splitter/core
+
+# pnpm
+pnpm add @a-multilayout-splitter/core
+
+# yarn
+yarn add @a-multilayout-splitter/core
 ```
 
 ## 🛠️ Basic Quick Start
 
 ```tsx
 import { Split } from '@a-multilayout-splitter/core';
+import '@a-multilayout-splitter/core/style.css';
 
 function App() {
   return (
@@ -67,6 +75,7 @@ Extend the splitter with powerful built-in plugins:
 
 ```tsx
 import { Split, keyboardPlugin, persistencePlugin } from '@a-multilayout-splitter/core';
+import '@a-multilayout-splitter/core/style.css';
 
 <Split
   plugins={[
