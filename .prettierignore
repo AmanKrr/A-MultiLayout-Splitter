@@ -1,0 +1,11 @@
+node_modules
+dist
+packages/*/dist
+coverage
+.vscode
+*.log
+build
+public
+*.tgz
+/.pnp
+.cache

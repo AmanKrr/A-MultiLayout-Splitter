@@ -21,9 +21,6 @@
       ]
     }
   },
-  "files": [
-    "playwright.config.ts"
-  ],
   "references": [
     {
       "path": "./packages/core"
