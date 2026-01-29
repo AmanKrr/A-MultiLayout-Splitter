@@ -45,7 +45,7 @@ cd examples/basic && pnpm dev
 Each example is a standalone React component that can be imported directly:
 
 ```tsx
-import SimpleHorizontal from '@a-multilayout-splitter/core/examples/basic/01-SimpleHorizontal';
+import SimpleHorizontal from "@a-multilayout-splitter/core/examples/basic/01-SimpleHorizontal";
 
 function App() {
   return <SimpleHorizontal />;
@@ -104,11 +104,12 @@ Extend functionality with plugins.
 ### Basic Usage
 
 ```tsx
-import { Split } from '@a-multilayout-splitter/core';
+import { Split } from "@a-multilayout-splitter/core";
+import "@a-multilayout-splitter/core/style.css";
 
 function App() {
   return (
-    <Split mode="horizontal" initialSizes={['50%', '50%']}>
+    <Split mode="horizontal" initialSizes={["50%", "50%"]}>
       <div>Left Pane</div>
       <div>Right Pane</div>
     </Split>
@@ -122,7 +123,7 @@ function App() {
 <Split
   id="my-split"
   mode="horizontal"
-  initialSizes={['40%', '60%']}
+  initialSizes={["40%", "60%"]}
   minSizes={[20, 30]}
   maxSizes={[60, 80]}
   collapsed={[false, false]}
@@ -130,7 +131,7 @@ function App() {
   disable={false}
   enablePersistence={true}
   onDragEnd={(prevSize, nextSize, index) => {
-    console.log('Resized:', prevSize, nextSize);
+    console.log("Resized:", prevSize, nextSize);
   }}
 >
   <div>Pane 1</div>
@@ -141,12 +142,12 @@ function App() {
 ### Nested Layout
 
 ```tsx
-<Split mode="horizontal" initialSizes={['30%', '70%']}>
+<Split mode="horizontal" initialSizes={["30%", "70%"]}>
   {/* Sidebar */}
   <div>Sidebar</div>
 
   {/* Main area with nested vertical split */}
-  <Split mode="vertical" initialSizes={['70%', '30%']}>
+  <Split mode="vertical" initialSizes={["70%", "30%"]}>
     <div>Editor</div>
     <div>Terminal</div>
   </Split>
@@ -156,17 +157,15 @@ function App() {
 ### With Plugins
 
 ```tsx
-import { Split, createPersistencePlugin, createKeyboardPlugin } from '@a-multilayout-splitter/core';
+import { Split, createPersistencePlugin, createKeyboardPlugin } from "@a-multilayout-splitter/core";
+import "@a-multilayout-splitter/core/style.css";
 
-const plugins = [
-  createPersistencePlugin({ storage: 'localStorage' }),
-  createKeyboardPlugin({ resizeStep: 5 }),
-];
+const plugins = [createPersistencePlugin({ storage: "localStorage" }), createKeyboardPlugin({ resizeStep: 5 })];
 
 <Split id="app-layout" plugins={plugins}>
   <div>Pane 1</div>
   <div>Pane 2</div>
-</Split>
+</Split>;
 ```
 
 ## 🔧 Development
@@ -181,17 +180,18 @@ To add new examples:
    - Clear visual indicators and labels
 
 3. Add the example to `index.tsx`:
+
    ```tsx
-   import NewExample from './category/XX-NewExample';
+   import NewExample from "./category/XX-NewExample";
 
    const EXAMPLES = [
      // ...
      {
-       id: 'new-example',
-       title: 'XX. New Example',
-       description: 'What this example demonstrates',
+       id: "new-example",
+       title: "XX. New Example",
+       description: "What this example demonstrates",
        component: NewExample,
-       category: 'basic', // or 'advanced', 'api', etc.
+       category: "basic", // or 'advanced', 'api', etc.
      },
    ];
    ```
@@ -199,6 +199,7 @@ To add new examples:
 ## 📖 Documentation
 
 For detailed API documentation, see:
+
 - [Main README](../../../README.md)
 - [API Reference](../docs/API.md)
 - [TypeScript Types](../src/types/index.ts)
@@ -206,6 +207,7 @@ For detailed API documentation, see:
 ## 🎨 Styling
 
 All examples use inline styles for portability. In production:
+
 - Import the CSS: `import '@a-multilayout-splitter/core/style.css'`
 - Customize via CSS variables or class overrides
 - Use the `className` prop for custom styling
