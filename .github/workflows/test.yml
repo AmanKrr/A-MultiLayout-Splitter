@@ -13,7 +13,7 @@ jobs:
       matrix:
         include:
           - react-version: 17
-            testing-library-version: 12
+            testing-library-version: 13
           - react-version: 18
             testing-library-version: 14
           - react-version: 19
