@@ -80,3 +80,41 @@ function App() {
   );
 }
 ```
+
+## Dynamic Panes with `addPane`
+
+When using the imperative `addPane` API, you have two options for content:
+
+### Static Content (Default)
+
+Content is captured at call time and won't update if state changes:
+
+```tsx
+// ⚠️ This count value is captured once - won't update later
+splitRef.current?.addPane({
+  size: '30%',
+  content: <Counter value={count} />,
+});
+```
+
+### Reactive Content with `render`
+
+Use a render function to keep dynamic panes reactive to state changes:
+
+```tsx
+const [count, setCount] = useState(0);
+
+// ✅ Render function is called on every render - stays reactive!
+splitRef.current?.addPane({
+  size: '30%',
+  render: () => <Counter value={count} />,
+});
+```
+
+::: tip Best Practice
+For panes that need to react to state changes, prefer:
+1. **Declarative children** (automatically reactive)
+2. **`render` function** for imperatively added panes
+
+Use `content` only for truly static panes that don't depend on external state.
+:::

@@ -135,12 +135,28 @@ export interface PaneExpandEvent {
 }
 
 /**
+ * PaneRenderFunction
+ * A render function that returns ReactNode. Called on every render
+ * to ensure the content always reflects current state/props.
+ */
+export type PaneRenderFunction = () => ReactNode;
+
+/**
  * AddPaneConfig
  * Parameters for dynamically injecting a new pane.
+ *
+ * You can provide content in two ways:
+ * 1. `content: ReactNode` - Static content, captured at addPane call time
+ * 2. `render: () => ReactNode` - Render function, called on every render for reactive content
+ *
+ * If both are provided, `render` takes precedence.
  */
 export interface AddPaneConfig {
   size: string;
-  content: ReactNode;
+  /** Static content - will not update if external state changes */
+  content?: ReactNode;
+  /** Render function - called on every render, content stays reactive to state changes */
+  render?: PaneRenderFunction;
   position?: number;
   collapsed?: boolean;
   minSize?: number;

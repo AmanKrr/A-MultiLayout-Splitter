@@ -29,9 +29,52 @@ function MyComponent() {
 
 ### `addPane(config: AddPaneConfig)`
 Adds a new pane dynamically to the split layout.
-- `config.size`: Starting size.
-- `config.position`: Optional index (defaults to end).
-- `config.content`: React element to render.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `size` | `string` | Starting size (e.g., `'30%'`, `'200px'`) |
+| `position` | `number` | Optional index to insert at (defaults to end) |
+| `content` | `ReactNode` | Static content - captured at call time |
+| `render` | `() => ReactNode` | Render function - called on every render for reactive content |
+| `collapsed` | `boolean` | Initial collapsed state |
+| `minSize` | `number` | Minimum size constraint (percentage) |
+| `maxSize` | `number` | Maximum size constraint (percentage) |
+
+#### Static vs Reactive Content
+
+You can provide content in two ways:
+
+**Static Content** - Use `content` when the pane content doesn't need to react to external state changes:
+
+```tsx
+splitRef.current?.addPane({
+  size: '30%',
+  content: <StaticPanel title="Fixed Title" />,
+});
+```
+
+**Reactive Content** - Use `render` when you need the pane content to update when external state changes:
+
+```tsx
+const [count, setCount] = useState(0);
+
+// The render function is called on every render,
+// so the pane always shows the current count value
+splitRef.current?.addPane({
+  size: '30%',
+  render: () => <Counter value={count} />,
+});
+```
+
+::: tip
+If both `content` and `render` are provided, `render` takes precedence.
+:::
+
+::: warning When to use which?
+- Use `content` for static UI that doesn't depend on external state
+- Use `render` when the pane needs to react to state changes from parent components, Redux, Context, etc.
+- For most cases, prefer **declarative children** over `addPane` - they automatically stay reactive
+:::
 
 ### `removePane(index: number)`
 Removes a specific pane and redistributes its space to the remaining panes.

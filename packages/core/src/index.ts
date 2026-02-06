@@ -18,6 +18,8 @@ export type {
   Direction,
   PaneStatus,
   Pane,
+  PaneMetadata,
+  PaneRenderFunction,
   DragState,
   DragCallbacks,
   DragStartEvent,
