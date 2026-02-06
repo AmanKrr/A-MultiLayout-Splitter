@@ -86,12 +86,7 @@ export const DragHandle: React.FC<DragHandleProps> = ({
   const hideGrip = leftPaneCollapsed || rightPaneCollapsed;
 
   return (
-    <div
-      className={handlebarClass}
-      onMouseDown={(e) => !disabled && onMouseDown(e)}
-      onTouchStart={(e) => !disabled && onMouseDown(e)}
-      style={{ cursor: disabled ? 'default' : isHorizontal ? 'col-resize' : 'row-resize' }}
-    >
+    <div className={handlebarClass} onMouseDown={(e) => !disabled && onMouseDown(e)} onTouchStart={(e) => !disabled && onMouseDown(e)}>
       {showButtons && (
         <>
           <button

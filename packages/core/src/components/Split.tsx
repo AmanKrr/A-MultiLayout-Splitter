@@ -336,7 +336,6 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
         element.style.cursor = 'default';
       } else {
         element.classList.remove('a-split-handlebar-disabled');
-        element.style.cursor = mode === 'horizontal' ? 'col-resize' : 'row-resize';
       }
 
       const isVisible = isHandlebarVisible(handlebarIndex, visible);
