@@ -1,5 +1,27 @@
 import { useState, useCallback, useMemo, useRef } from 'react';
-import { Pane, AddPaneConfig, AnimationOptions, SplitSnapshot, SplitControllerState, SplitControllerActions, UseSplitControllerOptions } from '../types';
+import {
+  Pane,
+  AddPaneConfig,
+  AnimationOptions,
+  SplitSnapshot,
+  SplitControllerState,
+  SplitControllerActions,
+  UseSplitControllerOptions,
+  PaneRenderFunction,
+} from '../types';
+import {
+  redistributeSizesOnAdd,
+  redistributeSizesOnRemove,
+  removePanesWithRedistribution,
+} from '../utils/paneRedistribution';
+
+/**
+ * Internal pane state that includes optional render function for reactive content.
+ */
+interface InternalControllerPane extends Pane {
+  /** Render function for reactive dynamic panes (via addPane with render) */
+  renderFn?: PaneRenderFunction;
+}
 
 /**
  * useSplitController
@@ -13,9 +35,9 @@ import { Pane, AddPaneConfig, AnimationOptions, SplitSnapshot, SplitControllerSt
 export function useSplitController(options: UseSplitControllerOptions = {}): SplitControllerState & SplitControllerActions {
   const { mode = 'horizontal', initialPanes = [], initialSizes = [], minSizes = [], maxSizes = [], onPaneChange } = options;
 
-  const [panes, setPanesInternal] = useState<Pane[]>(() => {
+  const [panes, setPanesInternal] = useState<InternalControllerPane[]>(() => {
     if (initialPanes.length > 0) {
-      return initialPanes;
+      return initialPanes.map((pane) => ({ ...pane }));
     }
 
     return initialSizes.map((size, idx) => ({
@@ -30,6 +52,15 @@ export function useSplitController(options: UseSplitControllerOptions = {}): Spl
 
   const [isDragging] = useState(false);
   const isBatchUpdateRef = useRef(false);
+  const containerRefId = useRef<string | null>(null);
+
+  /**
+   * Sets the container ID for accurate pixel-to-percentage conversion.
+   * Call this with the Split component's ID if you need accurate pixel sizing.
+   */
+  const setContainerId = useCallback((id: string) => {
+    containerRefId.current = id;
+  }, []);
 
   const setPanes = useCallback(
     (newPanes: Pane[] | ((prev: Pane[]) => Pane[])) => {
@@ -40,7 +71,7 @@ export function useSplitController(options: UseSplitControllerOptions = {}): Spl
           onPaneChange(updated);
         }
 
-        return updated;
+        return updated as InternalControllerPane[];
       });
     },
     [onPaneChange]
@@ -48,27 +79,52 @@ export function useSplitController(options: UseSplitControllerOptions = {}): Spl
 
   /**
    * Adds a new pane configuration to the controller state.
+   *
+   * Content can be provided in two ways:
+   * - `content`: Static ReactNode, captured at call time (won't update with state changes)
+   * - `render`: Function that returns ReactNode, called on every render (reactive to state)
+   *
+   * If both are provided, `render` takes precedence.
+   *
+   * **Note:** Pixel-based sizes (e.g., '200px') will be converted to percentages
+   * to ensure proper space redistribution among existing panes.
    */
   const addPane = useCallback(
     (config: AddPaneConfig) => {
-      setPanes((prevPanes) => {
+      // Get container size for accurate pixel -> percentage conversion
+      let containerSize: number | undefined;
+      if (containerRefId.current) {
+        const container = document.getElementById(containerRefId.current);
+        if (container) {
+          containerSize = mode === 'horizontal' ? container.offsetWidth : container.offsetHeight;
+        }
+      }
+
+      setPanesInternal((prevPanes) => {
         const position = config.position ?? prevPanes.length;
-        const newPane: Pane = {
+
+        // Determine content: render function takes precedence over static content
+        const renderFn = config.render;
+        const content = renderFn ? renderFn() : config.content;
+
+        const newPane: InternalControllerPane = {
           id: `pane-${Date.now()}`,
           size: config.size,
           collapsed: config.collapsed || false,
           minSize: config.minSize || 0,
           maxSize: config.maxSize || 100,
-          content: config.content,
+          content,
+          renderFn,
         };
 
         const newPanes = [...prevPanes];
         newPanes.splice(position, 0, newPane);
 
-        return newPanes;
+        // Redistribute sizes (handles pixel-to-percentage conversion)
+        return redistributeSizesOnAdd(newPanes, position, config.size, containerSize) as InternalControllerPane[];
       });
     },
-    [setPanes]
+    [mode]
   );
 
   /**
@@ -82,14 +138,8 @@ export function useSplitController(options: UseSplitControllerOptions = {}): Spl
         const newPanes = [...prevPanes];
         const removedPane = newPanes.splice(index, 1)[0];
 
-        if (removedPane && newPanes.length > 0) {
-          const removedSize = parseFloat(removedPane.size) || 0;
-          const redistributeAmount = removedSize / newPanes.length;
-
-          return newPanes.map((pane) => ({
-            ...pane,
-            size: `${(parseFloat(pane.size) || 0) + redistributeAmount}%`,
-          }));
+        if (removedPane) {
+          return redistributeSizesOnRemove(newPanes, removedPane.size) as InternalControllerPane[];
         }
 
         return newPanes;
@@ -104,28 +154,7 @@ export function useSplitController(options: UseSplitControllerOptions = {}): Spl
   const removePanes = useCallback(
     (indices: number[]) => {
       setPanes((prevPanes) => {
-        const sortedIndices = [...indices].sort((a, b) => b - a);
-        let newPanes = [...prevPanes];
-        let totalRemovedSize = 0;
-
-        sortedIndices.forEach((index) => {
-          if (index >= 0 && index < newPanes.length) {
-            const removed = newPanes.splice(index, 1)[0];
-            if (removed) {
-              totalRemovedSize += parseFloat(removed.size) || 0;
-            }
-          }
-        });
-
-        if (newPanes.length > 0 && totalRemovedSize > 0) {
-          const redistributeAmount = totalRemovedSize / newPanes.length;
-          newPanes = newPanes.map((pane) => ({
-            ...pane,
-            size: `${(parseFloat(pane.size) || 0) + redistributeAmount}%`,
-          }));
-        }
-
-        return newPanes;
+        return removePanesWithRedistribution(prevPanes, indices) as InternalControllerPane[];
       });
     },
     [setPanes]
@@ -240,7 +269,14 @@ export function useSplitController(options: UseSplitControllerOptions = {}): Spl
    */
   const getSnapshot = useCallback((): SplitSnapshot => {
     return {
-      panes: panes.map((p) => ({ ...p })),
+      panes: panes.map((p) => ({
+        id: p.id,
+        size: p.size,
+        collapsed: p.collapsed,
+        minSize: p.minSize,
+        maxSize: p.maxSize,
+        content: p.content,
+      })),
       totalSize: 0,
       mode,
       timestamp: Date.now(),
@@ -286,9 +322,23 @@ export function useSplitController(options: UseSplitControllerOptions = {}): Spl
     [mode, setPanes, onPaneChange]
   );
 
+  // Compute final panes with reactive content from render functions
+  const computedPanes = useMemo(() => {
+    return panes.map((pane) => {
+      // If pane has a render function, call it to get current content
+      if (pane.renderFn) {
+        return {
+          ...pane,
+          content: pane.renderFn(),
+        };
+      }
+      return pane;
+    });
+  }, [panes]);
+
   return useMemo(
     () => ({
-      panes,
+      panes: computedPanes,
       mode,
       isDragging,
       addPane,
@@ -302,7 +352,9 @@ export function useSplitController(options: UseSplitControllerOptions = {}): Spl
       setPanes,
       getSnapshot,
       restore,
+      // Additional utility for pixel-to-percentage conversion
+      setContainerId,
     }),
-    [panes, mode, isDragging, addPane, removePane, removePanes, togglePane, collapsePane, expandPane, setPaneSize, swapPanes, setPanes, getSnapshot, restore]
+    [computedPanes, mode, isDragging, addPane, removePane, removePanes, togglePane, collapsePane, expandPane, setPaneSize, swapPanes, setPanes, getSnapshot, restore, setContainerId]
   );
 }

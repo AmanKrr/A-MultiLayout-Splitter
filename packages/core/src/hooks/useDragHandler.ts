@@ -1,6 +1,13 @@
 import { useCallback, useRef, useEffect, RefObject } from 'react';
 import { throttle } from '../utils/native/throttle';
 import { DragState, DragCallbacks, SplitMode } from '../types';
+import { parseSize } from '../utils/sizeConversion';
+
+/** Extended drag state that tracks original units */
+interface ExtendedDragState extends DragState {
+  prevUnit: string;
+  nextUnit: string;
+}
 
 /**
  * useDragHandler
@@ -16,8 +23,8 @@ import { DragState, DragCallbacks, SplitMode } from '../types';
 export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: SplitMode, callbacks: DragCallbacks = {}) {
   const { onDragStart, onDragMove, onDragEnd } = callbacks;
 
-  const dragState = useRef<DragState | null>(null);
-  const finalSizes = useRef<{ prevSize: number; nextSize: number } | null>(null);
+  const dragState = useRef<ExtendedDragState | null>(null);
+  const finalSizes = useRef<{ prevSize: number; nextSize: number; prevSizePx: number; nextSizePx: number } | null>(null);
 
   /**
    * handleMouseDown
@@ -74,6 +81,12 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
         }
       });
 
+      // Extract original units from data-size attribute (set by Pane component)
+      const prevDataSize = prevElement.getAttribute('data-size') || '50%';
+      const nextDataSize = nextElement.getAttribute('data-size') || '50%';
+      const prevParsed = parseSize(prevDataSize);
+      const nextParsed = parseSize(nextDataSize);
+
       dragState.current = {
         active: true,
         paneIndex,
@@ -91,6 +104,8 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
         maxPrevSize: parseFloat(prevElement.getAttribute('data-max-size') || '100'),
         minNextSize: parseFloat(nextElement.getAttribute('data-min-size') || '0'),
         maxNextSize: parseFloat(nextElement.getAttribute('data-max-size') || '100'),
+        prevUnit: prevParsed.unit,
+        nextUnit: nextParsed.unit,
       };
 
       finalSizes.current = null;
@@ -167,21 +182,21 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
         return;
       }
 
-      finalSizes.current = { prevSize, nextSize };
+      finalSizes.current = { prevSize, nextSize, prevSizePx, nextSizePx };
 
       requestAnimationFrame(() => {
         if (!state.prevElement || !state.nextElement) return;
 
-        const prevHasPercent = state.prevElement.style.flexBasis.includes('%');
-        const nextHasPercent = state.nextElement.style.flexBasis.includes('%');
+        const extState = state as ExtendedDragState;
 
-        if (prevHasPercent) {
+        // Use percentage for '%' units, pixels for everything else (px, fr, etc.)
+        if (extState.prevUnit === '%') {
           state.prevElement.style.flexBasis = `${prevSize}%`;
         } else {
           state.prevElement.style.flexBasis = `${prevSizePx}px`;
         }
 
-        if (nextHasPercent) {
+        if (extState.nextUnit === '%') {
           state.nextElement.style.flexBasis = `${nextSize}%`;
         } else {
           state.nextElement.style.flexBasis = `${nextSizePx}px`;
@@ -200,17 +215,30 @@ export function useDragHandler(containerRef: RefObject<HTMLDivElement>, mode: Sp
    */
   const handleMouseUp = useCallback(
     (e: MouseEvent | TouchEvent) => {
-      const state = dragState.current;
+      const state = dragState.current as ExtendedDragState | null;
       if (!state?.active) return;
 
       const result = calculateDragState(e);
       if (result) {
-        finalSizes.current = { prevSize: result.prevSize, nextSize: result.nextSize };
+        finalSizes.current = {
+          prevSize: result.prevSize,
+          nextSize: result.nextSize,
+          prevSizePx: result.prevSizePx,
+          nextSizePx: result.nextSizePx,
+        };
       }
 
       const sizes = finalSizes.current;
       if (sizes) {
-        onDragEnd?.({ paneIndex: state.paneIndex, prevSize: sizes.prevSize, nextSize: sizes.nextSize });
+        onDragEnd?.({
+          paneIndex: state.paneIndex,
+          prevSize: sizes.prevSize,
+          nextSize: sizes.nextSize,
+          prevSizePx: sizes.prevSizePx,
+          nextSizePx: sizes.nextSizePx,
+          prevUnit: state.prevUnit,
+          nextUnit: state.nextUnit,
+        });
       }
 
       dragState.current = null;

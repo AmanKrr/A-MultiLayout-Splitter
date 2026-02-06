@@ -40,6 +40,7 @@ export const Pane: React.FC<PaneProps> = ({
   return (
     <div
       data-pane-id={id}
+      data-size={size}
       data-min-size={minSize}
       data-max-size={maxSize}
       className={`a-split-pane${collapsed ? ' a-split-hidden' : ''}`}

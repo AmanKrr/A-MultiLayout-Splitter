@@ -83,6 +83,8 @@ Learn different ways to control the Split component.
 2. **Imperative API** - Control via ref methods
 3. **Hook-Based API** - useSplitController hook
 
+> **Note on `addPane` sizing:** When using the imperative `addPane` method with pixel-based sizes (e.g., `'200px'`), the size will be converted to a percentage to ensure proper space redistribution among existing panes. If you need precise pixel-based layouts, consider using `initialSizes` with the declarative API or calculating the appropriate percentage based on your container size.
+
 ### Nested Layouts (3)
 
 Master complex nested layout patterns.

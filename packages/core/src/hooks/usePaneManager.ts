@@ -1,6 +1,11 @@
 import React, { useState, useCallback, useRef, useLayoutEffect, ReactNode } from 'react';
-import { PaneMetadata, Pane, AddPaneConfig, AnimationOptions, PaneRenderFunction } from '../types';
+import { PaneMetadata, Pane, AddPaneConfig, AnimationOptions, PaneRenderFunction, SplitMode } from '../types';
 import { animatePaneSize } from '../utils/paneOperations';
+import {
+  redistributeSizesOnAdd,
+  redistributeSizesOnRemove,
+  removePanesWithRedistribution,
+} from '../utils/paneRedistribution';
 
 /**
  * Internal pane state that includes optional dynamic content.
@@ -33,6 +38,7 @@ interface InternalPaneState extends PaneMetadata {
  * @param minSizes - Array of minimum percentage constraints
  * @param maxSizes - Array of maximum percentage constraints
  * @param splitId - Unique identifier used for DOM attribution
+ * @param mode - Layout orientation ('horizontal' or 'vertical')
  */
 export function usePaneManager(
   children: ReactNode,
@@ -40,7 +46,8 @@ export function usePaneManager(
   collapsed: boolean[] = [],
   minSizes: number[] = [],
   maxSizes: number[] = [],
-  splitId: string = 'split'
+  splitId: string = 'split',
+  mode: SplitMode = 'horizontal'
 ) {
   // Get children as stable array
   const childArray = React.Children.toArray(children);
@@ -142,6 +149,14 @@ export function usePaneManager(
    */
   const addPane = useCallback(
     (config: AddPaneConfig) => {
+      // Get container size for accurate pixel -> percentage conversion
+      const container = document.getElementById(splitId);
+      const containerSize = container
+        ? mode === 'horizontal'
+          ? container.offsetWidth
+          : container.offsetHeight
+        : undefined;
+
       setPaneStates((prevStates) => {
         const position = config.position ?? prevStates.length;
         const newPaneState: InternalPaneState = {
@@ -159,10 +174,10 @@ export function usePaneManager(
         const newStates = [...prevStates];
         newStates.splice(position, 0, newPaneState);
 
-        return redistributeSizesOnAdd(newStates, position, config.size);
+        return redistributeSizesOnAdd(newStates, position, config.size, containerSize) as InternalPaneState[];
       });
     },
-    [splitId]
+    [splitId, mode]
   );
 
   /**
@@ -176,7 +191,7 @@ export function usePaneManager(
       const removedPane = newStates.splice(index, 1)[0];
 
       if (removedPane) {
-        return redistributeSizesOnRemove(newStates, removedPane.size);
+        return redistributeSizesOnRemove(newStates, removedPane.size) as InternalPaneState[];
       }
       return newStates;
     });
@@ -250,28 +265,7 @@ export function usePaneManager(
    */
   const removePanes = useCallback((indices: number[]) => {
     setPaneStates((prevStates) => {
-      const sortedIndices = [...indices].sort((a, b) => b - a);
-      let newStates = [...prevStates];
-      let totalRemovedSize = 0;
-
-      sortedIndices.forEach((index) => {
-        if (index >= 0 && index < newStates.length) {
-          const removed = newStates.splice(index, 1)[0];
-          if (removed) {
-            totalRemovedSize += parseFloat(removed.size) || 0;
-          }
-        }
-      });
-
-      if (newStates.length > 0 && totalRemovedSize > 0) {
-        const redistributeAmount = totalRemovedSize / newStates.length;
-        newStates = newStates.map((pane) => ({
-          ...pane,
-          size: `${(parseFloat(pane.size) || 0) + redistributeAmount}%`,
-        }));
-      }
-
-      return newStates;
+      return removePanesWithRedistribution(prevStates, indices) as InternalPaneState[];
     });
   }, []);
 
@@ -481,91 +475,5 @@ function mergePaneArrays(
   return result;
 }
 
-/**
- * Redistributes sizes among panes when a new pane is added.
- */
-function redistributeSizesOnAdd(panes: InternalPaneState[], addedIndex: number, addedSize: string): InternalPaneState[] {
-  const addedValue = parseFloat(addedSize);
-  const isPercent = addedSize.includes('%');
-
-  if (!isPercent) {
-    return panes;
-  }
-
-  const remainingPanes = panes.filter((_, i) => i !== addedIndex);
-  const totalOtherSize = remainingPanes.reduce((sum, pane) => {
-    return sum + parseFloat(pane.size);
-  }, 0);
-
-  const scaleFactor = (100 - addedValue) / totalOtherSize;
-
-  return panes.map((pane, i) => {
-    if (i === addedIndex) return pane;
-
-    const currentValue = parseFloat(pane.size);
-    const newValue = currentValue * scaleFactor;
-
-    return {
-      ...pane,
-      size: pane.size.includes('%') ? `${newValue}%` : pane.size,
-    };
-  });
-}
-
-/**
- * Redistributes sizes among remaining panes when a pane is removed.
- */
-function redistributeSizesOnRemove(panes: InternalPaneState[], removedSize: string): InternalPaneState[] {
-  if (panes.length === 0) return panes;
-
-  const removedValue = parseFloat(removedSize);
-  const isPercent = removedSize.includes('%');
-
-  if (!isPercent) {
-    return panes;
-  }
-
-  const distributionAmount = removedValue / panes.length;
-
-  return panes.map((pane) => {
-    if (!pane.size.includes('%')) return pane;
-
-    const currentValue = parseFloat(pane.size);
-    const newValue = currentValue + distributionAmount;
-
-    return {
-      ...pane,
-      size: `${newValue}%`,
-    };
-  });
-}
-
-/**
- * Redistributes pane sizes proportionally based on their current sizes.
- */
-export function redistributeSizesProportional(panes: PaneMetadata[], removedSize: string): PaneMetadata[] {
-  if (panes.length === 0) return panes;
-
-  const removedValue = parseFloat(removedSize);
-  const isPercent = removedSize.includes('%');
-
-  if (!isPercent) return panes;
-
-  const totalSize = panes.reduce((sum, pane) => {
-    return sum + parseFloat(pane.size);
-  }, 0);
-
-  return panes.map((pane) => {
-    if (!pane.size.includes('%')) return pane;
-
-    const currentValue = parseFloat(pane.size);
-    const proportion = currentValue / totalSize;
-    const addition = removedValue * proportion;
-    const newValue = currentValue + addition;
-
-    return {
-      ...pane,
-      size: `${newValue}%`,
-    };
-  });
-}
+// Re-export for backwards compatibility
+export { redistributeSizesProportional } from '../utils/paneRedistribution';

@@ -32,13 +32,21 @@ Adds a new pane dynamically to the split layout.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `size` | `string` | Starting size (e.g., `'30%'`, `'200px'`) |
+| `size` | `string` | Starting size (e.g., `'30%'`, `'200px'`). For horizontal layouts, this represents width; for vertical layouts, this represents height. |
 | `position` | `number` | Optional index to insert at (defaults to end) |
 | `content` | `ReactNode` | Static content - captured at call time |
 | `render` | `() => ReactNode` | Render function - called on every render for reactive content |
 | `collapsed` | `boolean` | Initial collapsed state |
 | `minSize` | `number` | Minimum size constraint (percentage) |
 | `maxSize` | `number` | Maximum size constraint (percentage) |
+
+::: warning Size Conversion
+When using `addPane` with pixel-based sizes (e.g., `'200px'`), the size will be **converted to a percentage** to ensure proper space redistribution among existing panes. This conversion uses the container's width for horizontal layouts and height for vertical layouts.
+
+If you need precise pixel-based layouts, consider:
+- Using `initialSizes` with the declarative API
+- Calculating the appropriate percentage based on your container size
+:::
 
 #### Static vs Reactive Content
 

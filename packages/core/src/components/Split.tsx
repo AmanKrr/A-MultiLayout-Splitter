@@ -145,7 +145,8 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     collapsed,
     minSizes,
     maxSizes,
-    id
+    id,
+    mode
   );
 
   const [dragState, setDragState] = useState<any>(null);
@@ -354,9 +355,16 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
     onDragStart: (event) => {
       setDragState({ active: true, paneIndex: event.paneIndex });
       pluginManagerRef.current?.onDragStart(event);
-      const pane = panes[event.paneIndex];
-      if (pane) {
-        onLayoutChange?.(event.paneIndex, pane.id, 'dragging', null);
+      // event.paneIndex is the handlebar index (1-indexed)
+      // Previous pane is at index (handlebarIndex - 1), next pane is at index handlebarIndex
+      const prevPaneIndex = event.paneIndex - 1;
+      const prevPane = panes[prevPaneIndex];
+      const nextPane = panes[event.paneIndex];
+      if (prevPane) {
+        onLayoutChange?.(prevPaneIndex, prevPane.id, 'dragging', null);
+      }
+      if (nextPane) {
+        onLayoutChange?.(event.paneIndex, nextPane.id, 'dragging', null);
       }
     },
     onDragMove: (event) => {
@@ -366,14 +374,35 @@ export const Split = forwardRef<SplitRef, SplitProps>((props, ref) => {
       }
     },
     onDragEnd: (event) => {
-      setPaneSize(event.paneIndex - 1, `${event.prevSize}%`);
-      setPaneSize(event.paneIndex, `${event.nextSize}%`);
+      // Preserve original units:
+      // - '%' -> percentage
+      // - 'px' -> pixels
+      // - 'fr' -> convert to pixels (fraction loses meaning after manual resize)
+      const getSizeStr = (unit: string, sizePx: number, sizePercent: number): string => {
+        if (unit === '%') {
+          return `${sizePercent}%`;
+        }
+        // For 'px', 'fr', and other units, use pixel values
+        return `${Math.round(sizePx)}px`;
+      };
+
+      const prevSizeStr = getSizeStr(event.prevUnit, event.prevSizePx, event.prevSize);
+      const nextSizeStr = getSizeStr(event.nextUnit, event.nextSizePx, event.nextSize);
+
+      const prevPaneIndex = event.paneIndex - 1;
+      setPaneSize(prevPaneIndex, prevSizeStr);
+      setPaneSize(event.paneIndex, nextSizeStr);
       setDragState(null);
       pluginManagerRef.current?.onDragEnd(event);
       onDragEnd?.(event.prevSize, event.nextSize, event.paneIndex);
-      const pane = panes[event.paneIndex];
-      if (pane) {
-        onLayoutChange?.(event.paneIndex, pane.id, 'dragged', null);
+      // Notify both panes that were resized
+      const prevPane = panes[prevPaneIndex];
+      const nextPane = panes[event.paneIndex];
+      if (prevPane) {
+        onLayoutChange?.(prevPaneIndex, prevPane.id, 'dragged', null);
+      }
+      if (nextPane) {
+        onLayoutChange?.(event.paneIndex, nextPane.id, 'dragged', null);
       }
     },
   });

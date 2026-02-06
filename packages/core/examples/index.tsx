@@ -14,6 +14,9 @@ import MinMaxSizes from './basic/04-MinMaxSizes';
 import InitialCollapsed from './basic/05-InitialCollapsed';
 import PixelSizes from './basic/06-PixelSizes';
 import DynamicProps from './basic/07-DynamicProps';
+import PixelOnlySizes from './basic/08-PixelOnlySizes';
+import PercentageSizes from './basic/09-PercentageSizes';
+import MixedSizes from './basic/10-MixedSizes';
 
 // Advanced Examples
 import DisabledHandlebars from './advanced/01-DisabledHandlebars';
@@ -94,6 +97,27 @@ const EXAMPLES: Example[] = [
     title: '07. Dynamic Props Update',
     description: 'Props updated externally propagate to pane children',
     component: DynamicProps,
+    category: 'basic',
+  },
+  {
+    id: 'pixel-only-sizes',
+    title: '08. Pixel-Only Layout',
+    description: 'All panes using fixed pixel values',
+    component: PixelOnlySizes,
+    category: 'basic',
+  },
+  {
+    id: 'percentage-sizes',
+    title: '09. Percentage Layout',
+    description: 'All panes using percentage values',
+    component: PercentageSizes,
+    category: 'basic',
+  },
+  {
+    id: 'mixed-sizes',
+    title: '10. Mixed Units Layout',
+    description: 'Combining pixels, percentages, and fractions',
+    component: MixedSizes,
     category: 'basic',
   },
 

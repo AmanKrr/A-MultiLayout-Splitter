@@ -62,6 +62,14 @@ export interface DragEndEvent {
   prevSize: number;
   /** Final percentage size for the next pane */
   nextSize: number;
+  /** Final pixel size for the previous pane */
+  prevSizePx: number;
+  /** Final pixel size for the next pane */
+  nextSizePx: number;
+  /** Original unit of the previous pane ('px', '%', 'fr', etc.) */
+  prevUnit: string;
+  /** Original unit of the next pane ('px', '%', 'fr', etc.) */
+  nextUnit: string;
 }
 
 /**
@@ -150,8 +158,19 @@ export type PaneRenderFunction = () => ReactNode;
  * 2. `render: () => ReactNode` - Render function, called on every render for reactive content
  *
  * If both are provided, `render` takes precedence.
+ *
+ * **Important:** When using `addPane`, pixel-based sizes (e.g., '200px') will be
+ * converted to percentages to ensure proper space redistribution among existing panes.
+ * If you need to maintain pixel-based sizing, consider using percentages that
+ * approximate your desired pixel value based on the container size.
  */
 export interface AddPaneConfig {
+  /**
+   * Initial size of the pane. Accepts percentage ('50%'), pixel ('200px'), or fraction ('1fr') values.
+   *
+   * **Note:** Pixel values will be converted to percentages when the pane is added
+   * to ensure proper space redistribution among all panes.
+   */
   size: string;
   /** Static content - will not update if external state changes */
   content?: ReactNode;
@@ -202,7 +221,7 @@ export interface DragState {
 export interface DragCallbacks {
   onDragStart?: (event: { paneIndex: number }) => void;
   onDragMove?: (event: { paneIndex: number; prevSize: number; nextSize: number }) => void;
-  onDragEnd?: (event: { paneIndex: number; prevSize: number; nextSize: number }) => void;
+  onDragEnd?: (event: DragEndEvent) => void;
 }
 
 /**
@@ -463,4 +482,9 @@ export interface SplitControllerActions {
   setPanes: (update: Pane[] | ((prev: Pane[]) => Pane[])) => void;
   getSnapshot: () => SplitSnapshot;
   restore: (snapshot: SplitSnapshot) => void;
+  /**
+   * Sets the container ID for accurate pixel-to-percentage conversion in addPane.
+   * Call this with the Split component's ID if you need accurate pixel sizing.
+   */
+  setContainerId: (id: string) => void;
 }
