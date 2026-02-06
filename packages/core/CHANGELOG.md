@@ -1,3 +1,16 @@
+# [6.0.0-alpha.7](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v6.0.0-alpha.6...v6.0.0-alpha.7) (2026-02-06)
+
+
+### Bug Fixes
+
+* Nested col-resize and row-resize icon ([6dc1d6e](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/6dc1d6eee7964d95ad025d030ce9133703c6bee7))
+* onLayoutChange on collapse and expand, addPane pixel conversion to percentage for better redistribution of panes ([11d25c1](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/11d25c18c77f2d1b76e98731c8c0f7b4ce2d7313))
+
+
+### Features
+
+* Add support for reactive component support in addPane ([3ca52c9](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/3ca52c9860b5d35e8cb3a1ba58cdfbf5187e40e8))
+
 # [6.0.0-alpha.6](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v6.0.0-alpha.5...v6.0.0-alpha.6) (2026-02-06)
 
 
