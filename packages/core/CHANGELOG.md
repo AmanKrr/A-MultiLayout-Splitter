@@ -1,3 +1,10 @@
+# [6.0.0-alpha.6](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v6.0.0-alpha.5...v6.0.0-alpha.6) (2026-02-06)
+
+
+### Bug Fixes
+
+* ensure prop updates propagate to components inside panes ([f801639](https://github.com/AmanKrr/A-MultiLayout-Splitter/commit/f80163915014dfe1970865789be866c5d2dbf9b9))
+
 # [6.0.0-alpha.5](https://github.com/AmanKrr/A-MultiLayout-Splitter/compare/v6.0.0-alpha.4...v6.0.0-alpha.5) (2026-01-29)
 
 
