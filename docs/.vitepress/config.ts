@@ -60,6 +60,7 @@ export default defineConfig({
           text: 'Demos',
           items: [
             { text: 'Basic Layout', link: '/examples/basic' },
+            { text: 'Dynamic Props', link: '/examples/dynamic-props' },
             { text: 'Props Playground', link: '/examples/props-playground' },
             { text: 'Nested Sidebar', link: '/examples/nested' },
             { text: 'Custom Handles', link: '/examples/custom-handles' },

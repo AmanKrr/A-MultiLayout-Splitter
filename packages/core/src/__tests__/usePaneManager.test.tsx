@@ -396,8 +396,8 @@ describe('usePaneManager', () => {
 describe('redistributeSizesProportional', () => {
   it('redistributes proportionally based on pane sizes', () => {
     const panes = [
-      { id: '1', size: '25%', collapsed: false, minSize: 0, maxSize: 100, content: null },
-      { id: '2', size: '75%', collapsed: false, minSize: 0, maxSize: 100, content: null },
+      { id: '1', size: '25%', collapsed: false, minSize: 0, maxSize: 100 },
+      { id: '2', size: '75%', collapsed: false, minSize: 0, maxSize: 100 },
     ];
 
     const result = redistributeSizesProportional(panes, '20%');
@@ -416,8 +416,8 @@ describe('redistributeSizesProportional', () => {
 
   it('does not modify non-percentage panes', () => {
     const panes = [
-      { id: '1', size: '200px', collapsed: false, minSize: 0, maxSize: 100, content: null },
-      { id: '2', size: '300px', collapsed: false, minSize: 0, maxSize: 100, content: null },
+      { id: '1', size: '200px', collapsed: false, minSize: 0, maxSize: 100 },
+      { id: '2', size: '300px', collapsed: false, minSize: 0, maxSize: 100 },
     ];
 
     const result = redistributeSizesProportional(panes, '20%');

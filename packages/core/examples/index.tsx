@@ -13,6 +13,7 @@ import ThreePanes from './basic/03-ThreePanes';
 import MinMaxSizes from './basic/04-MinMaxSizes';
 import InitialCollapsed from './basic/05-InitialCollapsed';
 import PixelSizes from './basic/06-PixelSizes';
+import DynamicProps from './basic/07-DynamicProps';
 
 // Advanced Examples
 import DisabledHandlebars from './advanced/01-DisabledHandlebars';
@@ -86,6 +87,13 @@ const EXAMPLES: Example[] = [
     title: '06. Pixel-Based Sizes',
     description: 'Using fixed pixel values instead of percentages',
     component: PixelSizes,
+    category: 'basic',
+  },
+  {
+    id: 'dynamic-props',
+    title: '07. Dynamic Props Update',
+    description: 'Props updated externally propagate to pane children',
+    component: DynamicProps,
     category: 'basic',
   },
 

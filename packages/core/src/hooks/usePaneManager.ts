@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useEffect, useRef, ReactNode } from 'react';
-import { Pane, AddPaneConfig, AnimationOptions } from '../types';
+import React, { useState, useCallback, ReactNode } from 'react';
+import { PaneMetadata, Pane, AddPaneConfig, AnimationOptions } from '../types';
 import { animatePaneSize } from '../utils/paneOperations';
 
 /**
@@ -8,6 +8,10 @@ import { animatePaneSize } from '../utils/paneOperations';
  * Internal hook responsible for managing the state and dynamic lifecycle of split panes.
  * It handles adding, removing, toggling, and resizing panes while maintaining
  * proportional size redistribution.
+ *
+ * IMPORTANT: This hook stores only pane metadata (size, collapsed, etc.) in state.
+ * Content is NOT stored in state - it's derived from children prop at render time.
+ * This ensures prop updates always propagate correctly to child components.
  *
  * @param children - React children elements to be managed as panes
  * @param initialSizes - Array of starting size strings (e.g. "50%", "100px")
@@ -24,71 +28,73 @@ export function usePaneManager(
   maxSizes: number[] = [],
   splitId: string = 'split'
 ) {
-  const [panes, setPanes] = useState<Pane[]>(() => {
+  // Store only metadata, not content
+  const [paneMetadata, setPaneMetadata] = useState<PaneMetadata[]>(() => {
     const childArray = React.Children.toArray(children);
 
-    return childArray.map((child, index) => ({
+    return childArray.map((_, index) => ({
       id: `${splitId}-pane-${index}`,
       size: initialSizes[index] || '100%',
       collapsed: collapsed[index] || false,
       minSize: minSizes[index] || 0,
       maxSize: maxSizes[index] || 100,
-      content: child,
     }));
   });
 
-  // Track previous children to detect changes
-  const prevChildrenRef = useRef<ReactNode>(children);
+  // Get children as array for merging with metadata
+  const childArray = React.Children.toArray(children);
 
-  /**
-   * Sync pane content when children change.
-   * This ensures nested components receive updated props.
-   */
-  useEffect(() => {
-    const childArray = React.Children.toArray(children);
-    const prevChildArray = React.Children.toArray(prevChildrenRef.current);
-
-    // Only update if children count matches (not adding/removing panes)
-    if (childArray.length === panes.length) {
-      setPanes((prevPanes) => {
-        let hasChanges = false;
-        const newPanes = prevPanes.map((pane, index) => {
-          const newChild = childArray[index];
-          const prevChild = prevChildArray[index];
-
-          // Check if this child has changed (by reference)
-          if (newChild !== prevChild) {
-            hasChanges = true;
-            return { ...pane, content: newChild };
-          }
-          return pane;
+  // Sync pane count when children count changes
+  // This handles dynamic addition/removal of children
+  if (childArray.length !== paneMetadata.length) {
+    // If children were added
+    if (childArray.length > paneMetadata.length) {
+      const newMetadata = [...paneMetadata];
+      for (let i = paneMetadata.length; i < childArray.length; i++) {
+        newMetadata.push({
+          id: `${splitId}-pane-${Date.now()}-${i}`,
+          size: initialSizes[i] || '100%',
+          collapsed: collapsed[i] || false,
+          minSize: minSizes[i] || 0,
+          maxSize: maxSizes[i] || 100,
         });
-
-        return hasChanges ? newPanes : prevPanes;
-      });
+      }
+      // Use setTimeout to avoid state update during render
+      setTimeout(() => setPaneMetadata(newMetadata), 0);
     }
+    // If children were removed
+    else if (childArray.length < paneMetadata.length) {
+      const newMetadata = paneMetadata.slice(0, childArray.length);
+      setTimeout(() => setPaneMetadata(newMetadata), 0);
+    }
+  }
 
-    prevChildrenRef.current = children;
-  }, [children, panes.length]);
+  // Merge metadata with children to create full Pane objects
+  // This is computed on every render, ensuring children always have latest props
+  const panes: Pane[] = paneMetadata.map((metadata, index) => ({
+    ...metadata,
+    content: childArray[index],
+  }));
 
   /**
    * Adds a new pane at the specified position.
+   * Note: For dynamically added panes, content must be managed externally
+   * by updating the children prop.
    */
   const addPane = useCallback(
     (config: AddPaneConfig) => {
-      setPanes((prevPanes) => {
-        const position = config.position ?? prevPanes.length;
-        const newPane: Pane = {
+      setPaneMetadata((prevMetadata) => {
+        const position = config.position ?? prevMetadata.length;
+        const newMetadata: PaneMetadata = {
           id: `${splitId}-pane-${Date.now()}`,
           size: config.size,
           collapsed: config.collapsed || false,
           minSize: config.minSize || 0,
           maxSize: config.maxSize || 100,
-          content: config.content,
         };
 
-        const newPanes = [...prevPanes];
-        newPanes.splice(position, 0, newPane);
+        const newPanes = [...prevMetadata];
+        newPanes.splice(position, 0, newMetadata);
 
         return redistributeSizesOnAdd(newPanes, position, config.size);
       });
@@ -100,10 +106,10 @@ export function usePaneManager(
    * Removes a pane by its index and redistributes the freed space.
    */
   const removePane = useCallback((index: number) => {
-    setPanes((prevPanes) => {
-      if (index < 0 || index >= prevPanes.length) return prevPanes;
+    setPaneMetadata((prevMetadata) => {
+      if (index < 0 || index >= prevMetadata.length) return prevMetadata;
 
-      const newPanes = [...prevPanes];
+      const newPanes = [...prevMetadata];
       const removedPane = newPanes.splice(index, 1)[0];
 
       if (removedPane) {
@@ -117,13 +123,13 @@ export function usePaneManager(
    * Toggles the visibility (collapse/expand) of a specific pane.
    */
   const togglePane = useCallback((index: number) => {
-    setPanes((prevPanes) => {
-      if (index < 0 || index >= prevPanes.length) return prevPanes;
+    setPaneMetadata((prevMetadata) => {
+      if (index < 0 || index >= prevMetadata.length) return prevMetadata;
 
-      const currentPane = prevPanes[index];
-      if (!currentPane) return prevPanes;
+      const currentPane = prevMetadata[index];
+      if (!currentPane) return prevMetadata;
 
-      const newPanes = [...prevPanes];
+      const newPanes = [...prevMetadata];
       newPanes[index] = {
         ...currentPane,
         collapsed: !currentPane.collapsed,
@@ -152,13 +158,13 @@ export function usePaneManager(
    * Sets a pane's size and optionally triggers a CSS transition.
    */
   const setPaneSize = useCallback((index: number, size: string, options?: AnimationOptions) => {
-    setPanes((prevPanes) => {
-      if (index < 0 || index >= prevPanes.length) return prevPanes;
+    setPaneMetadata((prevMetadata) => {
+      if (index < 0 || index >= prevMetadata.length) return prevMetadata;
 
-      const currentPane = prevPanes[index];
-      if (!currentPane) return prevPanes;
+      const currentPane = prevMetadata[index];
+      if (!currentPane) return prevMetadata;
 
-      const newPanes = [...prevPanes];
+      const newPanes = [...prevMetadata];
       newPanes[index] = { ...currentPane, size, flexGrow: undefined };
 
       const element = document.querySelector(`[data-pane-id="${currentPane.id}"]`) as HTMLElement;
@@ -172,7 +178,7 @@ export function usePaneManager(
   }, []);
 
   /**
-   * Helper to retrieve the current internal pane array.
+   * Helper to retrieve the current internal pane array (with content).
    */
   const getPaneState = useCallback(() => panes, [panes]);
 
@@ -180,9 +186,9 @@ export function usePaneManager(
    * Removes multiple panes by their indices simultaneously.
    */
   const removePanes = useCallback((indices: number[]) => {
-    setPanes((prevPanes) => {
+    setPaneMetadata((prevMetadata) => {
       const sortedIndices = [...indices].sort((a, b) => b - a);
-      let newPanes = [...prevPanes];
+      let newPanes = [...prevMetadata];
       let totalRemovedSize = 0;
 
       sortedIndices.forEach((index) => {
@@ -210,12 +216,12 @@ export function usePaneManager(
    * Swaps the positions of two panes in the DOM order.
    */
   const swapPanes = useCallback((indexA: number, indexB: number) => {
-    setPanes((prevPanes) => {
-      if (indexA < 0 || indexA >= prevPanes.length || indexB < 0 || indexB >= prevPanes.length || indexA === indexB) {
-        return prevPanes;
+    setPaneMetadata((prevMetadata) => {
+      if (indexA < 0 || indexA >= prevMetadata.length || indexB < 0 || indexB >= prevMetadata.length || indexA === indexB) {
+        return prevMetadata;
       }
 
-      const newPanes = [...prevPanes];
+      const newPanes = [...prevMetadata];
       const temp = newPanes[indexA];
       newPanes[indexA] = newPanes[indexB]!;
       newPanes[indexB] = temp!;
@@ -228,11 +234,11 @@ export function usePaneManager(
    * Direct collapse method that optionally handles neighboring growth.
    */
   const collapsePane = useCallback((index: number, options?: AnimationOptions & { direction?: 'left' | 'right' }) => {
-    setPanes((prevPanes) => {
-      if (index < 0 || index >= prevPanes.length) return prevPanes;
+    setPaneMetadata((prevMetadata) => {
+      if (index < 0 || index >= prevMetadata.length) return prevMetadata;
 
-      const currentPane = prevPanes[index];
-      if (!currentPane || currentPane.collapsed) return prevPanes;
+      const currentPane = prevMetadata[index];
+      if (!currentPane || currentPane.collapsed) return prevMetadata;
 
       const direction = options?.direction;
       let adjacentIndex: number;
@@ -242,10 +248,10 @@ export function usePaneManager(
       } else if (direction === 'right') {
         adjacentIndex = index - 1;
       } else {
-        adjacentIndex = index < prevPanes.length - 1 ? index + 1 : index - 1;
+        adjacentIndex = index < prevMetadata.length - 1 ? index + 1 : index - 1;
       }
 
-      const newPanes = prevPanes.map((pane, i) => {
+      const newPanes = prevMetadata.map((pane, i) => {
         if (i === index) {
           return { ...pane, collapsed: true, flexGrow: 0 };
         } else if (i === adjacentIndex && !pane.collapsed) {
@@ -274,16 +280,16 @@ export function usePaneManager(
    * Expands a previously collapsed pane back to its original size.
    */
   const expandPane = useCallback((index: number, options?: AnimationOptions & { direction?: 'left' | 'right' }) => {
-    setPanes((prevPanes) => {
-      if (index < 0 || index >= prevPanes.length) return prevPanes;
+    setPaneMetadata((prevMetadata) => {
+      if (index < 0 || index >= prevMetadata.length) return prevMetadata;
 
-      const currentPane = prevPanes[index];
-      if (!currentPane || !currentPane.collapsed) return prevPanes;
+      const currentPane = prevMetadata[index];
+      if (!currentPane || !currentPane.collapsed) return prevMetadata;
 
-      const openPaneCountAfter = prevPanes.filter((p) => !p.collapsed).length + 1;
-      const totalPanes = prevPanes.length;
+      const openPaneCountAfter = prevMetadata.filter((p) => !p.collapsed).length + 1;
+      const totalPanes = prevMetadata.length;
 
-      let newPanes = [...prevPanes];
+      let newPanes = [...prevMetadata];
       newPanes[index] = { ...currentPane, collapsed: false, flexGrow: undefined };
 
       if (openPaneCountAfter === totalPanes) {
@@ -300,7 +306,7 @@ export function usePaneManager(
         } else if (direction === 'right') {
           adjacentIndex = index - 1;
         } else {
-          adjacentIndex = index < prevPanes.length - 1 ? index + 1 : index - 1;
+          adjacentIndex = index < prevMetadata.length - 1 ? index + 1 : index - 1;
         }
 
         if (adjacentIndex >= 0 && adjacentIndex < newPanes.length) {
@@ -329,16 +335,16 @@ export function usePaneManager(
    * Resizes a pane by a relative delta.
    */
   const resizePane = useCallback((index: number, delta: number) => {
-    setPanes((prevPanes) => {
-      if (index < 0 || index >= prevPanes.length) return prevPanes;
+    setPaneMetadata((prevMetadata) => {
+      if (index < 0 || index >= prevMetadata.length) return prevMetadata;
 
-      const currentPane = prevPanes[index];
-      if (!currentPane) return prevPanes;
+      const currentPane = prevMetadata[index];
+      if (!currentPane) return prevMetadata;
 
       const currentSize = parseFloat(currentPane.size) || 0;
       const newSize = Math.max(currentPane.minSize || 0, Math.min(currentPane.maxSize || 100, currentSize + delta));
 
-      const newPanes = [...prevPanes];
+      const newPanes = [...prevMetadata];
       newPanes[index] = { ...currentPane, size: `${newSize}%` };
 
       const element = document.querySelector(`[data-pane-id="${currentPane.id}"]`) as HTMLElement;
@@ -367,12 +373,12 @@ export function usePaneManager(
 
 /**
  * Redistributes sizes among panes when a new pane is added.
- * @param panes The current array of panes.
+ * @param panes The current array of pane metadata.
  * @param addedIndex The index where the new pane was added.
  * @param addedSize The size of the newly added pane.
- * @returns A new array of panes with redistributed sizes.
+ * @returns A new array of pane metadata with redistributed sizes.
  */
-function redistributeSizesOnAdd(panes: Pane[], addedIndex: number, addedSize: string): Pane[] {
+function redistributeSizesOnAdd(panes: PaneMetadata[], addedIndex: number, addedSize: string): PaneMetadata[] {
   const addedValue = parseFloat(addedSize);
   const isPercent = addedSize.includes('%');
 
@@ -402,11 +408,11 @@ function redistributeSizesOnAdd(panes: Pane[], addedIndex: number, addedSize: st
 
 /**
  * Redistributes sizes among remaining panes when a pane is removed.
- * @param panes The current array of panes after removal.
+ * @param panes The current array of pane metadata after removal.
  * @param removedSize The size of the pane that was removed.
- * @returns A new array of panes with redistributed sizes.
+ * @returns A new array of pane metadata with redistributed sizes.
  */
-function redistributeSizesOnRemove(panes: Pane[], removedSize: string): Pane[] {
+function redistributeSizesOnRemove(panes: PaneMetadata[], removedSize: string): PaneMetadata[] {
   if (panes.length === 0) return panes;
 
   const removedValue = parseFloat(removedSize);
@@ -434,7 +440,7 @@ function redistributeSizesOnRemove(panes: Pane[], removedSize: string): Pane[] {
 /**
  * Redistributes pane sizes proportionally based on their current sizes.
  */
-export function redistributeSizesProportional(panes: Pane[], removedSize: string): Pane[] {
+export function redistributeSizesProportional(panes: PaneMetadata[], removedSize: string): PaneMetadata[] {
   if (panes.length === 0) return panes;
 
   const removedValue = parseFloat(removedSize);

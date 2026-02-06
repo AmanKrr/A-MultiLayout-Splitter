@@ -77,18 +77,27 @@ export type PaneStatus = 'open' | 'close' | 'dragging' | 'dragged' | 'added' | '
 export type Direction = 'left' | 'right' | 'top' | 'bottom';
 
 /**
- * Pane
- * Internal state representation of a single split section.
+ * PaneMetadata
+ * Internal state representation of pane properties (without content).
+ * Content is derived from children prop at render time for proper prop propagation.
  */
-export interface Pane {
+export interface PaneMetadata {
   id: string;
   size: string;
-  content: ReactNode;
   collapsed: boolean;
   minSize: number;
   maxSize: number;
   /** Internal flex distribution override */
   flexGrow?: number;
+}
+
+/**
+ * Pane
+ * Complete pane representation including content.
+ * Used for external APIs and plugin contexts.
+ */
+export interface Pane extends PaneMetadata {
+  content: ReactNode;
 }
 
 /**
