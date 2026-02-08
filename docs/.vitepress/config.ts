@@ -22,7 +22,14 @@ export default defineConfig({
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'API', link: '/api/props' },
       { text: 'Examples', link: '/examples/basic' },
-      { text: 'v6.0.0-alpha', items: [{ text: 'Changelog', link: 'https://github.com/AmanKrr/A-MultiLayout-Splitter/blob/v6/CHANGELOG.md' }] },
+      {
+        text: 'Community',
+        items: [
+          { text: 'Contributing', link: '/contributing' },
+          { text: 'Support', link: '/support' },
+        ],
+      },
+      { text: 'v6.0.0-alpha', items: [{ text: 'Changelog', link: 'https://github.com/AmanKrr/A-MultiLayout-Splitter/blob/v6/packages/core/CHANGELOG.md' }] },
     ],
 
     sidebar: {
