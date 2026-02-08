@@ -89,14 +89,6 @@ import '@a-multilayout-splitter/core/style.css';
 
 ---
 
-## 💖 Support
-
-If you find this project useful, consider supporting its development:
-
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-ffdd00?style=flat-square&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/amankr)
-
----
-
 ## 🤝 Contributing
 
 We welcome contributions! Please see our [Contributing Guide](https://github.com/AmanKrr/A-MultiLayout-Splitter/blob/v6/CONTRIBUTING.md) to get started.
