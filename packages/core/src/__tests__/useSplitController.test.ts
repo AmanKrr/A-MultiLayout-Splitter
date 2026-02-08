@@ -34,9 +34,9 @@ describe('useSplitController', () => {
       );
 
       expect(result.current.panes).toHaveLength(3);
-      expect(result.current.panes[0].size).toBe('30%');
-      expect(result.current.panes[1].size).toBe('40%');
-      expect(result.current.panes[2].size).toBe('30%');
+      expect(result.current.panes[0]!.size).toBe('30%');
+      expect(result.current.panes[1]!.size).toBe('40%');
+      expect(result.current.panes[2]!.size).toBe('30%');
     });
 
     it('initializes with initialPanes', () => {
@@ -59,10 +59,10 @@ describe('useSplitController', () => {
         })
       );
 
-      expect(result.current.panes[0].minSize).toBe(20);
-      expect(result.current.panes[0].maxSize).toBe(80);
-      expect(result.current.panes[1].minSize).toBe(30);
-      expect(result.current.panes[1].maxSize).toBe(70);
+      expect(result.current.panes[0]!.minSize).toBe(20);
+      expect(result.current.panes[0]!.maxSize).toBe(80);
+      expect(result.current.panes[1]!.minSize).toBe(30);
+      expect(result.current.panes[1]!.maxSize).toBe(70);
     });
   });
 
@@ -85,7 +85,7 @@ describe('useSplitController', () => {
       });
 
       expect(result.current.panes).toHaveLength(3);
-      expect(result.current.panes[0].size).toBe('30%');
+      expect(result.current.panes[0]!.size).toBe('30%');
     });
 
     it('adds pane with custom options', () => {
@@ -100,9 +100,9 @@ describe('useSplitController', () => {
         });
       });
 
-      expect(result.current.panes[0].collapsed).toBe(true);
-      expect(result.current.panes[0].minSize).toBe(10);
-      expect(result.current.panes[0].maxSize).toBe(90);
+      expect(result.current.panes[0]!.collapsed).toBe(true);
+      expect(result.current.panes[0]!.minSize).toBe(10);
+      expect(result.current.panes[0]!.maxSize).toBe(90);
     });
   });
 
@@ -125,7 +125,7 @@ describe('useSplitController', () => {
       });
 
       expect(result.current.panes).toHaveLength(1);
-      expect(parseFloat(result.current.panes[0].size)).toBeCloseTo(100);
+      expect(parseFloat(result.current.panes[0]!.size)).toBeCloseTo(100);
     });
 
     it('handles invalid index', () => {
@@ -167,19 +167,19 @@ describe('useSplitController', () => {
     it('toggles pane collapsed state', () => {
       const { result } = renderHook(() => useSplitController({ initialSizes: ['50%', '50%'] }));
 
-      expect(result.current.panes[0].collapsed).toBe(false);
+      expect(result.current.panes[0]!.collapsed).toBe(false);
 
       act(() => {
         result.current.togglePane(0);
       });
 
-      expect(result.current.panes[0].collapsed).toBe(true);
+      expect(result.current.panes[0]!.collapsed).toBe(true);
 
       act(() => {
         result.current.togglePane(0);
       });
 
-      expect(result.current.panes[0].collapsed).toBe(false);
+      expect(result.current.panes[0]!.collapsed).toBe(false);
     });
   });
 
@@ -191,7 +191,7 @@ describe('useSplitController', () => {
         result.current.collapsePane(0);
       });
 
-      expect(result.current.panes[0].collapsed).toBe(true);
+      expect(result.current.panes[0]!.collapsed).toBe(true);
     });
 
     it('does not modify already collapsed pane', () => {
@@ -206,7 +206,7 @@ describe('useSplitController', () => {
         result.current.collapsePane(0);
       });
 
-      expect(result.current.panes[0].collapsed).toBe(true);
+      expect(result.current.panes[0]!.collapsed).toBe(true);
     });
   });
 
@@ -223,7 +223,7 @@ describe('useSplitController', () => {
         result.current.expandPane(0);
       });
 
-      expect(result.current.panes[0].collapsed).toBe(false);
+      expect(result.current.panes[0]!.collapsed).toBe(false);
     });
 
     it('does not modify already expanded pane', () => {
@@ -233,7 +233,7 @@ describe('useSplitController', () => {
         result.current.expandPane(0);
       });
 
-      expect(result.current.panes[0].collapsed).toBe(false);
+      expect(result.current.panes[0]!.collapsed).toBe(false);
     });
   });
 
@@ -245,7 +245,7 @@ describe('useSplitController', () => {
         result.current.setPaneSize(0, '30%');
       });
 
-      expect(result.current.panes[0].size).toBe('30%');
+      expect(result.current.panes[0]!.size).toBe('30%');
     });
 
     it('handles invalid index', () => {
@@ -256,7 +256,7 @@ describe('useSplitController', () => {
         result.current.setPaneSize(10, '30%');
       });
 
-      expect(result.current.panes[0].size).toBe('50%');
+      expect(result.current.panes[0]!.size).toBe('50%');
     });
   });
 
@@ -264,15 +264,15 @@ describe('useSplitController', () => {
     it('swaps two panes', () => {
       const { result } = renderHook(() => useSplitController({ initialSizes: ['30%', '40%', '30%'] }));
 
-      const originalFirst = result.current.panes[0].id;
-      const originalLast = result.current.panes[2].id;
+      const originalFirst = result.current.panes[0]!.id;
+      const originalLast = result.current.panes[2]!.id;
 
       act(() => {
         result.current.swapPanes(0, 2);
       });
 
-      expect(result.current.panes[0].id).toBe(originalLast);
-      expect(result.current.panes[2].id).toBe(originalFirst);
+      expect(result.current.panes[0]!.id).toBe(originalLast);
+      expect(result.current.panes[2]!.id).toBe(originalFirst);
     });
 
     it('handles same index', () => {
@@ -311,8 +311,8 @@ describe('useSplitController', () => {
         result.current.setPanes((prev) => prev.map((p) => ({ ...p, collapsed: true })));
       });
 
-      expect(result.current.panes[0].collapsed).toBe(true);
-      expect(result.current.panes[1].collapsed).toBe(true);
+      expect(result.current.panes[0]!.collapsed).toBe(true);
+      expect(result.current.panes[1]!.collapsed).toBe(true);
     });
   });
 
@@ -356,9 +356,9 @@ describe('useSplitController', () => {
         result.current.restore(snapshot);
       });
 
-      expect(result.current.panes[0].size).toBe('30%');
-      expect(result.current.panes[1].size).toBe('70%');
-      expect(result.current.panes[1].collapsed).toBe(true);
+      expect(result.current.panes[0]!.size).toBe('30%');
+      expect(result.current.panes[1]!.size).toBe('70%');
+      expect(result.current.panes[1]!.collapsed).toBe(true);
     });
 
     it('warns when restoring with different mode', () => {

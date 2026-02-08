@@ -2,7 +2,7 @@
  * Pane Operations Utilities Tests
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
   applyCollapseState,
   togglePaneCollapse,
@@ -149,8 +149,8 @@ describe('paneOperations utilities', () => {
       const result = getVisiblePanes(panes);
 
       expect(result).toHaveLength(2);
-      expect(result[0].id).toBe('1');
-      expect(result[1].id).toBe('3');
+      expect(result[0]!.id).toBe('1');
+      expect(result[1]!.id).toBe('3');
     });
 
     it('returns empty array when all collapsed', () => {
@@ -257,8 +257,8 @@ describe('paneOperations utilities', () => {
 
       const result = batchUpdatePanes(panes, updates);
 
-      expect(result[0].size).toBe('30%');
-      expect(result[1].collapsed).toBe(true);
+      expect(result[0]!.size).toBe('30%');
+      expect(result[1]!.collapsed).toBe(true);
     });
 
     it('leaves unupdated panes unchanged', () => {
@@ -271,7 +271,7 @@ describe('paneOperations utilities', () => {
 
       const result = batchUpdatePanes(panes, updates);
 
-      expect(result[1].size).toBe('50%');
+      expect(result[1]!.size).toBe('50%');
     });
   });
 

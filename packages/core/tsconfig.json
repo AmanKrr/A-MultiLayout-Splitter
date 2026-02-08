@@ -13,6 +13,7 @@
     "emitDeclarationOnly": true,
     "declarationDir": "./dist",
     "jsx": "react-jsx",
+    "types": ["vitest/globals", "@testing-library/jest-dom"],
     "composite": true,
     /* Linting - Strict mode enabled in Phase 2 */
     "strict": true,
@@ -32,8 +33,6 @@
   "exclude": [
     "node_modules",
     "dist",
-    "**/*.test.ts",
-    "**/*.test.tsx",
     "src/base",
     "src/helper",
     "src/DragHandle",

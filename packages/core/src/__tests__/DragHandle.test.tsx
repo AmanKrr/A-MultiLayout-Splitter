@@ -57,25 +57,25 @@ describe('DragHandle', () => {
       expect(handlebar).toHaveClass('a-split-handlebar-line');
     });
 
-    it('has correct cursor style for horizontal mode', () => {
+    it('has correct cursor class for horizontal mode', () => {
       const { container } = render(<DragHandle {...defaultProps} mode="horizontal" />);
 
       const handlebar = container.querySelector('.a-split-handlebar') as HTMLElement;
-      expect(handlebar.style.cursor).toBe('col-resize');
+      expect(handlebar).toHaveClass('a-split-handlebar-horizontal');
     });
 
-    it('has correct cursor style for vertical mode', () => {
+    it('has correct cursor class for vertical mode', () => {
       const { container } = render(<DragHandle {...defaultProps} mode="vertical" />);
 
       const handlebar = container.querySelector('.a-split-handlebar') as HTMLElement;
-      expect(handlebar.style.cursor).toBe('row-resize');
+      expect(handlebar).toHaveClass('a-split-handlebar-vertical');
     });
 
-    it('has default cursor when disabled', () => {
+    it('has disabled cursor class when disabled', () => {
       const { container } = render(<DragHandle {...defaultProps} disabled={true} />);
 
       const handlebar = container.querySelector('.a-split-handlebar') as HTMLElement;
-      expect(handlebar.style.cursor).toBe('default');
+      expect(handlebar).toHaveClass('a-split-handlebar-disabled');
     });
   });
 
@@ -225,7 +225,8 @@ describe('DragHandle', () => {
       const renderCustom = vi.fn(() => <div>Custom</div>);
       render(<DragHandle {...defaultProps} index={2} mode="vertical" renderCustom={renderCustom} />);
 
-      const callProps = renderCustom.mock.calls[0][0];
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const callProps = (renderCustom as any).mock.calls[0][0];
       expect(callProps.index).toBe(2);
       expect(callProps.mode).toBe('vertical');
     });

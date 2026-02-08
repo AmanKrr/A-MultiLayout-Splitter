@@ -133,8 +133,8 @@ describe('Split', () => {
       );
 
       const panes = container.querySelectorAll('.a-split-pane') as NodeListOf<HTMLElement>;
-      expect(panes[0].style.flexBasis).toBe('30%');
-      expect(panes[1].style.flexBasis).toBe('70%');
+      expect(panes[0]!.style.flexBasis).toBe('30%');
+      expect(panes[1]!.style.flexBasis).toBe('70%');
     });
 
     it('applies pixel-based initialSizes', async () => {
@@ -146,8 +146,8 @@ describe('Split', () => {
       );
 
       const panes = container.querySelectorAll('.a-split-pane') as NodeListOf<HTMLElement>;
-      expect(panes[0].style.flexBasis).toBe('200px');
-      expect(panes[1].style.flexBasis).toBe('300px');
+      expect(panes[0]!.style.flexBasis).toBe('200px');
+      expect(panes[1]!.style.flexBasis).toBe('300px');
     });
   });
 

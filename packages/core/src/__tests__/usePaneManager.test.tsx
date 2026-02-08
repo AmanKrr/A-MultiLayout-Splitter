@@ -2,7 +2,6 @@
  * usePaneManager Hook Tests
  */
 
-import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { usePaneManager, redistributeSizesProportional } from '../hooks/usePaneManager';
@@ -28,34 +27,34 @@ describe('usePaneManager', () => {
       const children = createChildren(2);
       const { result } = renderHook(() => usePaneManager(children, ['40%', '60%'], [], [], [], 'test-split'));
 
-      expect(result.current.panes[0].size).toBe('40%');
-      expect(result.current.panes[1].size).toBe('60%');
+      expect(result.current.panes[0]!.size).toBe('40%');
+      expect(result.current.panes[1]!.size).toBe('60%');
     });
 
     it('applies initial collapsed state', () => {
       const children = createChildren(2);
       const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [true, false], [], [], 'test-split'));
 
-      expect(result.current.panes[0].collapsed).toBe(true);
-      expect(result.current.panes[1].collapsed).toBe(false);
+      expect(result.current.panes[0]!.collapsed).toBe(true);
+      expect(result.current.panes[1]!.collapsed).toBe(false);
     });
 
     it('applies min and max sizes', () => {
       const children = createChildren(2);
       const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [], [20, 30], [80, 70], 'test-split'));
 
-      expect(result.current.panes[0].minSize).toBe(20);
-      expect(result.current.panes[0].maxSize).toBe(80);
-      expect(result.current.panes[1].minSize).toBe(30);
-      expect(result.current.panes[1].maxSize).toBe(70);
+      expect(result.current.panes[0]!.minSize).toBe(20);
+      expect(result.current.panes[0]!.maxSize).toBe(80);
+      expect(result.current.panes[1]!.minSize).toBe(30);
+      expect(result.current.panes[1]!.maxSize).toBe(70);
     });
 
     it('defaults to 100% size when no initialSizes provided', () => {
       const children = createChildren(2);
       const { result } = renderHook(() => usePaneManager(children, [], [], [], [], 'test-split'));
 
-      expect(result.current.panes[0].size).toBe('100%');
-      expect(result.current.panes[1].size).toBe('100%');
+      expect(result.current.panes[0]!.size).toBe('100%');
+      expect(result.current.panes[1]!.size).toBe('100%');
     });
 
     it('generates unique pane IDs', () => {
@@ -110,8 +109,8 @@ describe('usePaneManager', () => {
       });
 
       // Original panes should be scaled down
-      expect(parseFloat(result.current.panes[0].size)).toBeLessThan(50);
-      expect(parseFloat(result.current.panes[1].size)).toBeLessThan(50);
+      expect(parseFloat(result.current.panes[0]!.size)).toBeLessThan(50);
+      expect(parseFloat(result.current.panes[1]!.size)).toBeLessThan(50);
     });
   });
 
@@ -138,7 +137,7 @@ describe('usePaneManager', () => {
       });
 
       expect(result.current.panes).toHaveLength(1);
-      expect(parseFloat(result.current.panes[0].size)).toBeCloseTo(initialTotal);
+      expect(parseFloat(result.current.panes[0]!.size)).toBeCloseTo(initialTotal);
     });
 
     it('handles invalid index gracefully', () => {
@@ -159,19 +158,19 @@ describe('usePaneManager', () => {
       const children = createChildren(2);
       const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [false, false], [], [], 'test-split'));
 
-      expect(result.current.panes[0].collapsed).toBe(false);
+      expect(result.current.panes[0]!.collapsed).toBe(false);
 
       act(() => {
         result.current.togglePane(0);
       });
 
-      expect(result.current.panes[0].collapsed).toBe(true);
+      expect(result.current.panes[0]!.collapsed).toBe(true);
 
       act(() => {
         result.current.togglePane(0);
       });
 
-      expect(result.current.panes[0].collapsed).toBe(false);
+      expect(result.current.panes[0]!.collapsed).toBe(false);
     });
 
     it('handles invalid index gracefully', () => {
@@ -197,7 +196,7 @@ describe('usePaneManager', () => {
         result.current.setPaneSize(0, '30%');
       });
 
-      expect(result.current.panes[0].size).toBe('30%');
+      expect(result.current.panes[0]!.size).toBe('30%');
     });
 
     it('handles invalid index gracefully', () => {
@@ -209,8 +208,8 @@ describe('usePaneManager', () => {
         result.current.setPaneSize(10, '30%');
       });
 
-      expect(result.current.panes[0].size).toBe('50%');
-      expect(result.current.panes[1].size).toBe('50%');
+      expect(result.current.panes[0]!.size).toBe('50%');
+      expect(result.current.panes[1]!.size).toBe('50%');
     });
   });
 
@@ -245,7 +244,7 @@ describe('usePaneManager', () => {
       });
 
       expect(result.current.panes).toHaveLength(1);
-      expect(parseFloat(result.current.panes[0].size)).toBeCloseTo(100);
+      expect(parseFloat(result.current.panes[0]!.size)).toBeCloseTo(100);
     });
   });
 
@@ -254,15 +253,15 @@ describe('usePaneManager', () => {
       const children = createChildren(3);
       const { result } = renderHook(() => usePaneManager(children, ['30%', '40%', '30%'], [], [], [], 'test-split'));
 
-      const originalFirst = result.current.panes[0].id;
-      const originalLast = result.current.panes[2].id;
+      const originalFirst = result.current.panes[0]!.id;
+      const originalLast = result.current.panes[2]!.id;
 
       act(() => {
         result.current.swapPanes(0, 2);
       });
 
-      expect(result.current.panes[0].id).toBe(originalLast);
-      expect(result.current.panes[2].id).toBe(originalFirst);
+      expect(result.current.panes[0]!.id).toBe(originalLast);
+      expect(result.current.panes[2]!.id).toBe(originalFirst);
     });
 
     it('handles same index gracefully', () => {
@@ -304,7 +303,7 @@ describe('usePaneManager', () => {
         result.current.collapsePane(0);
       });
 
-      expect(result.current.panes[0].collapsed).toBe(true);
+      expect(result.current.panes[0]!.collapsed).toBe(true);
     });
 
     it('does not collapse already collapsed pane', () => {
@@ -315,7 +314,7 @@ describe('usePaneManager', () => {
         result.current.collapsePane(0);
       });
 
-      expect(result.current.panes[0].collapsed).toBe(true);
+      expect(result.current.panes[0]!.collapsed).toBe(true);
     });
 
     it('handles direction option for left', () => {
@@ -326,8 +325,8 @@ describe('usePaneManager', () => {
         result.current.collapsePane(0, { direction: 'left' });
       });
 
-      expect(result.current.panes[0].collapsed).toBe(true);
-      expect(result.current.panes[1].flexGrow).toBe(1);
+      expect(result.current.panes[0]!.collapsed).toBe(true);
+      expect(result.current.panes[1]!.flexGrow).toBe(1);
     });
   });
 
@@ -336,13 +335,13 @@ describe('usePaneManager', () => {
       const children = createChildren(2);
       const { result } = renderHook(() => usePaneManager(children, ['50%', '50%'], [true, false], [], [], 'test-split'));
 
-      expect(result.current.panes[0].collapsed).toBe(true);
+      expect(result.current.panes[0]!.collapsed).toBe(true);
 
       act(() => {
         result.current.expandPane(0);
       });
 
-      expect(result.current.panes[0].collapsed).toBe(false);
+      expect(result.current.panes[0]!.collapsed).toBe(false);
     });
 
     it('does not expand already expanded pane', () => {
@@ -353,7 +352,7 @@ describe('usePaneManager', () => {
         result.current.expandPane(0);
       });
 
-      expect(result.current.panes[0].collapsed).toBe(false);
+      expect(result.current.panes[0]!.collapsed).toBe(false);
     });
   });
 
@@ -366,7 +365,7 @@ describe('usePaneManager', () => {
         result.current.resizePane(0, 10);
       });
 
-      expect(parseFloat(result.current.panes[0].size)).toBe(60);
+      expect(parseFloat(result.current.panes[0]!.size)).toBe(60);
     });
 
     it('respects minSize constraint', () => {
@@ -377,7 +376,7 @@ describe('usePaneManager', () => {
         result.current.resizePane(0, -50);
       });
 
-      expect(parseFloat(result.current.panes[0].size)).toBe(30);
+      expect(parseFloat(result.current.panes[0]!.size)).toBe(30);
     });
 
     it('respects maxSize constraint', () => {
@@ -388,7 +387,7 @@ describe('usePaneManager', () => {
         result.current.resizePane(0, 50);
       });
 
-      expect(parseFloat(result.current.panes[0].size)).toBe(70);
+      expect(parseFloat(result.current.panes[0]!.size)).toBe(70);
     });
   });
 });
@@ -405,8 +404,8 @@ describe('redistributeSizesProportional', () => {
     // The 20% should be distributed proportionally
     // Pane 1 (25% of remaining) should get 25% of 20% = 5%
     // Pane 2 (75% of remaining) should get 75% of 20% = 15%
-    expect(parseFloat(result[0].size)).toBeCloseTo(30);
-    expect(parseFloat(result[1].size)).toBeCloseTo(90);
+    expect(parseFloat(result[0]!.size)).toBeCloseTo(30);
+    expect(parseFloat(result[1]!.size)).toBeCloseTo(90);
   });
 
   it('handles empty panes array', () => {
@@ -422,7 +421,7 @@ describe('redistributeSizesProportional', () => {
 
     const result = redistributeSizesProportional(panes, '20%');
 
-    expect(result[0].size).toBe('200px');
-    expect(result[1].size).toBe('300px');
+    expect(result[0]!.size).toBe('200px');
+    expect(result[1]!.size).toBe('300px');
   });
 });

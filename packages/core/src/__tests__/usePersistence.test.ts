@@ -22,8 +22,8 @@ describe('usePersistence', () => {
       const { result } = renderHook(() => usePersistence(true, 'test-split', 'horizontal'));
 
       const panes: Pane[] = [
-        { id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-        { id: '2', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
+        { id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null },
+        { id: '2', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null },
       ];
 
       act(() => {
@@ -46,7 +46,7 @@ describe('usePersistence', () => {
     it('does not save when disabled', async () => {
       const { result } = renderHook(() => usePersistence(false, 'test-split', 'horizontal'));
 
-      const panes: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' }];
+      const panes: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null }];
 
       act(() => {
         result.current.save(panes);
@@ -63,9 +63,9 @@ describe('usePersistence', () => {
 
       const { result: verticalResult } = renderHook(() => usePersistence(true, 'test-split', 'vertical'));
 
-      const panesH: Pane[] = [{ id: 'h1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' }];
+      const panesH: Pane[] = [{ id: 'h1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null }];
 
-      const panesV: Pane[] = [{ id: 'v1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'vertical' }];
+      const panesV: Pane[] = [{ id: 'v1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null }];
 
       act(() => {
         horizontalResult.current.save(panesH);
@@ -94,7 +94,7 @@ describe('usePersistence', () => {
 
       const { result } = renderHook(() => usePersistence(true, 'test-split', 'horizontal'));
 
-      const panes: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' }];
+      const panes: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null }];
 
       act(() => {
         result.current.save(panes);
@@ -111,9 +111,9 @@ describe('usePersistence', () => {
     it('debounces multiple rapid calls', async () => {
       const { result } = renderHook(() => usePersistence(true, 'test-split', 'horizontal'));
 
-      const panes1: Pane[] = [{ id: '1', size: '30%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' }];
-      const panes2: Pane[] = [{ id: '1', size: '40%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' }];
-      const panes3: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' }];
+      const panes1: Pane[] = [{ id: '1', size: '30%', collapsed: false, minSize: 10, maxSize: 90, content: null }];
+      const panes2: Pane[] = [{ id: '1', size: '40%', collapsed: false, minSize: 10, maxSize: 90, content: null }];
+      const panes3: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null }];
 
       act(() => {
         result.current.save(panes1);

@@ -33,9 +33,9 @@ describe('layoutCalculations utilities', () => {
   describe('calculateTotalSize', () => {
     it('calculates total size for percentage panes', () => {
       const panes: Pane[] = [
-        { id: '1', size: '30%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-        { id: '2', size: '40%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-        { id: '3', size: '30%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
+        { id: '1', size: '30%', collapsed: false, minSize: 10, maxSize: 90, content: null },
+        { id: '2', size: '40%', collapsed: false, minSize: 10, maxSize: 90, content: null },
+        { id: '3', size: '30%', collapsed: false, minSize: 10, maxSize: 90, content: null },
       ];
 
       const result = calculateTotalSize(panes);
@@ -45,9 +45,9 @@ describe('layoutCalculations utilities', () => {
 
     it('calculates total size for pixel panes', () => {
       const panes: Pane[] = [
-        { id: '1', size: '200px', collapsed: false, minSize: 100, maxSize: 500, content: null, mode: 'horizontal' },
-        { id: '2', size: '300px', collapsed: false, minSize: 100, maxSize: 500, content: null, mode: 'horizontal' },
-        { id: '3', size: '500px', collapsed: false, minSize: 100, maxSize: 500, content: null, mode: 'horizontal' },
+        { id: '1', size: '200px', collapsed: false, minSize: 100, maxSize: 500, content: null },
+        { id: '2', size: '300px', collapsed: false, minSize: 100, maxSize: 500, content: null },
+        { id: '3', size: '500px', collapsed: false, minSize: 100, maxSize: 500, content: null },
       ];
 
       const result = calculateTotalSize(panes);
@@ -65,8 +65,8 @@ describe('layoutCalculations utilities', () => {
       const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
       const panes: Pane[] = [
-        { id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-        { id: '2', size: '500px', collapsed: false, minSize: 100, maxSize: 900, content: null, mode: 'horizontal' },
+        { id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null },
+        { id: '2', size: '500px', collapsed: false, minSize: 100, maxSize: 900, content: null },
       ];
 
       calculateTotalSize(panes);
@@ -79,8 +79,8 @@ describe('layoutCalculations utilities', () => {
   describe('validatePaneSizes', () => {
     it('validates correct pane sizes', () => {
       const panes: Pane[] = [
-        { id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-        { id: '2', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
+        { id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null },
+        { id: '2', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null },
       ];
 
       const result = validatePaneSizes(panes, 1000);
@@ -96,8 +96,8 @@ describe('layoutCalculations utilities', () => {
 
     it('detects total percentage exceeding 100%', () => {
       const panes: Pane[] = [
-        { id: '1', size: '60%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-        { id: '2', size: '60%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
+        { id: '1', size: '60%', collapsed: false, minSize: 10, maxSize: 90, content: null },
+        { id: '2', size: '60%', collapsed: false, minSize: 10, maxSize: 90, content: null },
       ];
 
       const result = validatePaneSizes(panes, 1000);
@@ -107,9 +107,9 @@ describe('layoutCalculations utilities', () => {
 
     it('allows small floating point errors', () => {
       const panes: Pane[] = [
-        { id: '1', size: '33.33%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-        { id: '2', size: '33.33%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-        { id: '3', size: '33.34%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
+        { id: '1', size: '33.33%', collapsed: false, minSize: 10, maxSize: 90, content: null },
+        { id: '2', size: '33.33%', collapsed: false, minSize: 10, maxSize: 90, content: null },
+        { id: '3', size: '33.34%', collapsed: false, minSize: 10, maxSize: 90, content: null },
       ];
 
       const result = validatePaneSizes(panes, 1000);
@@ -117,7 +117,7 @@ describe('layoutCalculations utilities', () => {
     });
 
     it('detects negative minSize', () => {
-      const panes: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: -10, maxSize: 90, content: null, mode: 'horizontal' }];
+      const panes: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: -10, maxSize: 90, content: null }];
 
       const result = validatePaneSizes(panes, 1000);
       expect(result.valid).toBe(false);
@@ -125,7 +125,7 @@ describe('layoutCalculations utilities', () => {
     });
 
     it('detects maxSize less than minSize', () => {
-      const panes: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: 80, maxSize: 20, content: null, mode: 'horizontal' }];
+      const panes: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: 80, maxSize: 20, content: null }];
 
       const result = validatePaneSizes(panes, 1000);
       expect(result.valid).toBe(false);
@@ -133,7 +133,7 @@ describe('layoutCalculations utilities', () => {
     });
 
     it('detects maxSize exceeding 100%', () => {
-      const panes: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 120, content: null, mode: 'horizontal' }];
+      const panes: Pane[] = [{ id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 120, content: null }];
 
       const result = validatePaneSizes(panes, 1000);
       expect(result.valid).toBe(false);
@@ -176,7 +176,6 @@ describe('layoutCalculations utilities', () => {
         minSize: 10,
         maxSize: 90,
         content: null,
-        mode: 'horizontal',
       };
 
       const result = calculateFlexValues(pane, true);
@@ -191,7 +190,6 @@ describe('layoutCalculations utilities', () => {
         minSize: 10,
         maxSize: 90,
         content: null,
-        mode: 'horizontal',
       };
 
       const result = calculateFlexValues(pane, false);
@@ -206,7 +204,6 @@ describe('layoutCalculations utilities', () => {
         minSize: 100,
         maxSize: 900,
         content: null,
-        mode: 'horizontal',
       };
 
       const result = calculateFlexValues(pane, false);
@@ -239,59 +236,59 @@ describe('layoutCalculations utilities', () => {
   describe('normalizePaneSizes', () => {
     it('normalizes panes that sum to more than 100%', () => {
       const panes: Pane[] = [
-        { id: '1', size: '60%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-        { id: '2', size: '60%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
+        { id: '1', size: '60%', collapsed: false, minSize: 10, maxSize: 90, content: null },
+        { id: '2', size: '60%', collapsed: false, minSize: 10, maxSize: 90, content: null },
       ];
 
       const result = normalizePaneSizes(panes);
-      expect(parseFloat(result[0].size)).toBeCloseTo(50);
-      expect(parseFloat(result[1].size)).toBeCloseTo(50);
+      expect(parseFloat(result[0]!.size)).toBeCloseTo(50);
+      expect(parseFloat(result[1]!.size)).toBeCloseTo(50);
     });
 
     it('normalizes panes that sum to less than 100%', () => {
       const panes: Pane[] = [
-        { id: '1', size: '30%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-        { id: '2', size: '30%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
+        { id: '1', size: '30%', collapsed: false, minSize: 10, maxSize: 90, content: null },
+        { id: '2', size: '30%', collapsed: false, minSize: 10, maxSize: 90, content: null },
       ];
 
       const result = normalizePaneSizes(panes);
-      expect(parseFloat(result[0].size)).toBeCloseTo(50);
-      expect(parseFloat(result[1].size)).toBeCloseTo(50);
+      expect(parseFloat(result[0]!.size)).toBeCloseTo(50);
+      expect(parseFloat(result[1]!.size)).toBeCloseTo(50);
     });
 
     it('does not modify panes already at 100%', () => {
       const panes: Pane[] = [
-        { id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-        { id: '2', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
+        { id: '1', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null },
+        { id: '2', size: '50%', collapsed: false, minSize: 10, maxSize: 90, content: null },
       ];
 
       const result = normalizePaneSizes(panes);
-      expect(result[0].size).toBe('50%');
-      expect(result[1].size).toBe('50%');
+      expect(result[0]!.size).toBe('50%');
+      expect(result[1]!.size).toBe('50%');
     });
 
     it('does not modify pixel panes', () => {
       const panes: Pane[] = [
-        { id: '1', size: '500px', collapsed: false, minSize: 100, maxSize: 900, content: null, mode: 'horizontal' },
-        { id: '2', size: '500px', collapsed: false, minSize: 100, maxSize: 900, content: null, mode: 'horizontal' },
+        { id: '1', size: '500px', collapsed: false, minSize: 100, maxSize: 900, content: null },
+        { id: '2', size: '500px', collapsed: false, minSize: 100, maxSize: 900, content: null },
       ];
 
       const result = normalizePaneSizes(panes);
-      expect(result[0].size).toBe('500px');
-      expect(result[1].size).toBe('500px');
+      expect(result[0]!.size).toBe('500px');
+      expect(result[1]!.size).toBe('500px');
     });
 
     it('handles mixed units correctly', () => {
       const panes: Pane[] = [
-        { id: '1', size: '30%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
-        { id: '2', size: '500px', collapsed: false, minSize: 100, maxSize: 900, content: null, mode: 'horizontal' },
-        { id: '3', size: '30%', collapsed: false, minSize: 10, maxSize: 90, content: null, mode: 'horizontal' },
+        { id: '1', size: '30%', collapsed: false, minSize: 10, maxSize: 90, content: null },
+        { id: '2', size: '500px', collapsed: false, minSize: 100, maxSize: 900, content: null },
+        { id: '3', size: '30%', collapsed: false, minSize: 10, maxSize: 90, content: null },
       ];
 
       const result = normalizePaneSizes(panes);
-      expect(parseFloat(result[0].size)).toBeCloseTo(50);
-      expect(result[1].size).toBe('500px');
-      expect(parseFloat(result[2].size)).toBeCloseTo(50);
+      expect(parseFloat(result[0]!.size)).toBeCloseTo(50);
+      expect(result[1]!.size).toBe('500px');
+      expect(parseFloat(result[2]!.size)).toBeCloseTo(50);
     });
   });
 
@@ -303,7 +300,6 @@ describe('layoutCalculations utilities', () => {
       minSize: 20,
       maxSize: 80,
       content: null,
-      mode: 'horizontal',
     };
 
     it('allows resize within bounds', () => {
